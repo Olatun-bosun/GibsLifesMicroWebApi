@@ -1,13 +1,16 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 using Universal.Api.Data.Repositories;
 
 namespace Universal.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     [ApiConventionType(typeof(DefaultApiConventions))]
     [Produces("application/json")]
     public class SecureControllerBase : ControllerBase
@@ -18,6 +21,12 @@ namespace Universal.Api.Controllers
         {
             _repository = repository;
         }
+
+        protected string GetCurrUserPartyId()
+        {
+            return User.FindFirst(c => c.Type == ClaimTypes.Name).Value;
+        }
+
         protected ActionResult ExceptionResult(Exception ex)
         {
             if (ex is null)

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Universal.Api.Contracts.V1;
 using Universal.Api.Data.Repositories;
@@ -10,7 +9,6 @@ using Universal.Api.Data.Repositories;
 namespace Universal.Api.Controllers
 {
     [Route("api/[controller]")]
-    [Authorize]
     public class ClaimsController : SecureControllerBase
     {
         public ClaimsController(IRepository repository) : base(repository)

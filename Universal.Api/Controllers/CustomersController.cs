@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +9,6 @@ using Universal.Api.Data.Repositories;
 namespace Universal.Api.Controllers
 {
     [Route("api/[controller]")]
-    [Authorize]
     public class CustomersController : SecureControllerBase
     {
         public CustomersController(IRepository repository) : base(repository)

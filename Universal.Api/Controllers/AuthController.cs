@@ -13,6 +13,7 @@ using static Universal.Api.Contracts.SessionContract;
 namespace Universal.Api.Controllers
 {
     [Route("api/[controller]")]
+    [AllowAnonymous]
     public class AuthController : SecureControllerBase
     {
         private readonly Settings _settings;
@@ -36,7 +37,7 @@ namespace Universal.Api.Controllers
         /// </remarks>
         /// <param name="loginCreds"></param>
         /// <returns>A jwt token and it's expiry time.</returns>
-        [HttpPost, AllowAnonymous]
+        [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public ActionResult<LoginResponse> Login(LoginRequest loginCreds)
@@ -51,7 +52,7 @@ namespace Universal.Api.Controllers
                     return Problem("SID or password is incorrect.", statusCode: 400);
 
                 string token = CreateToken(_settings.JwtSecret,
-                                       _settings.JwtExpiresIn, loginCreds.sid);
+                                       _settings.JwtExpiresIn, loginCreds.sid, "test");
 
                 var response = new LoginResponse
                 {
@@ -61,7 +62,7 @@ namespace Universal.Api.Controllers
                 };
                 return Ok(response);
 
-                string CreateToken(string secret, int expiresIn, string username)
+                string CreateToken(string secret, int expiresIn, string username, string partyId)
                 {
                     var key = Encoding.UTF8.GetBytes(secret);
                     var tokenHandler = new JwtSecurityTokenHandler();
@@ -70,6 +71,7 @@ namespace Universal.Api.Controllers
                         Subject = new ClaimsIdentity(new Claim[]
                         {
                              new Claim(ClaimTypes.Email, username),
+                             new Claim(ClaimTypes.Name, partyId),
                              new Claim(ClaimTypes.Role, "Agent")
                         }),
                         Expires = DateTime.UtcNow.AddSeconds(expiresIn),

@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -10,7 +8,6 @@ using Universal.Api.Data.Repositories;
 namespace Universal.Api.Controllers
 {
     [Route("api/[controller]")]
-    [Authorize]
     public class DocumentsController : SecureControllerBase
     {
         public DocumentsController(IRepository repository) : base(repository)

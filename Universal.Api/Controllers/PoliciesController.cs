@@ -5,12 +5,10 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using Universal.Api.Controllers;
 using Universal.Api.Data.Repositories;
-using Microsoft.AspNetCore.Authorization;
 
 namespace Universal.Api.Contracts.V1
 {
     [Route("api/[controller]")]
-    [Authorize]
     public class PoliciesController : SecureControllerBase
     {
         public PoliciesController(IRepository repository) : base(repository)
@@ -28,7 +26,7 @@ namespace Universal.Api.Contracts.V1
         {
             try
             {
-                var policy = await _repository.PolicySelectAsync(filter);
+                var policy = await _repository.PolicySelectAsync(filter, GetCurrUserPartyId());
                 return policy.Select((O => new PolicyDto(O))).ToList();
             }
             catch (Exception ex)

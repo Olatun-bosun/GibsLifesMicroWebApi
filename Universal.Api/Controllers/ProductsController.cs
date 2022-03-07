@@ -5,12 +5,10 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using Universal.Api.Data.Repositories;
 using Universal.Api.Contracts.V1;
-using Microsoft.AspNetCore.Authorization;
 
 namespace Universal.Api.Controllers
 {
     [Route("api/[controller]")]
-    [Authorize]
     public class ProductsController : SecureControllerBase
     {
         public ProductsController(IRepository repository) : base(repository)

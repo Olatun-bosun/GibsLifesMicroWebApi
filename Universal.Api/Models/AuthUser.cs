@@ -9,6 +9,7 @@ namespace Universal.Api.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int CompanyId { get; set; }
         public string CompanyName { get; set; }
+        public string PartyID { get; set; }
         public string Password { get; set; }
         public string Status { get; set; }
         public string Remarks { get; set; }

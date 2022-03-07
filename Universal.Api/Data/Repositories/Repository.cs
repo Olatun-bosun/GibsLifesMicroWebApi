@@ -15,7 +15,7 @@ namespace Universal.Api.Data.Repositories
         Task<List<Claim>> ClaimsSelectAsync(FilterPaging filter);
         Task<List<Party>> PartySelectAsync(string searchText, int pageNo, int pageSize);
         void PolicyDelete(string policyNo);
-        Task<List<Policy>> PolicySelectAsync(FilterPaging filter);
+        Task<List<Policy>> PolicySelectAsync(FilterPaging filter, string partyId);
         Policy PolicySelectThis(string policyNo);
         string PartyCreate(AgentDto agentDto);
         SubRisk SubRiskSelectThis(string subRiskID);
@@ -204,12 +204,18 @@ namespace Universal.Api.Data.Repositories
 
 
 
-        public async Task<List<Policy>> PolicySelectAsync(FilterPaging filter)
+        public async Task<List<Policy>> PolicySelectAsync(FilterPaging filter, string partyId)
         {
             if (filter == null)
                 filter = new FilterPaging();
 
             var query = _db.Policies.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(partyId))
+            {
+                query = query.Where(p => p.PartyID == partyId);
+            }
+
             if (filter.CanSearchDate)
             {
                 query = query.Where(x => (x.TransDate >= filter.DateFrom) &&
