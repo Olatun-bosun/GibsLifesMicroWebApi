@@ -11,7 +11,12 @@ namespace Universal.Api.Contracts.V1
 
         public CustomerDto(Models.InsuredClient customer)
         {
-            Id = customer.InsuredID;
+            //todo
+            var splittedArray = customer.ApiId.Split('/');
+
+
+            CustomerId = splittedArray[1];
+            AgentId = splittedArray[0];
             FirstName = customer.FirstName;
             LastName = customer.Surname;
             OtherName = customer.OtherNames;
@@ -20,9 +25,13 @@ namespace Universal.Api.Contracts.V1
             MobilePhone = customer.MobilePhone;
             Email = customer.Email;
             Industry = customer.Occupation;
+            Status = customer.ApiStatus;
+
         }
 
-        public string Id { get; set; }
+        public string CustomerId { get; set; }
+        [Required]
+        public string AgentId { get; set; }
         [Required]
         public string FirstName { get; set; }
         [Required]
@@ -37,20 +46,21 @@ namespace Universal.Api.Contracts.V1
         public string Industry { get; set; }
         [Required]
         public string Email { get; set; }
+        public string Status { get; set; }
         public string StateOfOrigin { get; set; }
     }
 
-    public class InsuredDto : CustomerDto
-    {
-        public string InsuredType { get; set; }
-        public string Title { get; set; }
-        public string InsuredCode { get; set; }
-        public string AddressProof { get; set; }
-        public DateTime DateOfBirth { get; set; }
-        public string Identification { get; set; }
-        public string Nationality { get; set; }
-        public string LocalGovtArea { get; set; }
-        public string RiskProfiling { get; set; }
-        public string IdentificationNo { get; set; }
-    }
+    //public class InsuredDto : CustomerDto
+    //{
+    //    public string InsuredType { get; set; }
+    //    public string Title { get; set; }
+    //    public string InsuredCode { get; set; }
+    //    public string AddressProof { get; set; }
+    //    public DateTime DateOfBirth { get; set; }
+    //    public string Identification { get; set; }
+    //    public string Nationality { get; set; }
+    //    public string LocalGovtArea { get; set; }
+    //    public string RiskProfiling { get; set; }
+    //    public string IdentificationNo { get; set; }
+    //}
 }

@@ -11,7 +11,7 @@ namespace Universal.Api.Controllers
     [Route("api/[controller]")]
     public class ClaimsController : SecureControllerBase
     {
-        public ClaimsController(IRepository repository) : base(repository)
+        public ClaimsController(Repository repository) : base(repository)
         {
         }
 
@@ -25,7 +25,7 @@ namespace Universal.Api.Controllers
         {
             try
             {
-                var claims = await _repository.ClaimsSelectAsync(filter);
+                var claims = await _repository.ClaimsSelectAsync(filter, GetCurrUserPartyId());
                 return claims.Select((c => new ClaimDto(c))).ToList();
             }
             catch (Exception ex)

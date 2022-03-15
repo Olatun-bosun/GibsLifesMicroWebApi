@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 using Universal.Api.Data.Repositories;
 using Universal.Api.Contracts.V1;
 using Microsoft.AspNetCore.Authorization;
+using Universal.Api.Contracts;
+using Microsoft.AspNetCore.Http;
 
 namespace Universal.Api.Controllers
 {
@@ -13,8 +15,65 @@ namespace Universal.Api.Controllers
     [Authorize(Roles = "Admin")]
     public class AgentsController : SecureControllerBase
     {
-        public AgentsController(IRepository repository) : base(repository)
+        private readonly Settings _settings;
+        public AgentsController(Repository repository, Settings settings) : base(repository)
         {
+            _settings = settings;
+        }
+
+        ///<summary>
+        /// Creates a jwt token that can be used to access secured endpoints of the api.
+        /// </summary>
+        /// <remarks>
+        /// Sample request:
+        ///
+        ///     POST /Auth
+        ///     {
+        ///        "sid": "GibsUser1",
+        ///        "token": "gibs117#"
+        ///     }
+        ///
+        /// </remarks>
+        /// <param name="loginCreds"></param>
+        /// <returns>A jwt token and it's expiry time.</returns>
+        [HttpPost, AllowAnonymous]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public ActionResult<AgentDto> AgentLogin(LoginRequest loginCreds)
+        {
+            try
+            {
+                if (loginCreds == null)
+                    return Problem("request body is null", statusCode: 400);
+
+                try
+                {
+                    var validUser = _repository.AuthenticateAgent(loginCreds.sid, loginCreds.token);
+                    if (validUser == null)
+                        return Problem("SID or password is incorrect.", statusCode: 400);
+
+                    string token = CreateToken(_settings.JwtSecret,
+                                           _settings.JwtExpiresIn, loginCreds.sid, "test");
+
+                    var response = new LoginResponse
+                    {
+                        TokenType = "Bearer",
+                        ExpiresIn = _settings.JwtExpiresIn,
+                        AccessToken = token
+                    };
+                    return Ok(response);
+
+                    
+                }
+                catch (Exception ex)
+                {
+                    return ExceptionResult(ex);
+                }
+            }
+            catch (Exception ex)
+            {
+                return ExceptionResult(ex);
+            }
         }
 
         /// <summary>
@@ -27,7 +86,7 @@ namespace Universal.Api.Controllers
         {
             try
             {
-                var agents = await _repository.PartySelectAsync(searchText, pageNo, pageSize);
+                var agents = await _repository.PartySelectAsync(GetCurrUserPartyId(), searchText, pageNo, pageSize);
                 return Ok(agents.Select(a => new AgentDto(a)).ToList());
             }
             catch (Exception ex)
@@ -91,10 +150,10 @@ namespace Universal.Api.Controllers
         {
             try
             {
-                agentDetails.AgentID = _repository.PartyCreate(agentDetails);
+                var party = _repository.PartyCreate(agentDetails);
                 var uri = new Uri($"{Request.Path}/{ agentDetails.AgentID}", UriKind.Relative);
 
-                return Created(uri, agentDetails);
+                return Created(uri, new AgentDto(party));
             }
             catch (Exception ex)
             {

@@ -11,7 +11,7 @@ namespace Universal.Api.Contracts.V1
 
         public AgentDto(Models.Party agent)
         {
-            AgentID = agent.PartyID;
+            AgentID = agent.ApiId;
             AgentName = agent.Party1;
             Address = agent.Address;
             Telephone = agent.LandPhone;
@@ -22,8 +22,10 @@ namespace Universal.Api.Contracts.V1
             InsContact = agent.InsContact;
             FinContact = agent.FinContact;
             Remarks = agent.Remarks;
+            Status = agent.ApiStatus;
         }
 
+        [Required]
         public string AgentID { get; set; }
         [Required]
         public string AgentName { get; set; }
@@ -42,5 +44,6 @@ namespace Universal.Api.Contracts.V1
         public string InsContact { get; set; }
         public string FinContact { get; set; }
         public string Remarks { get; set; }
+        public string Status { get; set; }
     }
 }

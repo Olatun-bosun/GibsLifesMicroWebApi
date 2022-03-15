@@ -11,7 +11,7 @@ namespace Universal.Api.Controllers
     [Route("api/[controller]")]
     public class ProductsController : SecureControllerBase
     {
-        public ProductsController(IRepository repository) : base(repository)
+        public ProductsController(Repository repository) : base(repository)
         {
         }
 

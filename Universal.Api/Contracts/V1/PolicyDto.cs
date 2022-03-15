@@ -28,11 +28,13 @@ namespace Universal.Api.Contracts.V1
             Insured.Email = policy.InsEmail;
             Insured.Industry = policy.InsOccupation;
             Insured.StateOfOrigin = policy.InsStateID;
+            Insured.CustomerId = policy.InsuredID;
         }
 
         public string PolicyNo { get; set; }
         public string ProductID { get; set; }
         public string AgentID { get; set; }
+        public string CustomerID { get; set; }
         public DateTime EntryDate { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }

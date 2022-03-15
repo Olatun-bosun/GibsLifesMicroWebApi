@@ -10,7 +10,7 @@ namespace Universal.Api.Controllers
     [Route("api/[controller]")]
     public class DocumentsController : SecureControllerBase
     {
-        public DocumentsController(IRepository repository) : base(repository)
+        public DocumentsController(Repository repository) : base(repository)
         {
         }
 

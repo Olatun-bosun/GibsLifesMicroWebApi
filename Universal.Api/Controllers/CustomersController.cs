@@ -1,8 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Universal.Api.Contracts;
 using Universal.Api.Contracts.V1;
 using Universal.Api.Data.Repositories;
 
@@ -11,8 +14,50 @@ namespace Universal.Api.Controllers
     [Route("api/[controller]")]
     public class CustomersController : SecureControllerBase
     {
-        public CustomersController(IRepository repository) : base(repository)
+        private readonly Settings _settings;
+        public CustomersController(Repository repository, Settings settings) : base(repository)
         {
+            _settings = settings;
+        }
+
+        [HttpPost("{agentId}"), AllowAnonymous]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public ActionResult<AgentDto> CustomerLogin(LoginRequest loginCreds, string agentId)
+        {
+            try
+            {
+                if (loginCreds == null)
+                    return Problem("request body is null", statusCode: 400);
+
+                try
+                {
+                    var validUser = _repository.AuthenticateCustomer(agentId, loginCreds.sid, loginCreds.token);
+                    if (validUser == null)
+                        return Problem("SID or password is incorrect.", statusCode: 400);
+
+                    string token = CreateToken(_settings.JwtSecret,
+                                           _settings.JwtExpiresIn, loginCreds.sid, "test");
+
+                    var response = new LoginResponse
+                    {
+                        TokenType = "Bearer",
+                        ExpiresIn = _settings.JwtExpiresIn,
+                        AccessToken = token
+                    };
+                    return Ok(response);
+
+
+                }
+                catch (Exception ex)
+                {
+                    return ExceptionResult(ex);
+                }
+            }
+            catch (Exception ex)
+            {
+                return ExceptionResult(ex);
+            }
         }
 
         /// <summary>
@@ -59,13 +104,14 @@ namespace Universal.Api.Controllers
         }
 
         /// <summary>
-        /// Create an Agent.
+        /// Create a customer.
         /// </summary>
         /// <remarks>
         /// Sample request:
         ///
         ///     POST /Customer
         ///     {
+        ///         "agentId": "string",
         ///         "firstName": "string",
         ///         "lastName": "string",
         ///         "otherName": "string",
@@ -74,21 +120,21 @@ namespace Universal.Api.Controllers
         ///         "telephone": "string",
         ///         "email": "string",
         ///         "industry": "string",
+        ///         "stateOfOrigin": "string"
         ///     }
         ///
         /// </remarks>
         /// <param name="customerDetails"></param>
         /// <returns>A newly created customer</returns>
         [HttpPost]
-        public ActionResult<AgentDto> Post(AgentDto customerDetails)
+        public ActionResult<CustomerDto> Post(CustomerDto customerDetails)
         {
             try
             {
-                throw new NotImplementedException();
-                //agentDetails.AgentID = _repository.PartyCreate(customerDetails);
-                //var uri = new Uri($"{Request.Path}/{ customerDetails.AgentID}", UriKind.Relative);
+                var customer = _repository.CustomerCreate(customerDetails);
+                var uri = new Uri($"{Request.Path}/{ customerDetails.CustomerId}", UriKind.Relative);
 
-                //return Created(uri, customerDetails);
+                return Created(uri, new CustomerDto(customer));
             }
             catch (Exception ex)
             {

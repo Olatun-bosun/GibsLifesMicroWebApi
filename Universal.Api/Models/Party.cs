@@ -7,6 +7,8 @@ namespace Universal.Api.Models
     public class Party
     {
         public string PartyID { get; set; }
+        public string ApiId { get; set; }
+        public string ApiPassword { get; set; }
 
         public string StateID { get; set; }
 
@@ -36,6 +38,7 @@ namespace Universal.Api.Models
         public Decimal? ComRate { get; set; }
 
         public string Remarks { get; set; }
+        public string ApiStatus { get; set; }
 
         public byte? Deleted { get; set; }
 

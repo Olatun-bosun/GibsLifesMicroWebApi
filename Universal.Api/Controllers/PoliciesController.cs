@@ -11,7 +11,7 @@ namespace Universal.Api.Contracts.V1
     [Route("api/[controller]")]
     public class PoliciesController : SecureControllerBase
     {
-        public PoliciesController(IRepository repository) : base(repository)
+        public PoliciesController(Repository repository) : base(repository)
         {
         }
 
@@ -593,8 +593,7 @@ namespace Universal.Api.Contracts.V1
         {
             try
             {
-                //this.CheckApiKey(ApiKey);
-                //var policy = _repository.PolicyCreate(policyDto, sectionsDto);
+                var policy = _repository.PolicyCreate(policyDto, sectionsDto);
 
                 //var to = policy.InsEmail;
                 //var cc = "jelamah@cornerstone.com.ng";
@@ -603,9 +602,9 @@ namespace Universal.Api.Contracts.V1
 
                 //Documents.Certificate.SendEmailAsync(to, cc, bcc, pdf);
 
-                //var uri = new Uri($"{Request.Path}/{policy.PolicyNo}", UriKind.Relative);
+                var uri = new Uri($"{Request.Path}/{policy.PolicyNo}", UriKind.Relative);
 
-                //return Created(uri, policy);
+                return Created(uri, policy);
 
                 throw new NotImplementedException();
             }
