@@ -9,20 +9,19 @@ namespace Universal.Api.Contracts.V1
         {
         }
 
-        public AgentDto(Models.Party agent)
+        public AgentDto(Models.Party party)
         {
-            AgentID = agent.ApiId;
-            AgentName = agent.Party1;
-            Address = agent.Address;
-            Telephone = agent.LandPhone;
-            MobilePhone = agent.mobilePhone;
-            Email = agent.Email;
-            CommRate = (decimal)agent.ComRate;
-            CreditLimit = (decimal)agent.CreditLimit;
-            InsContact = agent.InsContact;
-            FinContact = agent.FinContact;
-            Remarks = agent.Remarks;
-            Status = agent.ApiStatus;
+            AgentID = party.ApiId;
+            AgentName = party.Party1;
+            Address = party.Address;
+            PhoneLine2 = party.LandPhone;
+            PhoneLine1 = party.mobilePhone;
+            Email = party.Email;
+            //CommissionRate = (decimal)party.ComRate;
+            //CreditLimit = (decimal)party.CreditLimit;
+            InsuranceContact = party.InsContact;
+            //FinancialContact = party.FinContact;
+            Remarks = party.Remarks;
         }
 
         [Required]
@@ -32,18 +31,16 @@ namespace Universal.Api.Contracts.V1
         [Required]
         public string Address { get; set; }
         [Required]
-        public string MobilePhone { get; set; }
+        public string PhoneLine1 { get; set; }
         [Required]
-        public string Telephone { get; set; }
+        public string PhoneLine2 { get; set; }
         [Required]
         public string Email { get; set; }
-        public decimal CommRate { get; set; }
-        public decimal CreditLimit { get; set; }
-        public string RPCNumber { get; set; }
-        public string Website { get; set; }
-        public string InsContact { get; set; }
-        public string FinContact { get; set; }
+        //public decimal CommissionRate { get; set; }
+        //public decimal CreditLimit { get; set; }
+        //public string RPCNumber { get; set; }
+        public string InsuranceContact { get; set; }
+        //public string FinancialContact { get; set; }
         public string Remarks { get; set; }
-        public string Status { get; set; }
     }
 }

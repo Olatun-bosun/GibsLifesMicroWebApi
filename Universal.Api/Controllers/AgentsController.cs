@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace Universal.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     [Authorize(Roles = "Admin")]
     public class AgentsController : SecureControllerBase
     {
@@ -36,10 +36,10 @@ namespace Universal.Api.Controllers
         /// </remarks>
         /// <param name="loginCreds"></param>
         /// <returns>A jwt token and it's expiry time.</returns>
-        [HttpPost, AllowAnonymous]
+        [HttpPost("Login"), AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult<AgentDto> AgentLogin(LoginRequest loginCreds)
+        public ActionResult<LoginResponse> AgentLogin(LoginRequest loginCreds)
         {
             try
             {
@@ -48,12 +48,12 @@ namespace Universal.Api.Controllers
 
                 try
                 {
-                    var validUser = _repository.AuthenticateAgent(loginCreds.sid, loginCreds.token);
+                    var validUser = _repository.AuthenticateAgent(loginCreds.id, loginCreds.password);
                     if (validUser == null)
                         return Problem("SID or password is incorrect.", statusCode: 400);
 
                     string token = CreateToken(_settings.JwtSecret,
-                                           _settings.JwtExpiresIn, loginCreds.sid, "test");
+                                           _settings.JwtExpiresIn, loginCreds.id, "Agent");
 
                     var response = new LoginResponse
                     {
@@ -86,7 +86,7 @@ namespace Universal.Api.Controllers
         {
             try
             {
-                var agents = await _repository.PartySelectAsync(GetCurrUserPartyId(), searchText, pageNo, pageSize);
+                var agents = await _repository.PartySelectAsync(GetCurrUserId(), searchText, pageNo, pageSize);
                 return Ok(agents.Select(a => new AgentDto(a)).ToList());
             }
             catch (Exception ex)
@@ -151,6 +151,7 @@ namespace Universal.Api.Controllers
             try
             {
                 var party = _repository.PartyCreate(agentDetails);
+                _repository.SaveChanges();
                 var uri = new Uri($"{Request.Path}/{ agentDetails.AgentID}", UriKind.Relative);
 
                 return Created(uri, new AgentDto(party));

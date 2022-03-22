@@ -8,7 +8,7 @@ using Universal.Api.Data.Repositories;
 
 namespace Universal.Api.Contracts.V1
 {
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     public class PoliciesController : SecureControllerBase
     {
         public PoliciesController(Repository repository) : base(repository)
@@ -26,7 +26,7 @@ namespace Universal.Api.Contracts.V1
         {
             try
             {
-                var policy = await _repository.PolicySelectAsync(filter, GetCurrUserPartyId());
+                var policy = await _repository.PolicySelectAsync(filter, GetCurrUserId());
                 return policy.Select((O => new PolicyDto(O))).ToList();
             }
             catch (Exception ex)
@@ -74,20 +74,20 @@ namespace Universal.Api.Contracts.V1
         /// <param name="policyNo"></param>
         /// <param name="remarks"></param>
         /// <returns>remarks.</returns>
-        [HttpDelete("{policyNo}")]
-        public ActionResult<string> TerminatePolicy(string policyNo, string remarks)
-        {
-            try
-            {
-                //this.CheckApiKey(ApiKey);
-                //_repository.PolicyDelete(policyNo);
-                return Ok(remarks);
-            }
-            catch (Exception ex)
-            {
-                return ExceptionResult(ex);
-            }
-        }
+        //[HttpDelete("{policyNo}")]
+        //public ActionResult<string> TerminatePolicy(string policyNo, string remarks)
+        //{
+        //    try
+        //    {
+        //        //this.CheckApiKey(ApiKey);
+        //        //_repository.PolicyDelete(policyNo);
+        //        return Ok(remarks);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return ExceptionResult(ex);
+        //    }
+        //}
 
         //[HttpGet("quote")]
         //public ActionResult<PolicyDto> QuotePolicy()
@@ -589,24 +589,24 @@ namespace Universal.Api.Contracts.V1
             return NewPolicy(policyDto, policyDto.PolicySection);
         }
 
-        private ActionResult<PolicyDto> NewPolicy(PolicyDto policyDto, IEnumerable<PolicySectionDto> sectionsDto)
+        private ActionResult<PolicyDto> NewPolicy(PolicyDto policyDto, IEnumerable<PolicyDetailDto> sectionsDto)
         {
             try
             {
-                var policy = _repository.PolicyCreate(policyDto, sectionsDto);
-
-                //var to = policy.InsEmail;
-                //var cc = "jelamah@cornerstone.com.ng";
-                //var bcc = "oseniwasiu@inttecktechnologies.com";
-                //var pdf = Documents.Certificate.ToPdfStream(policy);
-
-                //Documents.Certificate.SendEmailAsync(to, cc, bcc, pdf);
-
-                var uri = new Uri($"{Request.Path}/{policy.PolicyNo}", UriKind.Relative);
-
-                return Created(uri, policy);
-
                 throw new NotImplementedException();
+                //var policy = _repository.PolicyCreate(policyDto, sectionsDto);
+                //_repository.SaveChanges();
+
+                ////var to = policy.InsEmail;
+                ////var cc = "jelamah@cornerstone.com.ng";
+                ////var bcc = "oseniwasiu@inttecktechnologies.com";
+                ////var pdf = Documents.Certificate.ToPdfStream(policy);
+
+                ////Documents.Certificate.SendEmailAsync(to, cc, bcc, pdf);
+
+                //var uri = new Uri($"{Request.Path}/{policy.PolicyNo}", UriKind.Relative);
+
+                //return Created(uri, policy);
             }
             catch (Exception ex)
             {

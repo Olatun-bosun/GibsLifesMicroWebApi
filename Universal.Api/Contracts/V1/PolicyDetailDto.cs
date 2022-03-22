@@ -2,17 +2,17 @@
 
 namespace Universal.Api.Contracts.V1
 {
-    public class PolicySectionDto
+    public class PolicyDetailDto
     {
-        public long PolicySectionID { get; set; }
-        public string SectionID { get; set; }
-        public string SectionName { get; set; }
-        public decimal SectionSumInsured { get; set; }
-        public decimal SectionPremium { get; set; }
-        public string RiskLocation { get; set; }
+        public DateTime EntryDate { get; set; }
+        public decimal SumInsured { get; set; }
+        public decimal GrossPremium { get; set; }
+
+        public string RiskID { get; set; }
+
     }
 
-    public class AviationDto : PolicySectionDto
+    public class AviationDto : PolicyDetailDto
     {
         public string Interest { get; set; }
         public string AircraftID { get; set; }
@@ -43,7 +43,7 @@ namespace Universal.Api.Contracts.V1
         public decimal NetAggregatePremium { get; set; }
     }
 
-    public class BondDto : PolicySectionDto
+    public class BondDto : PolicyDetailDto
     {
         public int OurShare { get; set; }
         public string PrincipalName { get; set; }
@@ -75,7 +75,7 @@ namespace Universal.Api.Contracts.V1
         public string OurSharePremium { get; set; }
     }
 
-    public class EngineeringDto : PolicySectionDto
+    public class EngineeringDto : PolicyDetailDto
     {
         public int OurShare { get; set; }
         public string ContractorName { get; set; }
@@ -102,9 +102,9 @@ namespace Universal.Api.Contracts.V1
         public string MaintenanceTo { get; set; }
     }
 
-    public class FireDto : PolicySectionDto
+    public class FireDto : PolicyDetailDto
     {
-        public decimal GrossPremium { get; set; }
+        //public decimal GrossPremium { get; set; } // already inherited.
         public int Multiplier { get; set; }
         public double WarLoading { get; set; }
         public string RiskSMIID { get; set; }
@@ -115,7 +115,7 @@ namespace Universal.Api.Contracts.V1
         public decimal OurSharePremium { get; set; }
     }
 
-    public class GeneralAccidentDto : PolicySectionDto
+    public class GeneralAccidentDto : PolicyDetailDto
     {
         public int OurShare { get; set; }
         public string ContractorName { get; set; }
@@ -137,7 +137,7 @@ namespace Universal.Api.Contracts.V1
         public decimal OurSharePremium { get; set; }
     }
 
-    public class MarineCargoDto : PolicySectionDto
+    public class MarineCargoDto : PolicyDetailDto
     {
         public string VesselType { get; set; }
         public string FromCountryID { get; set; }
@@ -156,7 +156,7 @@ namespace Universal.Api.Contracts.V1
         public double OtherDiscountRate { get; set; }
     }
 
-    public class MarineHullDto : PolicySectionDto
+    public class MarineHullDto : PolicyDetailDto
     {
         public int OurShare { get; set; }
         public string VesselStateID { get; set; }
@@ -184,7 +184,7 @@ namespace Universal.Api.Contracts.V1
         public decimal OurSharePremium { get; set; }
     }
 
-    public class MotorDto : PolicySectionDto
+    public class MotorDto : PolicyDetailDto
     {
         public string CertificateTypeID { get; set; }
         public string DeclarationNo { get; set; }
@@ -219,7 +219,7 @@ namespace Universal.Api.Contracts.V1
         public int BusinessProportion { get; set; }
     }
 
-    public class OilGasDto : PolicySectionDto
+    public class OilGasDto : PolicyDetailDto
     {
         public int OurShare { get; set; }
         public string OrderHereon { get; set; }

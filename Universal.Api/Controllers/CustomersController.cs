@@ -11,7 +11,8 @@ using Universal.Api.Data.Repositories;
 
 namespace Universal.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
+    [Authorize(Roles = "Agent")]
     public class CustomersController : SecureControllerBase
     {
         private readonly Settings _settings;
@@ -20,24 +21,25 @@ namespace Universal.Api.Controllers
             _settings = settings;
         }
 
-        [HttpPost("{agentId}"), AllowAnonymous]
+        [HttpPost("Login/{agentId}"), AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult<AgentDto> CustomerLogin(LoginRequest loginCreds, string agentId)
+        public ActionResult<LoginResponse> CustomerLogin(LoginRequest loginRequest, string agentId)
         {
             try
             {
-                if (loginCreds == null)
+                if (loginRequest == null)
                     return Problem("request body is null", statusCode: 400);
 
                 try
                 {
-                    var validUser = _repository.AuthenticateCustomer(agentId, loginCreds.sid, loginCreds.token);
+                    var validUser = _repository.AuthenticateCustomer(agentId, loginRequest.id, loginRequest.password);
                     if (validUser == null)
                         return Problem("SID or password is incorrect.", statusCode: 400);
 
                     string token = CreateToken(_settings.JwtSecret,
-                                           _settings.JwtExpiresIn, loginCreds.sid, "test");
+                                               _settings.JwtExpiresIn, 
+                                               loginRequest.id, "Customer");
 
                     var response = new LoginResponse
                     {
@@ -131,7 +133,8 @@ namespace Universal.Api.Controllers
         {
             try
             {
-                var customer = _repository.CustomerCreate(customerDetails);
+                var customer = _repository.CreateNewInsured(customerDetails, GetCurrUserId());
+                _repository.SaveChanges();
                 var uri = new Uri($"{Request.Path}/{ customerDetails.CustomerId}", UriKind.Relative);
 
                 return Created(uri, new CustomerDto(customer));

@@ -10,30 +10,18 @@ namespace Universal.Api.Contracts.V1
 
         public ProductDto(Models.SubRisk product)
         {
-            ID = product.SubRiskID;
-            RiskID = product.RiskID;
-            //MidRiskID = product.MidRiskID;
-            //MidRisk = product.MidRisk;
-            SubRisk = product.SubRisk1;
+            ProductId = product.SubRiskID;
+            RiskId = product.RiskID;
+            ProductName = product.SubRiskName;
             Description = product.Description;
-            Deleted = Convert.ToBoolean(product.Deleted);
-            Active = Convert.ToBoolean(product.Active);
         }
 
-        public string ID { get; set; }
+        public string ProductId { get; set; }
 
-        public string RiskID { get; set; }
+        public string RiskId { get; set; }
 
-        //public string MidRiskID { get; set; }
-
-        //public string MidRisk { get; set; }
-
-        public string SubRisk { get; set; }
+        public string ProductName { get; set; }
 
         public string Description { get; set; }
-
-        public bool Deleted { get; set; }
-
-        public bool Active { get; set; }
     }
 }

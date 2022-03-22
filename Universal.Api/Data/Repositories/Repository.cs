@@ -17,6 +17,16 @@ namespace Universal.Api.Data.Repositories
             _db = db;
         }
 
+        public int SaveChanges()
+        {
+            return _db.SaveChanges();
+        }
+
+        public Task<int> SaveChangesAsync()
+        {
+            return _db.SaveChangesAsync();
+        }
+
         public AuthUser AuthenticateAdmin(string companyName, string password)
         {
             return _db.AuthUsers
@@ -53,9 +63,9 @@ namespace Universal.Api.Data.Repositories
             return _db.Policies.Where(O => O.PolicyNo == policyNo).SingleOrDefault();
         }
 
-        public Policy PolicyCreate(PolicyDto policyDto, IEnumerable<PolicySectionDto> sectionsDto)
+        public Policy PolicyCreate(PolicyDto policyDto, IEnumerable<PolicyDetailDto> sectionsDto)
         {
-            var contextTransaction = _db.Database.BeginTransaction();
+            //var contextTransaction = _db.Database.BeginTransaction();
 
             if (policyDto == null)
                 throw new ArgumentNullException("Policy cannot be empty ", nameof(policyDto));
@@ -72,60 +82,16 @@ namespace Universal.Api.Data.Repositories
 
             if (insured == null)
             {
-                insured = CustomerCreate(policyDto.Insured); 
+                insured = CreateNewInsured(policyDto.Insured, policyDto.AgentId); 
             }
 
             //get policyNo
-            string policyNo = GeneratePolicyNo(policyDto.ProductID, policyDto.BranchID, policyDto.BizSource);
+            //policyDto.PolicyNo = GeneratePolicyNo(policyDto.ProductId, policyDto.BranchId, policyDto.SourceId);
 
-            Policy policy = new Policy()
-            {
-                TransDate = policyDto.EntryDate,
-                StartDate = policyDto.StartDate,
-                EndDate = policyDto.EndDate,
-                SubRiskID = policyDto.ProductID,
-                PartyID = policyDto.AgentID,
-                BranchID = policyDto.BranchID,
-                SubRisk = SubRiskSelectThis(policyDto.ProductID).SubRisk1,
-                Party = PartySelectThis(policyDto.AgentID).Party1,
-                Branch = policyDto.BranchID, // BranchSelectThis(policyDto.BranchID).Description,
-                //TrackID = 100L,
-                //SourceType = policyDto.BizChannel,
-                //ExRate = 1.0,
-                //ExRateID = 1L,
-                ExCurrency = "NAIRA",
-                PremiumRate = 0.0,
-                ProportionRate = 0.0,
-                SumInsured = 0,
-                GrossPremium = 0,
-                SumInsuredFrgn = 0,
-                GrossPremiumFrgn = 0,
-                ProRataDays = 0,
-                ProRataPremium = 0,
-                BizSource = policyDto.BizSource,
-                Active = 1,
-                Deleted = 0,
-                SubmittedBy = "E-CHANNEL",
-                SubmittedOn = DateTime.Now,
-                PolicyNo = policyNo,
-                CoPolicyNo = policyNo,
-                TransSTATUS = "PENDING",
-
-                InsStateID = policyDto.Insured.StateOfOrigin,
-                InsuredID = insured.InsuredID,
-                InsSurname = insured.Surname,
-                InsFirstname = insured.FirstName,
-                InsOthernames = insured.OtherNames,
-                InsAddress = insured.Address,
-                InsMobilePhone = insured.MobilePhone,
-                InsLandPhone = insured.LandPhone,
-                InsEmail = insured.Email,
-                InsOccupation = insured.Occupation,
-                //InsFullName = insured.Surname + " " + insured.FirstName + " " + insured.OtherNames,
-            };
+            var policy = CreateNewPolicy(policyDto, insured);
 
             _db.Policies.Add(policy);
-            _db.SaveChanges();
+           // _db.SaveChanges();
 
             {
                 //PolicyDetail policyDetail = new PolicyDetail()
@@ -169,96 +135,259 @@ namespace Universal.Api.Data.Repositories
             decimal TotalSumInsured = 0;
             decimal TotalGrossPremium = 0;
 
-            foreach (PolicySectionDto section in sectionsDto)
+            foreach (PolicyDetailDto section in sectionsDto)
             {
                 PolicyDetail pd = new PolicyDetail();
 
-                TotalSumInsured += section.SectionSumInsured;
-                TotalGrossPremium += section.SectionPremium;
+                TotalSumInsured += section.SumInsured;
+                TotalGrossPremium += section.GrossPremium;
 
                 if (section.GetType().Equals(typeof(AviationDto)))
                 {
-                    AviationDto A = (AviationDto)section;
-                    pd.PolicyNo = policy.PolicyNo;
-                    //ptd.DetailID = policyDetail.DetailID;
-                    pd.Tag = "NEW";
-                    pd = pd.MapAviationPolicySection(A);
+                    AviationDto dto = (AviationDto)section;
+                    pd = dto.MapPolicyDetail(policy.PolicyNo);
                 }
                 else if (section.GetType().Equals(typeof(BondDto)))
                 {
-                    BondDto B = (BondDto)section;
-                    pd.PolicyNo = policy.PolicyNo;
-                    //ptd.DetailID = policyDetail.DetailID;
-                    pd.Tag = "NEW";
-                    pd = pd.MapBondPolicySection(B);
+                    BondDto dto = (BondDto)section;
+                    pd = dto.MapPolicyDetail(policy.PolicyNo);
                 }
                 else if (section.GetType().Equals(typeof(EngineeringDto)))
                 {
-                    EngineeringDto E = (EngineeringDto)section;
-                    pd.PolicyNo = policy.PolicyNo;
-                    //ptd.DetailID = policyDetail.DetailID;
-                    pd.Tag = "NEW";
-                    pd = pd.MapEngineeringPolicySection(E);
+                    EngineeringDto dto = (EngineeringDto)section;
+                    pd = dto.MapPolicyDetail(policy.PolicyNo);
                 }
                 else if (section.GetType().Equals(typeof(FireDto)))
                 {
-                    FireDto F = (FireDto)section;
-                    pd.PolicyNo = policy.PolicyNo;
-                    //ptd.DetailID = policyDetail.DetailID;
-                    pd.Tag = "NEW";
-                    pd = pd.MapFirePolicySection(F);
+                    FireDto dto = (FireDto)section;
+                    //pd = dto.MapPolicyDetail(policy);
                 }
                 else if (section.GetType().Equals(typeof(GeneralAccidentDto)))
                 {
-                    GeneralAccidentDto G = (GeneralAccidentDto)section;
-                    pd.PolicyNo = policy.PolicyNo;
-                    //ptd.DetailID = policyDetail.DetailID;
-                    pd.Tag = "NEW";
-                    pd = pd.MapGeneralAccidentPolicySection(G);
+                    GeneralAccidentDto dto = (GeneralAccidentDto)section;
+                    pd = dto.MapPolicyDetail(policy.PolicyNo);
                 }
                 else if (section.GetType().Equals(typeof(MarineCargoDto)))
                 {
-                    MarineCargoDto M = (MarineCargoDto)section;
-                    pd.PolicyNo = policy.PolicyNo;
-                    //ptd.DetailID = policyDetail.DetailID;
-                    pd.Tag = "NEW";
-                    pd = pd.MapMarineCargoPolicySection(M);
+                    MarineCargoDto dto = (MarineCargoDto)section;
+                    pd = dto.MapPolicyDetail(policy.PolicyNo);
                 }
                 else if (section.GetType().Equals(typeof(MarineHullDto)))
                 {
-                    MarineHullDto H = (MarineHullDto)section;
-                    pd.PolicyNo = policy.PolicyNo;
-                    //ptd.DetailID = policyDetail.DetailID;
-                    pd.Tag = "NEW";
-                    pd = pd.MapMarineHullPolicySection(H);
+                    MarineHullDto dto = (MarineHullDto)section;
+                    pd = dto.MapPolicyDetail(policy.PolicyNo);
                 }
                 else if (section.GetType().Equals(typeof(MotorDto)))
                 {
-                    MotorDto M = (MotorDto)section;
-                    pd.PolicyNo = policy.PolicyNo;
-                    //ptd.DetailID = policyDetail.DetailID;
-                    pd.Tag = "NEW";
-                    pd = pd.MapMotorPolicySection(M);
+                    MotorDto dto = (MotorDto)section;
+                    pd = dto.MapPolicyDetail(policy.PolicyNo);
                 }
                 else if (section.GetType().Equals(typeof(OilGasDto)))
                 {
-                    OilGasDto O = (OilGasDto)section;
-                    pd.PolicyNo = policy.PolicyNo;
-                    pd.DetailID = policyDetail.DetailID;
-                    pd.Tag = "NEW";
-                    pd = pd.MapOilGasPolicySection(O);
+                    OilGasDto dto = (OilGasDto)section;
+                    pd = dto.MapPolicyDetail(policy.PolicyNo);
                 }
                 _db.PolicyDetails.Add(pd);
             }
 
             //PolicyDetailUpdate(policyDetail.PolicyNo, TotalSumInsured, TotalGrossPremium);
 
-            var newNote = Extensions.MapDNNoteForPolicy(policy, policyDetail, TotalSumInsured, TotalGrossPremium);
 
-            _db.DNCNNotes.Add(newNote);
-            _db.SaveChanges();
+           
+            var debitNote = CreateNewDebitNote(policy, TotalSumInsured, TotalGrossPremium);
+            _db.DNCNNotes.Add(debitNote);
 
-            contextTransaction.Commit();
+            var receipt = CreateNewReceipt(policy, debitNote.refDNCNNo);
+            _db.DNCNNotes.Add(receipt);
+
+           // _db.SaveChanges();
+           // contextTransaction.Commit();
+            return policy;
+        }
+
+        private DNCNNote CreateNewDebitNote(Policy P, Decimal TotalSumInsured, Decimal TotalGrossPremium)
+        {
+            string DNCNNo = Guid.NewGuid().ToString().Split('-')[0];
+            return new DNCNNote()
+            {
+                DNCNNo = DNCNNo,
+                refDNCNNo = DNCNNo,
+                PolicyNo = P.PolicyNo,
+                CoPolicyNo = P.CoPolicyNo,
+                BranchID = P.BranchID,
+                BizSource = P.BizSource,
+                //BizOption = P.BizOption,
+                NoteType = "DN",
+                BillingDate = DateTime.Now,
+                SubRiskID = P.SubRiskID,
+                SubRisk = P.SubRisk,
+                PartyID = P.PartyID,
+                Party = P.Party,
+                PartyRate = 0,
+                InsuredID = P.InsuredID,
+                //InsuredName = P.InsuredName,
+                StartDate = P.StartDate,
+                EndDate = P.EndDate,
+                SumInsured = TotalSumInsured,
+                GrossPremium = TotalGrossPremium,
+                Commission = 0,
+                PropRate = 100.0,
+                ProRataDays = 12L,
+                ProRataPremium = 0,
+                VatRate = 0.0,
+                VatAmount = 0,
+                NetAmount = 0,
+                Narration = "Being policy premium  for Policy No. " + P.PolicyNo,
+                ExRate = 1.0,
+                ExCurrency = "NAIRA",
+                SumInsuredFrgn = 0,
+                GrossPremiumFrgn = 0,
+                Approval = 1,
+                HasTreaty = 1,
+                Remarks = "NORMAL",
+                TopMostValue = 0,
+                PMLValue = 0,
+                PaymentType = "NORMAL",
+                Deleted = 0,
+                DeletedOn = DateTime.Now,
+                Active = 1,
+                SubmittedBy = "E-CHANNEL",
+                SubmittedOn = DateTime.Now,
+                TotalRiskValue = 0,
+                TotalPremium = 0,
+                RetProp = 0.0,
+                RetValue = 0,
+                RetPremium = 0,
+                DBDate = DateTime.Now,
+                A1 = 0,
+                A2 = 0,
+                A3 = 0,
+                A4 = 0,
+                A5 = 0,
+                A6 = 0,
+                A7 = 0,
+                A8 = 0,
+                A9 = 0,
+                A10 = 0
+            };
+        }
+
+        private DNCNNote CreateNewReceipt(Policy P, string refDNCNNO)
+        {
+            string DNCNNo = Guid.NewGuid().ToString().Split('-')[0];
+            return new DNCNNote()
+            {
+                DNCNNo = DNCNNo,
+                refDNCNNo = refDNCNNO,
+                ReceiptNo = "FORMAT NEEDED",
+                PolicyNo = P.PolicyNo,
+                CoPolicyNo = P.CoPolicyNo,
+                BranchID = P.BranchID,
+                BizSource = P.BizSource,
+                //BizOption = P.BizOption,
+                NoteType = "RCP",
+                BillingDate = DateTime.Now,
+                SubRiskID = P.SubRiskID,
+                SubRisk = P.SubRisk,
+                PartyID = P.PartyID,
+                Party = P.Party,
+                PartyRate = 0,
+                InsuredID = P.InsuredID,
+                //InsuredName = P.InsuredName,
+                StartDate = P.StartDate,
+                EndDate = P.EndDate,
+                SumInsured = P.SumInsured,
+                GrossPremium = P.GrossPremium,
+                Commission = 0,
+                PropRate = 100.0,
+                ProRataDays = 12L,
+                ProRataPremium = 0,
+                VatRate = 0.0,
+                VatAmount = 0,
+                NetAmount = 0,
+                Narration = "Being policy premium  for Policy No. " + P.PolicyNo,
+                ExRate = 1.0,
+                ExCurrency = "NAIRA",
+                SumInsuredFrgn = 0,
+                GrossPremiumFrgn = 0,
+                Approval = 1,
+                HasTreaty = 1,
+                Remarks = "NORMAL",
+                TopMostValue = 0,
+                PMLValue = 0,
+                PaymentType = "NORMAL",
+                Deleted = 0,
+                DeletedOn = DateTime.Now,
+                Active = 1,
+                SubmittedBy = "E-CHANNEL",
+                SubmittedOn = DateTime.Now,
+                TotalRiskValue = 0,
+                TotalPremium = 0,
+                RetProp = 0.0,
+                RetValue = 0,
+                RetPremium = 0,
+                DBDate = DateTime.Now,
+                A1 = 0,
+                A2 = 0,
+                A3 = 0,
+                A4 = 0,
+                A5 = 0,
+                A6 = 0,
+                A7 = 0,
+                A8 = 0,
+                A9 = 0,
+                A10 = 0
+            };
+        }
+
+        private Policy CreateNewPolicy(PolicyDto policyDto, InsuredClient insured)
+        {
+            Policy policy = new Policy()
+            {
+                TransDate = policyDto.EntryDate,
+                StartDate = policyDto.StartDate,
+                EndDate = policyDto.EndDate,
+                SubRiskID = policyDto.ProductId,
+                PartyID = policyDto.AgentId,
+                SubRisk = SubRiskSelectThis(policyDto.ProductId).SubRiskName,
+                Party = PartySelectThis(policyDto.AgentId).Party1,
+                //Branch = policyDto.BranchId, // BranchSelectThis(policyDto.BranchID).Description,
+                //TrackID = 100L,
+                //SourceType = policyDto.BizChannel,
+                //ExRate = 1.0,
+                //ExRateID = 1L,
+                ExCurrency = "NAIRA",
+                PremiumRate = 0.0,
+                ProportionRate = 0.0,
+                SumInsured = 0,
+                GrossPremium = 0,
+                SumInsuredFrgn = 0,
+                GrossPremiumFrgn = 0,
+                ProRataDays = 0,
+                ProRataPremium = 0,
+                //BizSource = policyDto.SourceId,
+                Active = 1,
+                Deleted = 0,
+                SubmittedBy = "E-CHANNEL",
+                SubmittedOn = DateTime.Now,
+                PolicyNo = policyDto.PolicyNo,
+                CoPolicyNo = policyDto.PolicyNo,
+                TransSTATUS = "PENDING",
+
+                InsStateID = policyDto.Insured.StateOfOrigin,
+                InsuredID = insured.InsuredID,
+                InsSurname = insured.Surname,
+                InsFirstname = insured.FirstName,
+                InsOthernames = insured.OtherNames,
+                InsAddress = insured.Address,
+                InsMobilePhone = insured.MobilePhone,
+                InsLandPhone = insured.LandPhone,
+                InsEmail = insured.Email,
+                InsOccupation = insured.Occupation,
+                InsFaxNo = insured.ApiId,
+                //InsFullName = insured.Surname + " " + insured.FirstName + " " + insured.OtherNames,
+            };
+
             return policy;
         }
 
@@ -290,64 +419,6 @@ namespace Universal.Api.Data.Repositories
             return null;
         }
 
-        //public PolicyAutoNumber PolicyAutoNumberSelectThis(string productID, string branchID)
-        //{
-        //    if (string.IsNullOrWhiteSpace(productID))
-        //        throw new ArgumentNullException("Product ID cannot be empty ", nameof(productID));
-
-        //    if (string.IsNullOrWhiteSpace(branchID))
-        //        throw new ArgumentNullException("Branch ID cannot be empty ", nameof(branchID));
-
-        //    var policyAutoNumber = _db.PolicyAutoNumbers.Where(O => O.RiskID == productID && O.BranchID == branchID).SingleOrDefault();
-
-        //    if (policyAutoNumber != null)
-        //        return policyAutoNumber;
-
-        //    throw new KeyNotFoundException("Branch ID does not exist");
-        //}
-
-        //public void PolicyAutoNumberUpdateNextValue(string productID, string branchID, long? serialNo)
-        //{
-        //    if (string.IsNullOrWhiteSpace(productID))
-        //        throw new ArgumentNullException("Product ID cannot be empty ", nameof(productID));
-
-        //    if (string.IsNullOrWhiteSpace(branchID))
-        //        throw new ArgumentNullException("Branch ID cannot be empty ", nameof(branchID));
-
-        //    var policyAutoNumber = PolicyAutoNumberSelectThis(productID, branchID);
-
-        //    if (policyAutoNumber == null)
-        //        throw new KeyNotFoundException("Branch ID does not exist");
-
-        //    policyAutoNumber.NextValue = serialNo;
-        //    _db.SaveChanges();
-        //}
-
-        public void PolicyDetailUpdate(
-          string policyNo,
-          decimal totalSumInsured,
-          decimal totalGrossPremium)
-        {
-            if (string.IsNullOrWhiteSpace(policyNo))
-                throw new ArgumentNullException("Policy No cannot be empty ", nameof(policyNo));
-
-            if (totalSumInsured <= decimal.Zero)
-                throw new ArgumentException("Total SumInsured cannot be less than zero ", nameof(totalSumInsured));
-
-            if (totalGrossPremium <= decimal.Zero)
-                throw new ArgumentException("Total GrossPremium cannot be less than zero ", nameof(totalGrossPremium));
-
-            PolicyDetail policyDetail = PolicyDetailSelectThis(policyNo);
-
-            if (policyDetail == null)
-                throw new KeyNotFoundException("Policy No does not exist");
-
-            policyDetail.SumInsured = totalSumInsured;
-            policyDetail.GrossPremium = totalGrossPremium;
-
-            _db.SaveChanges();
-        }
-
         public PolicyDetail PolicyDetailSelectThis(string policyNo)
         {
             if (string.IsNullOrWhiteSpace(policyNo))
@@ -355,26 +426,6 @@ namespace Universal.Api.Data.Repositories
 
             return _db.PolicyDetails.Where(O => O.PolicyNo == policyNo).OrderBy(O => O.DetailID).ToList().LastOrDefault();
         }
-
-        public void PolicyDelete(string policyNo)
-        {
-            if (string.IsNullOrWhiteSpace(policyNo))
-                throw new ArgumentNullException("Policy No cannot be empty", nameof(policyNo));
-
-            var policy = PolicySelectThis(policyNo);
-
-            if (policy == null)
-                throw new KeyNotFoundException("Policy No does not exist");
-
-            //mark policy as deleted.
-            policy.Active = Convert.ToByte(false);
-            policy.Deleted = Convert.ToByte(true);
-
-            _db.Policies.Update(policy);
-            _db.SaveChanges();
-        }
-
-
         
     }
 }

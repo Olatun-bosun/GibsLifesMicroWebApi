@@ -10,15 +10,16 @@ namespace Universal.Api.Data.Repositories
 {
     public partial class Repository
     {
-        public InsuredClient AuthenticateCustomer(string agentId, string apiId, string password)
+
+        public InsuredClient AuthenticateCustomer(string agentId, string customerId, string password)
         {
             return _db.InsuredClients
-                        .Where(a => a.ApiId == $"{agentId}/{apiId}"
+                        .Where(a => a.ApiId == $"{agentId}/{customerId}"
                                 && a.ApiPassword == password
                                 && a.ApiStatus == "ENABLED").SingleOrDefault();
         }
 
-        public InsuredClient CustomerCreate(CustomerDto customerDto)
+        public InsuredClient CreateNewInsured(CustomerDto customerDto, string agentId)
         {
             var newInsured = new InsuredClient
             {
@@ -29,8 +30,8 @@ namespace Universal.Api.Data.Repositories
                 //FullName = policyDto.Title + " " + policyDto.LastName + " " + policyDto.FirstName + " " + policyDto.LastName,
                 //DOB = policyDto.DateOfBirth,
                 //InsuredType = policyDto.InsuredType,
-                LandPhone = customerDto.Telephone,
-                MobilePhone = customerDto.MobilePhone,
+                LandPhone = customerDto.PhoneLine2,
+                MobilePhone = customerDto.PhoneLine1,
                 //MeansID = policyDto.Identification,
                 //MeansIDNo = policyDto.IdentificationNo,
                 Occupation = customerDto.Industry,
@@ -42,13 +43,12 @@ namespace Universal.Api.Data.Repositories
                 Active = 1,
                 Deleted = 0,
 
-                ApiId = $"{customerDto.AgentId}/{customerDto.MobilePhone}",
+                ApiId = $"{agentId}/{customerDto.PhoneLine1}",
                 ApiPassword = "password",
                 ApiStatus = "ACTIVE",
             };
-            _db.InsuredClients.Add(newInsured);
-            _db.SaveChanges();
 
+            _db.InsuredClients.Add(newInsured);
             return newInsured;
         }
 

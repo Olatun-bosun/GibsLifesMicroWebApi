@@ -16,7 +16,7 @@ namespace Universal.Api.Models
         //public string MidRisk { get; set; }
 
         [Column("SubRisk")]
-        public string SubRisk1 { get; set; }
+        public string SubRiskName { get; set; }
 
         public string Description { get; set; }
 

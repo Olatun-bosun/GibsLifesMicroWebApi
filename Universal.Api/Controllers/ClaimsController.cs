@@ -8,7 +8,7 @@ using Universal.Api.Data.Repositories;
 
 namespace Universal.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     public class ClaimsController : SecureControllerBase
     {
         public ClaimsController(Repository repository) : base(repository)
@@ -20,13 +20,21 @@ namespace Universal.Api.Controllers
         /// </summary>
         /// <param name="filter"></param>
         /// <returns>A collection of Claims.</returns>
-        [HttpGet]
+        [HttpGet()]
         public async Task<ActionResult<IEnumerable<ClaimDto>>> ListClaimsAsync([FromQuery] FilterPaging filter)
         {
             try
             {
-                var claims = await _repository.ClaimsSelectAsync(filter, GetCurrUserPartyId());
-                return claims.Select((c => new ClaimDto(c))).ToList();
+                if (User.IsAgent())
+                {
+                    var claims = await _repository.SelectAgentClaimsAsync(filter, GetCurrUserId());
+                    return claims.Select((c => new ClaimDto(c))).ToList();
+                }
+                else
+                {
+                    var claims = await _repository.SelectCustomerClaimsAsync(filter, GetCurrUserId());
+                    return claims.Select((c => new ClaimDto(c))).ToList();
+                }
             }
             catch (Exception ex)
             {

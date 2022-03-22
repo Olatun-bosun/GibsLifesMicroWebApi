@@ -10,12 +10,31 @@ namespace Universal.Api.Data.Repositories
 {
     public partial class Repository
     {
-        public async Task<List<Claim>> ClaimsSelectAsync(FilterPaging filter, string partyId)
+        public async Task<List<Claim>> SelectAgentClaimsAsync(FilterPaging filter, string partyId)
         {
             if (filter == null)
                 filter = new FilterPaging();
 
             var query = _db.ClaimsReserved.Where(c => c.PartyID == partyId);
+            if (filter.CanSearchDate)
+            {
+                query = query.Where(x => (x.EntryDate >= filter.DateFrom) &&
+                                         (x.EntryDate <= filter.DateTo));
+            }
+
+            var claims = await query.OrderByDescending(c => c.EntryDate)
+                                    .Skip(filter.SkipCount)
+                                    .Take(filter.PageSize)
+                                    .ToListAsync();
+            return claims;
+        }
+
+        public async Task<List<Claim>> SelectCustomerClaimsAsync(FilterPaging filter, string insuredId)
+        {
+            if (filter == null)
+                filter = new FilterPaging();
+
+            var query = _db.ClaimsReserved.Where(c => c.InsuredID == insuredId);
             if (filter.CanSearchDate)
             {
                 query = query.Where(x => (x.EntryDate >= filter.DateFrom) &&
@@ -48,9 +67,9 @@ namespace Universal.Api.Data.Repositories
             {
                 //NotificatnNo = GenerateNotificationNo(policy.SubRiskID, policy.BranchID),
                 PolicyNo = claimDto.PolicyNo,
-                NotifyDate = claimDto.NotifyDate.ToUniversalTime(),
+                NotifyDate = claimDto.LossNotifyDate.ToUniversalTime(),
                 LossDate = claimDto.LossDate.ToUniversalTime(),
-                LossDetails = claimDto.LossDetails,
+                LossDetails = claimDto.LossDescription,
                 //InsuredName = policy.InsFullName,
                 BranchID = policy.BranchID,
                 //SumInsured = policy.SumInsured,
@@ -68,7 +87,6 @@ namespace Universal.Api.Data.Repositories
                 //Premium = policy.GrossPremium
             };
             _db.ClaimsReserved.Add(claim);
-            //_db.SaveChanges();
             return claim;
         }
     }

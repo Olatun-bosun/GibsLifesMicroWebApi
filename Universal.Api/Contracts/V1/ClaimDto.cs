@@ -12,19 +12,25 @@ namespace Universal.Api.Contracts.V1
         public ClaimDto(Models.Claim claim)
         {
             PolicyNo = claim.PolicyNo;
-            NotifyDate = claim.NotifyDate.Value;
+            LossNotifyDate = claim.NotifyDate.Value;
             LossDate = claim.LossDate.Value;
-            LossDetails = claim.LossDetails;
+            LossDescription = claim.LossDetails;
             LossType = claim.LossType;
         }
 
         [Required]
         public string PolicyNo { get; set; }
-        public DateTime NotifyDate { get; set; }
+        [Required]
+        public DateTime LossNotifyDate { get; set; }
+        [Required]
         public DateTime LossDate { get; set; }
         [Required]
-        public string LossType { get; set; }
+        public string LossType { get; set; } //TODO: make enums
         [Required]
-        public string LossDetails { get; set; }
+        public string LossDescription { get; set; }
+        //[Required]
+        //public string LossLocation { get; set; }
+        //[Required]
+        //public string LossCause { get; set; }
     }
 }

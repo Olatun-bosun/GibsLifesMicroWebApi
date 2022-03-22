@@ -8,7 +8,7 @@ using Universal.Api.Contracts.V1;
 
 namespace Universal.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     public class ProductsController : SecureControllerBase
     {
         public ProductsController(Repository repository) : base(repository)

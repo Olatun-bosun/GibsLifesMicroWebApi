@@ -36,31 +36,12 @@ namespace Universal.Api.Data.Repositories
                 char[] chArray = new char[1] { ' ' };
                 foreach (string A in searchText.Split(chArray))
                 {
-                    query = query.Where(O => O.SubRisk1.Contains(A));
+                    query = query.Where(O => O.SubRiskName.Contains(A));
                 }
             }
 
-            var subRisks = await query.OrderBy(o => o.SubRisk1).Skip((pageNo - 1) * pageSize).Take(pageSize).ToListAsync();
+            var subRisks = await query.OrderBy(o => o.SubRiskName).Skip((pageNo - 1) * pageSize).Take(pageSize).ToListAsync();
             return subRisks;
-        }
-
-        private void ProductUpdateIsActive(string SubRiskID, long? SerialNo)
-        {
-            if (string.IsNullOrWhiteSpace(SubRiskID))
-                throw new ArgumentNullException("SubRisk ID cannot be empty ", nameof(SubRiskID));
-
-            long? nullable = SerialNo;
-            long num = 0;
-            if ((nullable.GetValueOrDefault() <= num ? (nullable.HasValue ? 1 : 0) : 0) != 0)
-                throw new ArgumentException("Serial No cannot be equal or less than 0 ", nameof(SerialNo));
-
-            //get product
-            SubRisk subRisk = SubRiskSelectThis(SubRiskID);
-            if (subRisk == null)
-                throw new KeyNotFoundException("SubRisk ID does not exist");
-
-            subRisk.Active = (byte?)SerialNo;
-            _db.SaveChanges();
         }
     }
 }

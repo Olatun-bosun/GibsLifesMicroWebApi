@@ -57,32 +57,30 @@ namespace Universal.Api.Data.Repositories
         {
             if (string.IsNullOrWhiteSpace(agentDto.AgentID))
                 throw new ArgumentNullException("Agent Id is required.", nameof(agentDto.AgentID));
-            if (agentDto.CommRate <= decimal.Zero)
-                throw new ArgumentException("Comm Rate cannot be less than or equal to zero ", nameof(agentDto.CommRate));
+            //if (agentDto.CommissionRate <= decimal.Zero)
+            //    throw new ArgumentException("Comm Rate cannot be less than or equal to zero ", nameof(agentDto.CommissionRate));
 
-            if (agentDto.CreditLimit <= decimal.Zero)
-                throw new ArgumentException("Credit Limit cannot be less than or equal to zero ", nameof(agentDto.CreditLimit));
+            //if (agentDto.CreditLimit <= decimal.Zero)
+            //    throw new ArgumentException("Credit Limit cannot be less than or equal to zero ", nameof(agentDto.CreditLimit));
 
             Party agent = new Party()
             {
                 Party1 = agentDto.AgentName,
                 Address = agentDto.Address,
-                LandPhone = agentDto.Telephone,
-                mobilePhone = agentDto.MobilePhone,
+                LandPhone = agentDto.PhoneLine2,
+                mobilePhone = agentDto.PhoneLine1,
                 Email = agentDto.Email,
-                ComRate = agentDto.CommRate,
-                CreditLimit = agentDto.CreditLimit,
+                //ComRate = agentDto.CommissionRate,
+                //CreditLimit = agentDto.CreditLimit,
                 PartyType = "AG",
-                InsContact = agentDto.InsContact,
-                FinContact = agentDto.FinContact,
+                InsContact = agentDto.InsuranceContact,
+                //FinContact = agentDto.FinancialContact,
                 Remarks = agentDto.Remarks,
                 ApiId = agentDto.AgentID,
                 ApiPassword = "password",
                 ApiStatus = "ENABLED"
             };
             _db.Parties.Add(agent);
-            _db.SaveChanges();
-
             return agent;
         }
     }

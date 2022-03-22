@@ -11,7 +11,7 @@ using Universal.Api.Data.Repositories;
 
 namespace Universal.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     [ApiController]
     [Authorize]
     [ApiConventionType(typeof(DefaultApiConventions))]
@@ -25,9 +25,9 @@ namespace Universal.Api.Controllers
             _repository = repository;
         }
 
-        protected string GetCurrUserPartyId()
+        protected string GetCurrUserId()
         {
-            return User.FindFirst(c => c.Type == ClaimTypes.Name).Value ?? "test";
+            return User?.FindFirst(c => c.Type == ClaimTypes.Name).Value;
         }
 
         protected ActionResult ExceptionResult(Exception ex)
@@ -49,7 +49,7 @@ namespace Universal.Api.Controllers
             return Problem(detail: message, statusCode: 500);
         }
 
-        protected string CreateToken(string secret, int expiresIn, string username, string partyId)
+        protected string CreateToken(string secret, int expiresIn, string username, string primaryRole)
         {
             var key = Encoding.UTF8.GetBytes(secret);
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -58,8 +58,8 @@ namespace Universal.Api.Controllers
                 Subject = new ClaimsIdentity(new Claim[]
                 {
                              new Claim(ClaimTypes.Email, username),
-                             new Claim(ClaimTypes.Name, partyId),
-                             new Claim(ClaimTypes.Role, "Agent")
+                             new Claim(ClaimTypes.Name, username),
+                             new Claim(ClaimTypes.Role, primaryRole)
                 }),
                 Expires = DateTime.UtcNow.AddSeconds(expiresIn),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),

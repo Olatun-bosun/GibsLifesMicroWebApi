@@ -7,8 +7,9 @@ namespace Universal.Api.Models
     public class Policy
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string PolicyNo { get; set; }
+        [ForeignKey("InsuredID")]
+        public virtual InsuredClient InsuredClient { get; set; }
         public long PolicyID { get; set; }
         public DateTime? TransDate { get; set; }
 
@@ -31,7 +32,7 @@ namespace Universal.Api.Models
         public string MktStaffID { get; set; }
 
         public string MktStaff { get; set; }
-
+        
         public string InsuredID { get; set; }
 
         public string InsSurname { get; set; }
@@ -99,5 +100,6 @@ namespace Universal.Api.Models
         public string LeadID { get; set; }
 
         public string Leader { get; set; }
+
     }
 }
