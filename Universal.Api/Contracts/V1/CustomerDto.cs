@@ -3,7 +3,33 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Universal.Api.Contracts.V1
 {
-    public class CustomerDto
+    public class CreateCustomerDto
+    {
+        [Required]
+        public string CustomerType { get; set; } //TODO: make enum list
+        public string Title { get; set; }
+        [Required]
+        public string FirstName { get; set; }
+        [Required]
+        public string LastName { get; set; }
+        public string OtherName { get; set; }
+        [Required]
+        public string Address { get; set; }
+        [Required]
+        public string PhoneLine1 { get; set; }
+        public string PhoneLine2 { get; set; }
+        [Required]
+        public string Email { get; set; }
+        public string LocalGovtArea { get; set; }
+        public string StateOfOrigin { get; set; }
+        public string Nationality { get; set; }
+        public DateTime DateOfBirth { get; set; }
+        public string IdentificationType { get; set; }
+        public string IdentificationNo { get; set; }
+        public string Industry { get; set; }
+    }
+
+    public class CustomerDto : CreateCustomerDto
     {
         public CustomerDto()
         {
@@ -51,27 +77,5 @@ namespace Universal.Api.Contracts.V1
         }
 
         public string CustomerId { get; set; }
-        [Required]
-        public string CustomerType { get; set; } //TODO: make enum list
-        public string Title { get; set; }
-        [Required]
-        public string FirstName { get; set; }
-        [Required]
-        public string LastName { get; set; }
-        public string OtherName { get; set; }
-        [Required]
-        public string Address { get; set; }
-        [Required]
-        public string PhoneLine1 { get; set; }
-        public string PhoneLine2 { get; set; }
-        [Required]
-        public string Email { get; set; }
-        public string LocalGovtArea { get; set; }
-        public string StateOfOrigin { get; set; }
-        public string Nationality { get; set; }
-        public DateTime DateOfBirth { get; set; }
-        public string IdentificationType { get; set; }
-        public string IdentificationNo { get; set; }
-        public string Industry { get; set; }
     }
 }

@@ -108,34 +108,15 @@ namespace Universal.Api.Controllers
         /// <summary>
         /// Create a customer.
         /// </summary>
-        /// <remarks>
-        /// Sample request:
-        ///
-        ///     POST /Customer
-        ///     {
-        ///         "agentId": "string",
-        ///         "firstName": "string",
-        ///         "lastName": "string",
-        ///         "otherName": "string",
-        ///         "address": "string",
-        ///         "mobilePhone": "string",
-        ///         "telephone": "string",
-        ///         "email": "string",
-        ///         "industry": "string",
-        ///         "stateOfOrigin": "string"
-        ///     }
-        ///
-        /// </remarks>
-        /// <param name="customerDetails"></param>
         /// <returns>A newly created customer</returns>
         [HttpPost]
-        public ActionResult<CustomerDto> Post(CustomerDto customerDetails)
+        public ActionResult<CustomerDto> Post(CreateCustomerDto customerDetails)
         {
             try
             {
                 var customer = _repository.CreateNewInsured(customerDetails, GetCurrUserId());
                 _repository.SaveChanges();
-                var uri = new Uri($"{Request.Path}/{ customerDetails.CustomerId}", UriKind.Relative);
+                var uri = new Uri($"{Request.Path}/{ customer.InsuredID}", UriKind.Relative);
 
                 return Created(uri, new CustomerDto(customer));
             }

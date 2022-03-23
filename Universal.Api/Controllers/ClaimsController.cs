@@ -69,20 +69,6 @@ namespace Universal.Api.Controllers
         /// <summary>
         /// Create a Claim.
         /// </summary>
-        /// <remarks>
-        /// Sample request:
-        ///
-        ///     POST /Claims
-        ///     {
-        ///        "policyNo": "string",
-        ///        "notifyDate": "2021-09-14T11:57:34.461Z",
-        ///        "lossDate": "2021-09-14T11:57:34.462Z",
-        ///        "lossType": "string",
-        ///        "lossDetails": "string"
-        ///     }
-        ///
-        /// </remarks>
-        /// <param name="claimDetails"></param>
         /// <returns>A newly created claim</returns>
         [HttpPost]
         public ActionResult<ClaimDto> CreateClaim(ClaimDto claimDetails)

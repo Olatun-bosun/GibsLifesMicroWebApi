@@ -32,7 +32,6 @@ namespace Universal.Api.Contracts.V1
         public string Address { get; set; }
         [Required]
         public string PhoneLine1 { get; set; }
-        [Required]
         public string PhoneLine2 { get; set; }
         [Required]
         public string Email { get; set; }
@@ -41,6 +40,21 @@ namespace Universal.Api.Contracts.V1
         //public string RPCNumber { get; set; }
         public string InsuranceContact { get; set; }
         //public string FinancialContact { get; set; }
+        public string Remarks { get; set; }
+    }
+
+    public class CreateAgentDto
+    {
+        [Required]
+        public string AgentName { get; set; }
+        [Required]
+        public string Address { get; set; }
+        [Required]
+        public string PhoneLine1 { get; set; }
+        public string PhoneLine2 { get; set; }
+        [Required]
+        public string Email { get; set; }
+        public string InsuranceContact { get; set; }
         public string Remarks { get; set; }
     }
 }

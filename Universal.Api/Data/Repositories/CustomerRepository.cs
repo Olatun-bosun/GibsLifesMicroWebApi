@@ -19,8 +19,13 @@ namespace Universal.Api.Data.Repositories
                                 && a.ApiStatus == "ENABLED").SingleOrDefault();
         }
 
-        public InsuredClient CreateNewInsured(CustomerDto customerDto, string agentId)
+        public InsuredClient CreateNewInsured(CreateCustomerDto customerDto, string agentId)
         {
+            //check for duplicate
+            var foundInsured = CustomerSelectThis(customerDto.PhoneLine1);
+            if (foundInsured != null)
+                throw new ArgumentException("Customer already exists.");
+
             var newInsured = new InsuredClient
             {
                 InsuredID = Guid.NewGuid().ToString().Split('-')[0].ToUpper(),

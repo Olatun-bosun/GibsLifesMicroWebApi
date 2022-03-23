@@ -53,15 +53,12 @@ namespace Universal.Api.Data.Repositories
             throw new KeyNotFoundException("Agent ID does not exist");
         }
 
-        public Party PartyCreate(AgentDto agentDto)
+        public Party PartyCreate(CreateAgentDto agentDto)
         {
-            if (string.IsNullOrWhiteSpace(agentDto.AgentID))
-                throw new ArgumentNullException("Agent Id is required.", nameof(agentDto.AgentID));
-            //if (agentDto.CommissionRate <= decimal.Zero)
-            //    throw new ArgumentException("Comm Rate cannot be less than or equal to zero ", nameof(agentDto.CommissionRate));
-
-            //if (agentDto.CreditLimit <= decimal.Zero)
-            //    throw new ArgumentException("Credit Limit cannot be less than or equal to zero ", nameof(agentDto.CreditLimit));
+            //check for duplicate
+            var foundAgent = _db.Parties.Where(p => p.PartyID == agentDto.PhoneLine1 || p.Email == agentDto.Email).FirstOrDefault();
+            if (foundAgent != null)
+                throw new InvalidOperationException("Duplicate agent found");
 
             Party agent = new Party()
             {
@@ -76,7 +73,7 @@ namespace Universal.Api.Data.Repositories
                 InsContact = agentDto.InsuranceContact,
                 //FinContact = agentDto.FinancialContact,
                 Remarks = agentDto.Remarks,
-                ApiId = agentDto.AgentID,
+                ApiId = agentDto.Email,
                 ApiPassword = "password",
                 ApiStatus = "ENABLED"
             };

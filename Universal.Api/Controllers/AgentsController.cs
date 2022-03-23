@@ -24,17 +24,6 @@ namespace Universal.Api.Controllers
         ///<summary>
         /// Creates a jwt token that can be used to access secured endpoints of the api.
         /// </summary>
-        /// <remarks>
-        /// Sample request:
-        ///
-        ///     POST /Auth
-        ///     {
-        ///        "sid": "GibsUser1",
-        ///        "token": "gibs117#"
-        ///     }
-        ///
-        /// </remarks>
-        /// <param name="loginCreds"></param>
         /// <returns>A jwt token and it's expiry time.</returns>
         [HttpPost("Login"), AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -122,37 +111,15 @@ namespace Universal.Api.Controllers
         /// <summary>
         /// Create an Agent.
         /// </summary>
-        /// <remarks>
-        /// Sample request:
-        ///
-        ///     POST /Agents
-        ///     {
-        ///        "agentID": "string",
-        ///         "agentName": "string",
-        ///         "address": "string",
-        ///         "mobilePhone": "string",
-        ///         "telephone": "string",
-        ///         "email": "string",
-        ///         "commRate": 0,
-        ///         "creditLimit": 0,
-        ///         "rpcNumber": "string",
-        ///         "website": "string",
-        ///         "insContact": "string",
-        ///         "finContact": "string",
-        ///         "remarks": "string"
-        ///     }
-        ///
-        /// </remarks>
-        /// <param name="agentDetails"></param>
         /// <returns>A newly created Agent</returns>
         [HttpPost]
-        public ActionResult<AgentDto> Post(AgentDto agentDetails)
+        public ActionResult<AgentDto> Post(CreateAgentDto agentDetails)
         {
             try
             {
                 var party = _repository.PartyCreate(agentDetails);
                 _repository.SaveChanges();
-                var uri = new Uri($"{Request.Path}/{ agentDetails.AgentID}", UriKind.Relative);
+                var uri = new Uri($"{Request.Path}/{ party.PartyID}", UriKind.Relative);
 
                 return Created(uri, new AgentDto(party));
             }
