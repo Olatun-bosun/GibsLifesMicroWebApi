@@ -1,17 +1,18 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
+
 using Universal.Api.Contracts;
 using Universal.Api.Contracts.V1;
 using Universal.Api.Data.Repositories;
 
 namespace Universal.Api.Controllers
 {
-    [Route("api/v1/[controller]")]
     [Authorize(Roles = "Agent")]
     public class CustomersController : SecureControllerBase
     {
@@ -22,45 +23,37 @@ namespace Universal.Api.Controllers
         }
 
         [HttpPost("Login/{agentId}"), AllowAnonymous]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public ActionResult<LoginResult> CustomerLogin(LoginRequest loginRequest, string agentId)
         {
+            if (loginRequest == null)
+                return BadRequest("request body is null");
+
             try
             {
-                if (loginRequest == null)
-                    return Problem("request body is null", statusCode: 400);
+                var insured = _repository.AuthenticateCustomer(agentId, loginRequest.id, loginRequest.password);
 
-                try
+                if (insured == null)
+                    return BadRequest("ID or password is incorrect.");
+
+                string token = CreateToken(_settings.JwtSecret,
+                                           _settings.JwtExpiresIn,
+                                           loginRequest.id, "Customer");
+
+                var response = new LoginResult
                 {
-                    var validUser = _repository.AuthenticateCustomer(agentId, loginRequest.id, loginRequest.password);
-                    if (validUser == null)
-                        return Problem("SID or password is incorrect.", statusCode: 400);
+                    TokenType = "Bearer",
+                    ExpiresIn = _settings.JwtExpiresIn,
+                    AccessToken = token
+                };
 
-                    string token = CreateToken(_settings.JwtSecret,
-                                               _settings.JwtExpiresIn, 
-                                               loginRequest.id, "Customer");
-
-                    var response = new LoginResult
-                    {
-                        TokenType = "Bearer",
-                        ExpiresIn = _settings.JwtExpiresIn,
-                        AccessToken = token
-                    };
-                    return Ok(response);
-
-
-                }
-                catch (Exception ex)
-                {
-                    return ExceptionResult(ex);
-                }
+                return Ok(response);
             }
             catch (Exception ex)
             {
                 return ExceptionResult(ex);
             }
         }
+
 
         /// <summary>
         /// Fetch a collection of Customers.
@@ -92,6 +85,7 @@ namespace Universal.Api.Controllers
             try
             {
                 var customer = _repository.CustomerSelectThis(customerId);
+
                 if (customer is null)
                 {
                     return NotFound();
@@ -116,8 +110,8 @@ namespace Universal.Api.Controllers
             {
                 var customer = _repository.CreateNewInsured(customerDetails, GetCurrUserId());
                 _repository.SaveChanges();
-                var uri = new Uri($"{Request.Path}/{ customer.InsuredID}", UriKind.Relative);
 
+                var uri = new Uri($"{Request.Path}/{ customer.InsuredID}", UriKind.Relative);
                 return Created(uri, new CustomerResult(customer));
             }
             catch (Exception ex)

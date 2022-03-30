@@ -75,7 +75,7 @@ namespace Universal.Api.Data.Repositories
                 Remarks = agentDto.Remarks,
                 ApiId = agentDto.Email,
                 ApiPassword = "password",
-                ApiStatus = "ENABLED"
+                ApiStatus = "PENDING"
             };
             _db.Parties.Add(agent);
             return agent;

@@ -8,7 +8,6 @@ using Universal.Api.Data.Repositories;
 
 namespace Universal.Api.Controllers
 {
-    [Route("api/v1/[controller]")]
     public class ClaimsController : SecureControllerBase
     {
         public ClaimsController(Repository repository) : base(repository)
@@ -71,7 +70,7 @@ namespace Universal.Api.Controllers
         /// </summary>
         /// <returns>A newly created claim</returns>
         [HttpPost]
-        public ActionResult<ClaimResult> CreateClaim(ClaimResult claimDetails)
+        public ActionResult<ClaimResult> CreateClaim(ClaimResult request)
         {
             try
             {

@@ -1,21 +1,22 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using System;
+﻿using System;
+using System.Text;
+using System.Security.Claims;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
+
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authorization;
+
 using Universal.Api.Data.Repositories;
 
 namespace Universal.Api.Controllers
 {
-    [Route("api/v1/[controller]")]
-    [ApiController]
     [Authorize]
+    [ApiController]
+    [Route("api/v1/[controller]")]
     [ApiConventionType(typeof(DefaultApiConventions))]
-    [Produces("application/json")]
     public class SecureControllerBase : ControllerBase
     {
         protected readonly Repository _repository;
@@ -39,14 +40,9 @@ namespace Universal.Api.Controllers
                 return BadRequest(ex.Message);
 
             if (ex.InnerException != null)
-                return InternalServerError(ex.Message + " --- inner exception --- " + ex.InnerException.ToString());
+                return StatusCode(500, ex.Message + " --- inner exception --- " + ex.InnerException.ToString());
 
-            return InternalServerError(ex.Message);
-        }
-
-        protected ActionResult InternalServerError(string message)
-        {
-            return Problem(detail: message, statusCode: 500);
+            return StatusCode(500, ex.Message);
         }
 
         protected string CreateToken(string secret, int expiresIn, string username, string primaryRole)

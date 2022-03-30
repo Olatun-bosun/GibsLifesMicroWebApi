@@ -8,7 +8,6 @@ using Universal.Api.Data.Repositories;
 
 namespace Universal.Api.Contracts.V1
 {
-    [Route("api/v1/[controller]")]
     public class PoliciesController : SecureControllerBase
     {
         public PoliciesController(Repository repository) : base(repository)
@@ -36,6 +35,7 @@ namespace Universal.Api.Contracts.V1
             {
                 //this.CheckApiKey(ApiKey);
                 var policy = _repository.PolicySelectThis(policyNo);
+
                 if(policy is null)
                 {
                     return NotFound();

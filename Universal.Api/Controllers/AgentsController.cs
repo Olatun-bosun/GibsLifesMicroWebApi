@@ -11,7 +11,6 @@ using Microsoft.AspNetCore.Http;
 
 namespace Universal.Api.Controllers
 {
-    [Route("api/v1/[controller]")]
     [Authorize(Roles = "Admin")]
     public class AgentsController : SecureControllerBase
     {
@@ -26,38 +25,29 @@ namespace Universal.Api.Controllers
         /// </summary>
         /// <returns>A jwt token and it's expiry time.</returns>
         [HttpPost("Login"), AllowAnonymous]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult<LoginResult> AgentLogin(LoginRequest loginCreds)
+        public ActionResult<LoginResult> AgentLogin(LoginRequest request)
         {
+            if (request == null)
+                return BadRequest("request body is null");
+
             try
             {
-                if (loginCreds == null)
-                    return Problem("request body is null", statusCode: 400);
+                var agent = _repository.AuthenticateAgent(request.id, request.password);
 
-                try
+                if (agent == null)
+                    return BadRequest("ID or password is incorrect");
+
+                string token = CreateToken(_settings.JwtSecret,
+                                           _settings.JwtExpiresIn,
+                                           request.id, "Agent");
+
+                var response = new LoginResult
                 {
-                    var validUser = _repository.AuthenticateAgent(loginCreds.id, loginCreds.password);
-                    if (validUser == null)
-                        return Problem("SID or password is incorrect.", statusCode: 400);
-
-                    string token = CreateToken(_settings.JwtSecret,
-                                           _settings.JwtExpiresIn, loginCreds.id, "Agent");
-
-                    var response = new LoginResult
-                    {
-                        TokenType = "Bearer",
-                        ExpiresIn = _settings.JwtExpiresIn,
-                        AccessToken = token
-                    };
-                    return Ok(response);
-
-                    
-                }
-                catch (Exception ex)
-                {
-                    return ExceptionResult(ex);
-                }
+                    TokenType = "Bearer",
+                    ExpiresIn = _settings.JwtExpiresIn,
+                    AccessToken = token
+                };
+                return Ok(response);
             }
             catch (Exception ex)
             {
@@ -95,6 +85,7 @@ namespace Universal.Api.Controllers
             try
             {
                 var agent = _repository.PartySelectThis(agentId);
+
                 if (agent is null)
                 {
                     return NotFound();
@@ -112,15 +103,15 @@ namespace Universal.Api.Controllers
         /// Create an Agent.
         /// </summary>
         /// <returns>A newly created Agent</returns>
-        [HttpPost]
-        public ActionResult<AgentResult> Post(CreateNewAgentRequest agentDetails)
+        [HttpPost, AllowAnonymous]
+        public ActionResult<AgentResult> Post(CreateNewAgentRequest request)
         {
             try
             {
-                var party = _repository.PartyCreate(agentDetails);
+                var party = _repository.PartyCreate(request);
                 _repository.SaveChanges();
-                var uri = new Uri($"{Request.Path}/{ party.PartyID}", UriKind.Relative);
 
+                var uri = new Uri($"{Request.Path}/{ party.PartyID}", UriKind.Relative);
                 return Created(uri, new AgentResult(party));
             }
             catch (Exception ex)

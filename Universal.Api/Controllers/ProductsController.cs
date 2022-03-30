@@ -8,7 +8,6 @@ using Universal.Api.Contracts.V1;
 
 namespace Universal.Api.Controllers
 {
-    [Route("api/v1/[controller]")]
     public class ProductsController : SecureControllerBase
     {
         public ProductsController(Repository repository) : base(repository)
@@ -47,6 +46,7 @@ namespace Universal.Api.Controllers
             try
             {
                 var subrisk = _repository.SubRiskSelectThis(subriskId);
+
                 if (subrisk is null)
                 {
                     return NotFound();
