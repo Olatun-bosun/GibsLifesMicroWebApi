@@ -63,7 +63,7 @@ namespace Universal.Api.Data.Repositories
             return _db.Policies.Where(O => O.PolicyNo == policyNo).SingleOrDefault();
         }
 
-        public Policy PolicyCreate(PolicyDto policyDto, IEnumerable<PolicyDetailDto> sectionsDto)
+        public Policy PolicyCreate(PolicyResult policyDto, IEnumerable<Contracts.V1.PolicyRequest> sectionsDto)
         {
             //var contextTransaction = _db.Database.BeginTransaction();
 
@@ -135,56 +135,56 @@ namespace Universal.Api.Data.Repositories
             decimal TotalSumInsured = 0;
             decimal TotalGrossPremium = 0;
 
-            foreach (PolicyDetailDto section in sectionsDto)
+            foreach (Contracts.V1.PolicyRequest section in sectionsDto)
             {
-                PolicyDetail pd = new PolicyDetail();
+                Models.PolicyDetail pd = new Models.PolicyDetail();
 
                 TotalSumInsured += section.SumInsured;
                 TotalGrossPremium += section.GrossPremium;
 
-                if (section.GetType().Equals(typeof(AviationDto)))
+                if (section.GetType().Equals(typeof(PolicyAsAviation)))
                 {
-                    AviationDto dto = (AviationDto)section;
+                    PolicyAsAviation dto = (PolicyAsAviation)section;
                     pd = dto.MapPolicyDetail(policy.PolicyNo);
                 }
-                else if (section.GetType().Equals(typeof(BondDto)))
+                else if (section.GetType().Equals(typeof(PolicyAsBond)))
                 {
-                    BondDto dto = (BondDto)section;
+                    PolicyAsBond dto = (PolicyAsBond)section;
                     pd = dto.MapPolicyDetail(policy.PolicyNo);
                 }
-                else if (section.GetType().Equals(typeof(EngineeringDto)))
+                else if (section.GetType().Equals(typeof(PolicyAsEngineering)))
                 {
-                    EngineeringDto dto = (EngineeringDto)section;
+                    PolicyAsEngineering dto = (PolicyAsEngineering)section;
                     pd = dto.MapPolicyDetail(policy.PolicyNo);
                 }
-                else if (section.GetType().Equals(typeof(FireDto)))
+                else if (section.GetType().Equals(typeof(PolicyAsFire)))
                 {
-                    FireDto dto = (FireDto)section;
+                    PolicyAsFire dto = (PolicyAsFire)section;
                     //pd = dto.MapPolicyDetail(policy);
                 }
-                else if (section.GetType().Equals(typeof(GeneralAccidentDto)))
+                else if (section.GetType().Equals(typeof(PolicyAsGeneralAccident)))
                 {
-                    GeneralAccidentDto dto = (GeneralAccidentDto)section;
+                    PolicyAsGeneralAccident dto = (PolicyAsGeneralAccident)section;
                     pd = dto.MapPolicyDetail(policy.PolicyNo);
                 }
-                else if (section.GetType().Equals(typeof(MarineCargoDto)))
+                else if (section.GetType().Equals(typeof(PolicyAsMarineCargo)))
                 {
-                    MarineCargoDto dto = (MarineCargoDto)section;
+                    PolicyAsMarineCargo dto = (PolicyAsMarineCargo)section;
                     pd = dto.MapPolicyDetail(policy.PolicyNo);
                 }
-                else if (section.GetType().Equals(typeof(MarineHullDto)))
+                else if (section.GetType().Equals(typeof(PolicyAsMarineHull)))
                 {
-                    MarineHullDto dto = (MarineHullDto)section;
+                    PolicyAsMarineHull dto = (PolicyAsMarineHull)section;
                     pd = dto.MapPolicyDetail(policy.PolicyNo);
                 }
-                else if (section.GetType().Equals(typeof(MotorDto)))
+                else if (section.GetType().Equals(typeof(PolicyAsMotor)))
                 {
-                    MotorDto dto = (MotorDto)section;
+                    PolicyAsMotor dto = (PolicyAsMotor)section;
                     pd = dto.MapPolicyDetail(policy.PolicyNo);
                 }
-                else if (section.GetType().Equals(typeof(OilGasDto)))
+                else if (section.GetType().Equals(typeof(PolicyAsOilGas)))
                 {
-                    OilGasDto dto = (OilGasDto)section;
+                    PolicyAsOilGas dto = (PolicyAsOilGas)section;
                     pd = dto.MapPolicyDetail(policy.PolicyNo);
                 }
                 _db.PolicyDetails.Add(pd);
@@ -340,7 +340,7 @@ namespace Universal.Api.Data.Repositories
             };
         }
 
-        private Policy CreateNewPolicy(PolicyDto policyDto, InsuredClient insured)
+        private Policy CreateNewPolicy(PolicyResult policyDto, InsuredClient insured)
         {
             Policy policy = new Policy()
             {
@@ -419,7 +419,7 @@ namespace Universal.Api.Data.Repositories
             return null;
         }
 
-        public PolicyDetail PolicyDetailSelectThis(string policyNo)
+        public Models.PolicyDetail PolicyDetailSelectThis(string policyNo)
         {
             if (string.IsNullOrWhiteSpace(policyNo))
                 throw new ArgumentNullException("Policy No cannot be empty ", nameof(policyNo));

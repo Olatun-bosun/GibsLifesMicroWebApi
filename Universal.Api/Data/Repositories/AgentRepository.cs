@@ -53,7 +53,7 @@ namespace Universal.Api.Data.Repositories
             throw new KeyNotFoundException("Agent ID does not exist");
         }
 
-        public Party PartyCreate(CreateAgentDto agentDto)
+        public Party PartyCreate(CreateNewAgentRequest agentDto)
         {
             //check for duplicate
             var foundAgent = _db.Parties.Where(p => p.PartyID == agentDto.PhoneLine1 || p.Email == agentDto.Email).FirstOrDefault();

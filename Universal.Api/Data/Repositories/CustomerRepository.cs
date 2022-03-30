@@ -19,7 +19,7 @@ namespace Universal.Api.Data.Repositories
                                 && a.ApiStatus == "ENABLED").SingleOrDefault();
         }
 
-        public InsuredClient CreateNewInsured(CreateCustomerDto customerDto, string agentId)
+        public InsuredClient CreateNewInsured(CreateNewCustomerRequest customerDto, string agentId)
         {
             //check for duplicate
             var foundInsured = CustomerSelectThis(customerDto.PhoneLine1);

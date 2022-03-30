@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Universal.Api.Contracts.V1
 {
-    public class CreateCustomerDto
+    public class CreateNewCustomerRequest
     {
         [Required]
         public string CustomerType { get; set; } //TODO: make enum list
@@ -29,13 +29,13 @@ namespace Universal.Api.Contracts.V1
         public string Industry { get; set; }
     }
 
-    public class CustomerDto : CreateCustomerDto
+    public class CustomerResult : CreateNewCustomerRequest
     {
-        public CustomerDto()
+        public CustomerResult()
         {
         }
 
-        public CustomerDto(Models.InsuredClient client)
+        public CustomerResult(Models.InsuredClient client)
         {
             //todo
             var splittedArray = client.ApiId.Split('/');
@@ -58,7 +58,7 @@ namespace Universal.Api.Contracts.V1
 
         }
 
-        public CustomerDto(Models.Policy policy)
+        public CustomerResult(Models.Policy policy)
         {
             //todo
             var splittedArray = policy.InsFaxNo.Split('/');

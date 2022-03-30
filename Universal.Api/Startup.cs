@@ -51,7 +51,8 @@ namespace Universal.Api
 
             services.AddControllers();
 
-            services.AddSwaggerGen(s => {
+            services.AddSwaggerGen(s =>
+            {
                 // Set the comments path for the Swagger JSON and UI.
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
@@ -76,40 +77,12 @@ namespace Universal.Api
             {
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(options => {
-                options.Events = new JwtBearerEvents()
-                {
-                    OnChallenge = context => {
-                        context.HandleResponse();
-                        var code = StatusCodes.Status401Unauthorized;
-
-                        var res = new ProblemDetails();
-                        res.Status = code;
-                        res.Title = "Unauthorized access";
-                        res.Type = "https://httpstatuses.com/401";
-                        res.Detail = "Invalid or expired access token.";
-
-                        context.Response.StatusCode = code;
-                        context.HttpContext.Response.Headers.Append("www-authenticate", "Bearer");
-
-                        return context.Response.WriteAsync(JsonConvert.SerializeObject(res));
-                    },
-                    OnForbidden = context =>
-                    {
-                        var code = StatusCodes.Status403Forbidden;
-
-                        var res = new ProblemDetails();
-                        res.Status = code;
-                        res.Title = "Forbidden request";
-                        res.Type = "https://httpstatuses.com/403";
-                        res.Detail = "You do not have the permission to access the resource.";
-
-                        context.Response.StatusCode = code;
-
-                        return context.Response.WriteAsync(JsonConvert.SerializeObject(res));
-                    }
-                };
-                options.TokenValidationParameters = new TokenValidationParameters
+            })
+            .AddJwtBearer(x =>
+            {
+                x.SaveToken = true;
+                x.RequireHttpsMetadata = false;
+                x.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = false,
                     ValidateAudience = false,

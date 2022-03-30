@@ -10,7 +10,7 @@ namespace Universal.Api.Contracts
         public string password { get; set; }
     }
 
-    public class LoginResponse
+    public class LoginResult
     {
         public string AccessToken { get; set; }
         public string TokenType { get; set; }

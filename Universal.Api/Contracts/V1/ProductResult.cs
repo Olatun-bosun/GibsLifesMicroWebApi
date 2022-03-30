@@ -2,13 +2,13 @@
 
 namespace Universal.Api.Contracts.V1
 {
-    public class ProductDto
+    public class ProductResult
     {
-        public ProductDto()
+        public ProductResult()
         {
         }
 
-        public ProductDto(Models.SubRisk product)
+        public ProductResult(Models.SubRisk product)
         {
             ProductId = product.SubRiskID;
             RiskId = product.RiskID;

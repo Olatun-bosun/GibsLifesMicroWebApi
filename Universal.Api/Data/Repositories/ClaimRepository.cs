@@ -56,7 +56,7 @@ namespace Universal.Api.Data.Repositories
             return _db.ClaimsReserved.Where(O => O.ClaimNo == claimNo).SingleOrDefault();
         }
 
-        public Claim ClaimCreate(ClaimDto claimDto)
+        public Claim ClaimCreate(ClaimResult claimDto)
         {
             Policy policy = PolicySelectThis(claimDto.PolicyNo);
 
