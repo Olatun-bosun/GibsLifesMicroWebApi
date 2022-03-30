@@ -110,7 +110,7 @@ namespace Universal.Api.Controllers
         /// </summary>
         /// <returns>A newly created customer</returns>
         [HttpPost("{agentId}"), AllowAnonymous]
-        public ActionResult<CustomerDto> Post(CreateCustomerDto customerDetails, string agentId)
+        public ActionResult<CustomerResult> Post(CreateNewCustomerRequest customerDetails, string agentId)
         {
             try
             {
