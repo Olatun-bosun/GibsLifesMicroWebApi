@@ -21,6 +21,9 @@ namespace Universal.Api.Data.Repositories
 
         public InsuredClient CreateNewInsured(CreateNewCustomerRequest customerDto, string agentId)
         {
+            if (string.IsNullOrWhiteSpace(agentId))
+                throw new ArgumentNullException(nameof(agentId), "The agent id is required.");
+
             //check for duplicate
             var foundInsured = CustomerSelectThis(customerDto.PhoneLine1);
             if (foundInsured != null)

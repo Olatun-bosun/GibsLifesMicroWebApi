@@ -29,6 +29,7 @@ namespace Universal.Api.Controllers
         {
             if (request == null)
                 return BadRequest("request body is null");
+                    return Problem("request body is null", statusCode: 400);
 
             try
             {

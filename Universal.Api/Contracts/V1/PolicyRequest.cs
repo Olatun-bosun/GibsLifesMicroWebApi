@@ -102,7 +102,7 @@ namespace Universal.Api.Contracts.V1
         public string PrincipalAddress { get; set; }
         public string RiskAddress { get; set; }
         public string MinorExcess { get; set; }
-        public string IndustryID { get; set; }
+        public string IndustryId { get; set; }
         public string Remarks { get; set; }
         public string AnyOneLimit { get; set; }
         public bool SurveyRequired { get; set; }
@@ -115,7 +115,7 @@ namespace Universal.Api.Contracts.V1
         //public decimal GrossPremium { get; set; } // already inherited.
         public int Multiplier { get; set; }
         public double WarLoading { get; set; }
-        public string RiskSMIID { get; set; }
+        public string RiskSMIId { get; set; }
         public double Rate { get; set; }
         public decimal TotalSumInsured { get; set; }
         public string Description { get; set; }
@@ -135,9 +135,9 @@ namespace Universal.Api.Contracts.V1
         public string LienClauses { get; set; }
         public string Remarks { get; set; }
         public bool SurveyRequired { get; set; }
-        public string IndustryID { get; set; }
+        public string IndustryId { get; set; }
         public string MfgDetails { get; set; }
-        public string RiskSMIID { get; set; }
+        public string RiskSMIId { get; set; }
         public double Rate { get; set; }
         public decimal TotalSumInsured { get; set; }
         public string Description { get; set; }
@@ -148,15 +148,15 @@ namespace Universal.Api.Contracts.V1
     public class PolicyAsMarineCargo : PolicyRequest
     {
         public string VesselType { get; set; }
-        public string FromCountryID { get; set; }
+        public string FromCountryId { get; set; }
         public string LienClause { get; set; }
         public string VesselOperation { get; set; }
         public string CertificateNo { get; set; }
-        public string ConveyanceID { get; set; }
+        public string ConveyanceId { get; set; }
         public string TINNumber { get; set; }
         public string SubjectMatter { get; set; }
-        public string ToCountryID { get; set; }
-        public string PackageTypeID { get; set; }
+        public string ToCountryId { get; set; }
+        public string PackageTypeId { get; set; }
         public string ProformaInvoiceNo { get; set; }
         public string MarksAndNumbers { get; set; }
         public double PremiumRate { get; set; }
@@ -167,7 +167,7 @@ namespace Universal.Api.Contracts.V1
     public class PolicyAsMarineHull : PolicyRequest
     {
         public int OurShare { get; set; }
-        public string VesselStateID { get; set; }
+        public string VesselStateId { get; set; }
         public string NameOfVessel { get; set; }
         public string VesselTone { get; set; }
         public string VesselOperation { get; set; }
@@ -184,7 +184,7 @@ namespace Universal.Api.Contracts.V1
         public int Beam { get; set; }
         public int Draft { get; set; }
         public double WarLoading { get; set; }
-        public string RiskSMIID { get; set; }
+        public string RiskSMIId { get; set; }
         public double Rate { get; set; }
         public decimal TotalSumInsured { get; set; }
         public string Description { get; set; }
@@ -194,22 +194,22 @@ namespace Universal.Api.Contracts.V1
 
     public class PolicyAsMotor : PolicyRequest
     {
-        public string CertificateTypeID { get; set; }
+        public string CertificateTypeId { get; set; }
         public string DeclarationNo { get; set; }
         public string VehicleRegNo { get; set; }
-        public string VehicleTypeID { get; set; }
+        public string VehicleTypeId { get; set; }
         public string VehicleUser { get; set; }
         public string EngineNumber { get; set; }
         public string ChasisNumber { get; set; }
-        public string VehicleUsageID { get; set; }
+        public string VehicleUsageId { get; set; }
         public int NumberOfSeats { get; set; }
-        public string StateOfIssueID { get; set; }
-        public string VehicleMakeID { get; set; }
-        public string VehicleModelID { get; set; }
+        public string StateOfIssueId { get; set; }
+        public string VehicleMakeId { get; set; }
+        public string VehicleModelId { get; set; }
         public string MfgYear { get; set; }
         public string VehicleColour { get; set; }
         public string EngineCapacityHP { get; set; }
-        public string CoverTypeID { get; set; }
+        public string CoverTypeId { get; set; }
         public string WaxCode { get; set; }
         public decimal VehicleValue { get; set; }
         public decimal BasicPremium { get; set; }

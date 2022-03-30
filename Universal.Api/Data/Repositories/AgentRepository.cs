@@ -58,7 +58,7 @@ namespace Universal.Api.Data.Repositories
             //check for duplicate
             var foundAgent = _db.Parties.Where(p => p.PartyID == agentDto.PhoneLine1 || p.Email == agentDto.Email).FirstOrDefault();
             if (foundAgent != null)
-                throw new InvalidOperationException("Duplicate agent found");
+                throw new ArgumentException("Duplicate agent found");
 
             Party agent = new Party()
             {
