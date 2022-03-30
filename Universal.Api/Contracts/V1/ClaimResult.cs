@@ -3,13 +3,13 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Universal.Api.Contracts.V1
 {
-    public class ClaimDto
+    public class ClaimResult
     {
-        public ClaimDto()
+        public ClaimResult()
         {
         }
 
-        public ClaimDto(Models.Claim claim)
+        public ClaimResult(Models.Claim claim)
         {
             PolicyNo = claim.PolicyNo;
             LossNotifyDate = claim.NotifyDate.Value;

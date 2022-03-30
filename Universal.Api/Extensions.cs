@@ -17,7 +17,7 @@ namespace Universal.Api
             return principal.IsInRole("Agent");
         }
 
-        public static PolicyDetail MapPolicyDetail(this AviationDto A, string policyNo)
+        public static PolicyDetail MapPolicyDetail(this PolicyAsAviation A, string policyNo)
         {
             var ptd = new PolicyDetail
             {
@@ -28,7 +28,7 @@ namespace Universal.Api
             return ptd;
         }
 
-        public static PolicyDetail MapPolicyDetail(this BondDto A, string policyNo)
+        public static PolicyDetail MapPolicyDetail(this PolicyAsBond A, string policyNo)
         {
             var ptd = new PolicyDetail
             {
@@ -39,8 +39,7 @@ namespace Universal.Api
             return ptd;
         }
 
-
-        public static PolicyDetail MapPolicyDetail(this EngineeringDto A, string policyNo)
+        public static PolicyDetail MapPolicyDetail(this PolicyAsEngineering A, string policyNo)
         {
             var ptd = new PolicyDetail
             {
@@ -51,7 +50,7 @@ namespace Universal.Api
             return ptd;
         }
 
-        public static PolicyDetail MapPolicyDetail(this FireDto A, Policy policy)
+        public static PolicyDetail MapPolicyDetail(this PolicyAsFire A, Policy policy)
         {
             var ptd = new PolicyDetail
             {
@@ -106,7 +105,7 @@ namespace Universal.Api
             return ptd;
         }
 
-        public static PolicyDetail MapPolicyDetail(this GeneralAccidentDto A, string policyNo)
+        public static PolicyDetail MapPolicyDetail(this PolicyAsGeneralAccident A, string policyNo)
         {
             var ptd = new PolicyDetail
             {
@@ -117,7 +116,7 @@ namespace Universal.Api
             return ptd;
         }
 
-        public static PolicyDetail MapPolicyDetail(this MarineCargoDto A, string policyNo)
+        public static PolicyDetail MapPolicyDetail(this PolicyAsMarineCargo A, string policyNo)
         {
             var ptd = new PolicyDetail
             {
@@ -128,7 +127,7 @@ namespace Universal.Api
             return ptd;
         }
 
-        public static PolicyDetail MapPolicyDetail(this MarineHullDto A, string policyNo)
+        public static PolicyDetail MapPolicyDetail(this PolicyAsMarineHull A, string policyNo)
         {
             var ptd = new PolicyDetail
             {
@@ -139,7 +138,7 @@ namespace Universal.Api
             return ptd;
         }
 
-        public static PolicyDetail MapPolicyDetail(this MotorDto A, string policyNo)
+        public static PolicyDetail MapPolicyDetail(this PolicyAsMotor A, string policyNo)
         {
             var ptd = new PolicyDetail
             {
@@ -150,7 +149,7 @@ namespace Universal.Api
             return ptd;
         }
 
-        public static PolicyDetail MapPolicyDetail(this OilGasDto A, string policyNo)
+        public static PolicyDetail MapPolicyDetail(this PolicyAsOilGas A, string policyNo)
         {
             var ptd = new PolicyDetail
             {

@@ -28,7 +28,7 @@ namespace Universal.Api.Controllers
         [HttpPost("Login"), AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult<LoginResponse> AgentLogin(LoginRequest loginCreds)
+        public ActionResult<LoginResult> AgentLogin(LoginRequest loginCreds)
         {
             
             if (loginCreds == null)
@@ -43,13 +43,13 @@ namespace Universal.Api.Controllers
                 string token = CreateToken(_settings.JwtSecret,
                                         _settings.JwtExpiresIn, loginCreds.id, "Agent");
 
-                var response = new LoginResponse
-                {
-                    TokenType = "Bearer",
-                    ExpiresIn = _settings.JwtExpiresIn,
-                    AccessToken = token
-                };
-                return Ok(response);
+                    var response = new LoginResult
+                    {
+                        TokenType = "Bearer",
+                        ExpiresIn = _settings.JwtExpiresIn,
+                        AccessToken = token
+                    };
+                    return Ok(response);
 
                     
             }
@@ -64,13 +64,13 @@ namespace Universal.Api.Controllers
         /// </summary>
         /// <returns>A collection of agents.</returns>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<AgentDto>>> ListAgentsAsync(
+        public async Task<ActionResult<IEnumerable<AgentResult>>> ListAgentsAsync(
             [FromQuery] string searchText, [FromQuery]int pageNo, [FromQuery] int pageSize)
         {
             try
             {
                 var agents = await _repository.PartySelectAsync(GetCurrUserId(), searchText, pageNo, pageSize);
-                return Ok(agents.Select(a => new AgentDto(a)).ToList());
+                return Ok(agents.Select(a => new AgentResult(a)).ToList());
             }
             catch (Exception ex)
             {
@@ -84,7 +84,7 @@ namespace Universal.Api.Controllers
         /// <param name="agentId">Id of the agent to get.</param>
         /// <returns>The agent with the Id entered.</returns>
         [HttpGet("{agentId}")]
-        public ActionResult<AgentDto> GetAgent(string agentId)
+        public ActionResult<AgentResult> GetAgent(string agentId)
         {
             try
             {
@@ -94,7 +94,7 @@ namespace Universal.Api.Controllers
                     return NotFound();
                 }
 
-                return Ok(new AgentDto(agent));
+                return Ok(new AgentResult(agent));
             }
             catch (Exception ex)
             {
@@ -106,7 +106,7 @@ namespace Universal.Api.Controllers
         /// Create an Agent.
         /// </summary>
         /// <returns>A newly created Agent</returns>
-        [HttpPost, AllowAnonymous]
+        [HttpPost]
         public ActionResult<AgentDto> Post(CreateAgentDto agentDetails)
         {
             try
@@ -115,7 +115,7 @@ namespace Universal.Api.Controllers
                 _repository.SaveChanges();
                 var uri = new Uri($"{Request.Path}/{ party.PartyID}", UriKind.Relative);
 
-                return Created(uri, new AgentDto(party));
+                return Created(uri, new AgentResult(party));
             }
             catch (Exception ex)
             {

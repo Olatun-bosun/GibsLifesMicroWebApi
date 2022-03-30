@@ -24,7 +24,7 @@ namespace Universal.Api.Controllers
         [HttpPost("Login/{agentId}"), AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult<LoginResponse> CustomerLogin(LoginRequest loginRequest, string agentId)
+        public ActionResult<LoginResult> CustomerLogin(LoginRequest loginRequest, string agentId)
         {
             try
             {
@@ -41,7 +41,7 @@ namespace Universal.Api.Controllers
                                                _settings.JwtExpiresIn, 
                                                loginRequest.id, "Customer");
 
-                    var response = new LoginResponse
+                    var response = new LoginResult
                     {
                         TokenType = "Bearer",
                         ExpiresIn = _settings.JwtExpiresIn,
@@ -67,13 +67,13 @@ namespace Universal.Api.Controllers
         /// </summary>
         /// <returns>A collection of customers.</returns>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<CustomerDto>>> ListCustomersAsync(
+        public async Task<ActionResult<IEnumerable<CustomerResult>>> ListCustomersAsync(
             [FromQuery] string searchText, [FromQuery] int pageNo, [FromQuery] int pageSize)
         {
             try
             {
                 var customers = await _repository.CustomerSelectAsync(searchText, pageNo, pageSize);
-                return Ok(customers.Select(a => new CustomerDto(a)).ToList());
+                return Ok(customers.Select(a => new CustomerResult(a)).ToList());
             }
             catch (Exception ex)
             {
@@ -87,7 +87,7 @@ namespace Universal.Api.Controllers
         /// <param name="customerId">Id of the customer to get.</param>
         /// <returns>The customer with the Id entered.</returns>
         [HttpGet("{customerId}")]
-        public ActionResult<CustomerDto> GetCustomer(string customerId)
+        public ActionResult<CustomerResult> GetCustomer(string customerId)
         {
             try
             {
@@ -97,7 +97,7 @@ namespace Universal.Api.Controllers
                     return NotFound();
                 }
 
-                return Ok(new CustomerDto(customer));
+                return Ok(new CustomerResult(customer));
             }
             catch (Exception ex)
             {
@@ -118,7 +118,7 @@ namespace Universal.Api.Controllers
                 _repository.SaveChanges();
                 var uri = new Uri($"{Request.Path}/{ customer.InsuredID}", UriKind.Relative);
 
-                return Created(uri, new CustomerDto(customer));
+                return Created(uri, new CustomerResult(customer));
             }
             catch (Exception ex)
             {

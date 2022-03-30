@@ -3,13 +3,13 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Universal.Api.Contracts.V1
 {
-    public class AgentDto
+    public class AgentResult
     {
-        public AgentDto()
+        public AgentResult()
         {
         }
 
-        public AgentDto(Models.Party party)
+        public AgentResult(Models.Party party)
         {
             AgentId = party.ApiId;
             AgentName = party.Party1;
@@ -43,7 +43,7 @@ namespace Universal.Api.Contracts.V1
         public string Remarks { get; set; }
     }
 
-    public class CreateAgentDto
+    public class CreateNewAgentRequest
     {
         [Required]
         public string AgentName { get; set; }

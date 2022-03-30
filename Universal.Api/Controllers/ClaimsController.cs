@@ -21,19 +21,19 @@ namespace Universal.Api.Controllers
         /// <param name="filter"></param>
         /// <returns>A collection of Claims.</returns>
         [HttpGet()]
-        public async Task<ActionResult<IEnumerable<ClaimDto>>> ListClaimsAsync([FromQuery] FilterPaging filter)
+        public async Task<ActionResult<IEnumerable<ClaimResult>>> ListClaimsAsync([FromQuery] FilterPaging filter)
         {
             try
             {
                 if (User.IsAgent())
                 {
                     var claims = await _repository.SelectAgentClaimsAsync(filter, GetCurrUserId());
-                    return claims.Select((c => new ClaimDto(c))).ToList();
+                    return claims.Select((c => new ClaimResult(c))).ToList();
                 }
                 else
                 {
                     var claims = await _repository.SelectCustomerClaimsAsync(filter, GetCurrUserId());
-                    return claims.Select((c => new ClaimDto(c))).ToList();
+                    return claims.Select((c => new ClaimResult(c))).ToList();
                 }
             }
             catch (Exception ex)
@@ -48,7 +48,7 @@ namespace Universal.Api.Controllers
         /// <param name="claimNo"></param>
         /// <returns>The claim with the claimNo entered.</returns>
         [HttpGet("{claimNo}")]
-        public ActionResult<ClaimDto> GetClaim(string claimNo)
+        public ActionResult<ClaimResult> GetClaim(string claimNo)
         {
             try
             {
@@ -58,7 +58,7 @@ namespace Universal.Api.Controllers
                     return NotFound();
                 }
 
-                return Ok(new ClaimDto(claim));
+                return Ok(new ClaimResult(claim));
             }
             catch (Exception ex)
             {
@@ -71,7 +71,7 @@ namespace Universal.Api.Controllers
         /// </summary>
         /// <returns>A newly created claim</returns>
         [HttpPost]
-        public ActionResult<ClaimDto> CreateClaim(ClaimDto claimDetails)
+        public ActionResult<ClaimResult> CreateClaim(ClaimResult claimDetails)
         {
             try
             {

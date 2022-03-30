@@ -21,13 +21,13 @@ namespace Universal.Api.Controllers
         /// </summary>
         /// <returns>A collection of products</returns>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ProductDto>>> ListProductsAsync(
+        public async Task<ActionResult<IEnumerable<ProductResult>>> ListProductsAsync(
             [FromQuery] string searchText, [FromQuery] int pageNo, [FromQuery] int pageSize)
         {
             try
             {
                 var subrisks = await _repository.SubRisksSelectAsync(searchText, pageNo, pageSize);
-                return Ok(subrisks.Select(sr => new ProductDto(sr)).ToList());
+                return Ok(subrisks.Select(sr => new ProductResult(sr)).ToList());
             }
             catch (Exception ex)
             {
@@ -42,7 +42,7 @@ namespace Universal.Api.Controllers
         /// <param name="subriskId">Id of the product to get.</param>
         /// <returns>The product with the subrisk Id</returns>
         [HttpGet("{subriskId}")]
-        public ActionResult<ProductDto> GetProduct(string subriskId)
+        public ActionResult<ProductResult> GetProduct(string subriskId)
         {
             try
             {
@@ -52,7 +52,7 @@ namespace Universal.Api.Controllers
                     return NotFound();
                 }
 
-                return Ok(new ProductDto(subrisk));
+                return Ok(new ProductResult(subrisk));
             }
             catch (Exception ex)
             {
