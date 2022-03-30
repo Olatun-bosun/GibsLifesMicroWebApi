@@ -30,34 +30,28 @@ namespace Universal.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public ActionResult<LoginResponse> AgentLogin(LoginRequest loginCreds)
         {
+            
+            if (loginCreds == null)
+                return Problem("request body is null", statusCode: 400);
+
             try
             {
-                if (loginCreds == null)
-                    return Problem("request body is null", statusCode: 400);
+                var validUser = _repository.AuthenticateAgent(loginCreds.id, loginCreds.password);
+                if (validUser == null)
+                    return Problem("SID or password is incorrect.", statusCode: 400);
 
-                try
+                string token = CreateToken(_settings.JwtSecret,
+                                        _settings.JwtExpiresIn, loginCreds.id, "Agent");
+
+                var response = new LoginResponse
                 {
-                    var validUser = _repository.AuthenticateAgent(loginCreds.id, loginCreds.password);
-                    if (validUser == null)
-                        return Problem("SID or password is incorrect.", statusCode: 400);
-
-                    string token = CreateToken(_settings.JwtSecret,
-                                           _settings.JwtExpiresIn, loginCreds.id, "Agent");
-
-                    var response = new LoginResponse
-                    {
-                        TokenType = "Bearer",
-                        ExpiresIn = _settings.JwtExpiresIn,
-                        AccessToken = token
-                    };
-                    return Ok(response);
+                    TokenType = "Bearer",
+                    ExpiresIn = _settings.JwtExpiresIn,
+                    AccessToken = token
+                };
+                return Ok(response);
 
                     
-                }
-                catch (Exception ex)
-                {
-                    return ExceptionResult(ex);
-                }
             }
             catch (Exception ex)
             {
@@ -112,7 +106,7 @@ namespace Universal.Api.Controllers
         /// Create an Agent.
         /// </summary>
         /// <returns>A newly created Agent</returns>
-        [HttpPost]
+        [HttpPost, AllowAnonymous]
         public ActionResult<AgentDto> Post(CreateAgentDto agentDetails)
         {
             try

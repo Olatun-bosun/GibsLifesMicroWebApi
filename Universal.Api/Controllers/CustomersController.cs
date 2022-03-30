@@ -109,12 +109,12 @@ namespace Universal.Api.Controllers
         /// Create a customer.
         /// </summary>
         /// <returns>A newly created customer</returns>
-        [HttpPost]
-        public ActionResult<CustomerDto> Post(CreateCustomerDto customerDetails)
+        [HttpPost("{agentId}"), AllowAnonymous]
+        public ActionResult<CustomerDto> Post(CreateCustomerDto customerDetails, string agentId)
         {
             try
             {
-                var customer = _repository.CreateNewInsured(customerDetails, GetCurrUserId());
+                var customer = _repository.CreateNewInsured(customerDetails, agentId);
                 _repository.SaveChanges();
                 var uri = new Uri($"{Request.Path}/{ customer.InsuredID}", UriKind.Relative);
 

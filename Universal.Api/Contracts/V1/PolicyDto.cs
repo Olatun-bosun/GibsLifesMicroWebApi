@@ -9,6 +9,7 @@ namespace Universal.Api.Contracts.V1
         public PolicyDto()
         {
         }
+
         public PolicyDto(Models.Policy policy)
         {
             PolicyNo = policy.PolicyNo;
@@ -36,7 +37,7 @@ namespace Universal.Api.Contracts.V1
 
     public class NewPolicyDto<T> : PolicyDto where T : PolicyDetailDto
     {
-        public List<T> PolicySection { get; set; }
+        public List<T> PolicyDetails { get; set; }
         public List<DocumentDto> Documents { get; set; }
     }
 

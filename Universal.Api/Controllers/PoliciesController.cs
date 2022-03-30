@@ -104,13 +104,13 @@ namespace Universal.Api.Contracts.V1
         [HttpPost("aviation")]
         public ActionResult<PolicyDto> NewAviationPolicy(NewPolicyDto<AviationDto> policyDto)
         {
-            return NewPolicy(policyDto, policyDto.PolicySection);
+            return NewPolicy(policyDto, policyDto.PolicyDetails);
         }
 
         [HttpPost("bond")]
         public ActionResult<PolicyDto> NewBondPolicy(NewPolicyDto<BondDto> policyDto)
         {
-            return NewPolicy(policyDto, policyDto.PolicySection);
+            return NewPolicy(policyDto, policyDto.PolicyDetails);
         }
 
 
@@ -121,7 +121,7 @@ namespace Universal.Api.Contracts.V1
         [HttpPost("engineering")]
         public ActionResult<PolicyDto> NewEngineeringPolicy(NewPolicyDto<EngineeringDto> policyDto)
         {
-            return NewPolicy(policyDto, policyDto.PolicySection);
+            return NewPolicy(policyDto, policyDto.PolicyDetails);
         }
 
 
@@ -132,7 +132,7 @@ namespace Universal.Api.Contracts.V1
         [HttpPost("fire")]
         public ActionResult<PolicyDto> NewFirePolicy(NewPolicyDto<FireDto> policyDto)
         {
-            return NewPolicy(policyDto, policyDto.PolicySection);
+            return NewPolicy(policyDto, policyDto.PolicyDetails);
         }
 
 
@@ -143,7 +143,7 @@ namespace Universal.Api.Contracts.V1
         [HttpPost("accident")]
         public ActionResult<PolicyDto> NewAccidentPolicy(NewPolicyDto<GeneralAccidentDto> policyDto)
         {
-            return NewPolicy(policyDto, policyDto.PolicySection);
+            return NewPolicy(policyDto, policyDto.PolicyDetails);
         }
 
         /// <summary>
@@ -153,13 +153,13 @@ namespace Universal.Api.Contracts.V1
         [HttpPost("marinecargo")]
         public ActionResult<PolicyDto> NewMarineCargoPolicy(NewPolicyDto<MarineCargoDto> policyDto)
         {
-            return NewPolicy(policyDto, policyDto.PolicySection);
+            return NewPolicy(policyDto, policyDto.PolicyDetails);
         }
 
         [HttpPost("marinehull")]
         public ActionResult<PolicyDto> NewMarineHullPolicy(NewPolicyDto<MarineHullDto> policyDto)
         {
-            return NewPolicy(policyDto, policyDto.PolicySection);
+            return NewPolicy(policyDto, policyDto.PolicyDetails);
         }
 
 
@@ -170,13 +170,13 @@ namespace Universal.Api.Contracts.V1
         [HttpPost("motor")]
         public ActionResult<PolicyDto> NewMotorPolicy(NewPolicyDto<MotorDto> policyDto)
         {
-            return NewPolicy(policyDto, policyDto.PolicySection);
+            return NewPolicy(policyDto, policyDto.PolicyDetails);
         }
 
         [HttpPost("oilgas")]
         public ActionResult<PolicyDto> NewOilGasPolicy(NewPolicyDto<OilGasDto> policyDto)
         {
-            return NewPolicy(policyDto, policyDto.PolicySection);
+            return NewPolicy(policyDto, policyDto.PolicyDetails);
         }
 
         private ActionResult<PolicyDto> NewPolicy(PolicyDto policyDto, IEnumerable<PolicyDetailDto> sectionsDto)
