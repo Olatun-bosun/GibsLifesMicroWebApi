@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using Universal.Api.Contracts.V1;
 using Universal.Api.Data.Repositories;
@@ -26,13 +26,13 @@ namespace Universal.Api.Controllers
             {
                 if (User.IsAgent())
                 {
-                    var claims = await _repository.SelectAgentClaimsAsync(filter, GetCurrUserId());
-                    return claims.Select((c => new ClaimResult(c))).ToList();
+                    var claims = await _repository.SelectAgentClaimsAsync(GetCurrUserId(), filter);
+                    return claims.Select((x => new ClaimResult(x))).ToList();
                 }
                 else
                 {
-                    var claims = await _repository.SelectCustomerClaimsAsync(filter, GetCurrUserId());
-                    return claims.Select((c => new ClaimResult(c))).ToList();
+                    var claims = await _repository.SelectCustomerClaimsAsync(GetCurrUserId(), filter);
+                    return claims.Select((x => new ClaimResult(x))).ToList();
                 }
             }
             catch (Exception ex)
@@ -47,15 +47,14 @@ namespace Universal.Api.Controllers
         /// <param name="claimNo"></param>
         /// <returns>The claim with the claimNo entered.</returns>
         [HttpGet("{claimNo}")]
-        public ActionResult<ClaimResult> GetClaim(string claimNo)
+        public async Task<ActionResult<ClaimResult>> GetClaim(string claimNo)
         {
             try
             {
-                var claim = _repository.ClaimSelectThis(claimNo);
+                var claim = await _repository.ClaimSelectThisAsync(claimNo);
+
                 if (claim is null)
-                {
                     return NotFound();
-                }
 
                 return Ok(new ClaimResult(claim));
             }
@@ -70,7 +69,7 @@ namespace Universal.Api.Controllers
         /// </summary>
         /// <returns>A newly created claim</returns>
         [HttpPost]
-        public ActionResult<ClaimResult> CreateClaim(ClaimResult request)
+        public async Task<ActionResult<ClaimResult>> CreateClaim(ClaimResult request)
         {
             try
             {

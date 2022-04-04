@@ -10,49 +10,50 @@ namespace Universal.Api.Data.Repositories
 {
     public partial class Repository
     {
-
-        public InsuredClient AuthenticateCustomer(string agentId, string customerId, string password)
+        public Task<InsuredClient> CustomerLoginAsync(string agentId, string customerId, string password)
         {
             return _db.InsuredClients
-                        .Where(a => a.ApiId == $"{agentId}/{customerId}"
-                                && a.ApiPassword == password
-                                && a.ApiStatus == "ENABLED").SingleOrDefault();
+                      .Where(x => x.ApiId == $"{agentId}/{customerId}"
+                               && x.ApiPassword == password
+                               && x.ApiStatus == "ENABLED").SingleOrDefaultAsync();
         }
 
-        public InsuredClient CreateNewInsured(CreateNewCustomerRequest customerDto, string agentId)
+        public async Task<InsuredClient> CustomerCreateAsync(CreateNewCustomerRequest newCustomerDto, string agentId)
         {
             if (string.IsNullOrWhiteSpace(agentId))
                 throw new ArgumentNullException(nameof(agentId), "The agent id is required.");
 
             //check for duplicate
-            var foundInsured = CustomerSelectThis(customerDto.PhoneLine1);
-            if (foundInsured != null)
-                throw new ArgumentException("Customer already exists.");
+            var duplicate = await CustomerSelectThisAsync(newCustomerDto.PhoneLine1);
+
+            if (duplicate != null)
+                throw new ArgumentException("Customer already exists");
 
             var newInsured = new InsuredClient
             {
-                InsuredID = Guid.NewGuid().ToString().Split('-')[0].ToUpper(),
-                Address = customerDto.Address,
-                Email = customerDto.Email,
-                FirstName = customerDto.FirstName,
+                InsuredID = "DEMO-" + Guid.NewGuid().ToString().ToUpper(),
+
+                Address = newCustomerDto.Address,
+                Email = newCustomerDto.Email,
+                FirstName = newCustomerDto.FirstName,
                 //FullName = policyDto.Title + " " + policyDto.LastName + " " + policyDto.FirstName + " " + policyDto.LastName,
                 //DOB = policyDto.DateOfBirth,
                 //InsuredType = policyDto.InsuredType,
-                LandPhone = customerDto.PhoneLine2,
-                MobilePhone = customerDto.PhoneLine1,
+                LandPhone = newCustomerDto.PhoneLine2,
+                MobilePhone = newCustomerDto.PhoneLine1,
                 //MeansID = policyDto.Identification,
                 //MeansIDNo = policyDto.IdentificationNo,
-                Occupation = customerDto.Industry,
-                OtherNames = customerDto.OtherName,
+                Occupation = newCustomerDto.Industry,
+                OtherNames = newCustomerDto.OtherName,
                 //Profile = policyDto.RiskProfiling,
                 SubmittedBy = "E-CHANNEL",
                 SubmittedOn = DateTime.Now,
-                Surname = customerDto.LastName,
+                Surname = newCustomerDto.LastName,
                 Active = 1,
                 Deleted = 0,
 
-                ApiId = $"{agentId}/{customerDto.PhoneLine1}",
-                ApiPassword = "password",
+                ApiId = $"{agentId}/{newCustomerDto.PhoneLine1}",
+                ApiPassword = newCustomerDto.Password,
                 ApiStatus = "ACTIVE",
             };
 
@@ -60,36 +61,28 @@ namespace Universal.Api.Data.Repositories
             return newInsured;
         }
 
-        public InsuredClient CustomerSelectThis(string customerID)
+        public Task<InsuredClient> CustomerSelectThisAsync(string customerID)
         {
             if (string.IsNullOrWhiteSpace(customerID))
-                throw new ArgumentNullException(nameof(customerID), "Customer ID cannot be empty.");
+                throw new ArgumentNullException(nameof(customerID));
 
-            var insuredClient = _db.InsuredClients.Where(I => I.InsuredID == customerID).SingleOrDefault();
-
-            if (insuredClient != null)
-                return insuredClient;
-
-            throw new KeyNotFoundException("Customer ID does not exist.");
+            return _db.InsuredClients.Where(x => x.InsuredID == customerID).SingleOrDefaultAsync();
         }
 
-        public async Task<List<InsuredClient>> CustomerSelectAsync(string searchText, int pageNo, int pageSize)
+        public Task<List<InsuredClient>> CustomerSelectAsync(FilterPaging filter)
         {
-            if (pageNo <= 0)
-                pageNo = 1;
-            if (pageSize <= 0)
-                pageSize = 25;
+            if (filter == null)
+                filter = new FilterPaging();
 
             var query = _db.InsuredClients.AsQueryable();
 
-            if (!string.IsNullOrWhiteSpace(searchText))
-            {
-                query = query.Where(C => C.Surname.Contains(searchText) || C.FirstName.Contains(searchText));
-            }
+            foreach (string item in filter.SearchTextItems)
+                query = query.Where(x => x.Surname.Contains(item) || x.FirstName.Contains(item)).AsQueryable();
 
-            var skipCount = (pageNo - 1) * pageSize;
-            var customers = await query.OrderBy(o => o.Surname).Skip(skipCount).Take(pageSize).ToListAsync();
-            return customers;
+            return query.OrderBy(x => x.Surname)
+                        .Skip(filter.SkipCount)
+                        .Take(filter.PageSize)
+                        .ToListAsync();
         }
     }
 }

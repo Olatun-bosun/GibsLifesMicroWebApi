@@ -7,6 +7,8 @@ namespace Universal.Api.Contracts.V1
     {
         [Required]
         public string CustomerType { get; set; } //TODO: make enum list
+        [Required]
+        public string Password { get; set; }
         public string Title { get; set; }
         [Required]
         public string FirstName { get; set; }
@@ -14,12 +16,12 @@ namespace Universal.Api.Contracts.V1
         public string LastName { get; set; }
         public string OtherName { get; set; }
         [Required]
+        public string Email { get; set; }
+        [Required]
         public string Address { get; set; }
         [Required]
         public string PhoneLine1 { get; set; }
         public string PhoneLine2 { get; set; }
-        [Required]
-        public string Email { get; set; }
         public string LocalGovtArea { get; set; }
         public string StateOfOrigin { get; set; }
         public string Nationality { get; set; }
@@ -62,7 +64,6 @@ namespace Universal.Api.Contracts.V1
         {
             //todo
             var splittedArray = policy.InsFaxNo.Split('/');
-
 
             CustomerId = splittedArray[1];
             LastName = policy.InsSurname;

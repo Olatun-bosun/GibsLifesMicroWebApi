@@ -10,57 +10,56 @@ namespace Universal.Api.Data.Repositories
 {
     public partial class Repository
     {
-        public async Task<List<Claim>> SelectAgentClaimsAsync(FilterPaging filter, string partyId)
+        public Task<List<Claim>> SelectAgentClaimsAsync(string partyId, FilterPaging filter)
         {
             if (filter == null)
                 filter = new FilterPaging();
 
-            var query = _db.ClaimsReserved.Where(c => c.PartyID == partyId);
+            var query = _db.ClaimsReserved.Where(x => x.PartyID == partyId);
+
             if (filter.CanSearchDate)
             {
                 query = query.Where(x => (x.EntryDate >= filter.DateFrom) &&
                                          (x.EntryDate <= filter.DateTo));
             }
 
-            var claims = await query.OrderByDescending(c => c.EntryDate)
-                                    .Skip(filter.SkipCount)
-                                    .Take(filter.PageSize)
-                                    .ToListAsync();
-            return claims;
+            return query.OrderByDescending(x => x.EntryDate)
+                        .Skip(filter.SkipCount)
+                        .Take(filter.PageSize)
+                        .ToListAsync();
         }
 
-        public async Task<List<Claim>> SelectCustomerClaimsAsync(FilterPaging filter, string insuredId)
+        public Task<List<Claim>> SelectCustomerClaimsAsync(string insuredId, FilterPaging filter)
         {
             if (filter == null)
                 filter = new FilterPaging();
 
-            var query = _db.ClaimsReserved.Where(c => c.InsuredID == insuredId);
+            var query = _db.ClaimsReserved.Where(x => x.InsuredID == insuredId);
             if (filter.CanSearchDate)
             {
                 query = query.Where(x => (x.EntryDate >= filter.DateFrom) &&
                                          (x.EntryDate <= filter.DateTo));
             }
 
-            var claims = await query.OrderByDescending(c => c.EntryDate)
-                                    .Skip(filter.SkipCount)
-                                    .Take(filter.PageSize)
-                                    .ToListAsync();
-            return claims;
+            return query.OrderByDescending(x => x.EntryDate)
+                        .Skip(filter.SkipCount)
+                        .Take(filter.PageSize)
+                        .ToListAsync();
         }
 
-        public Claim ClaimSelectThis(string claimNo)
+        public Task<Claim> ClaimSelectThisAsync(string claimNo)
         {
             if (string.IsNullOrWhiteSpace(claimNo))
                 throw new ArgumentNullException("Claim No cannot be empty ", nameof(claimNo));
 
-            return _db.ClaimsReserved.Where(O => O.ClaimNo == claimNo).SingleOrDefault();
+            return _db.ClaimsReserved.Where(x => x.ClaimNo == claimNo).SingleOrDefaultAsync();
         }
 
-        public Claim ClaimCreate(ClaimResult claimDto)
+        public async Task<Claim> ClaimCreateAsync(ClaimResult claimDto)
         {
-            Policy policy = PolicySelectThis(claimDto.PolicyNo);
+            var policy = await PolicySelectThisAsync(claimDto.PolicyNo);
 
-            if (policy == null)
+            if (policy is null)
                 throw new KeyNotFoundException("Policy No you supplied is invalid");
 
             var claim = new Claim
@@ -86,6 +85,7 @@ namespace Universal.Api.Data.Repositories
                 SubRisk = policy.SubRisk,
                 //Premium = policy.GrossPremium
             };
+
             _db.ClaimsReserved.Add(claim);
             return claim;
         }

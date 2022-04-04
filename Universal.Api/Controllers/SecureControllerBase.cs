@@ -3,12 +3,9 @@ using System.Text;
 using System.Security.Claims;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authorization;
-
 using Universal.Api.Data.Repositories;
 
 namespace Universal.Api.Controllers
@@ -34,13 +31,13 @@ namespace Universal.Api.Controllers
         protected ActionResult ExceptionResult(Exception ex)
         {
             if (ex is null)
-                return BadRequest("Empty API error message");
+                return StatusCode(500, "SecureControllerBase.ExceptionResult() ex parameter cannot be null");
 
             if (ex is ArgumentException || ex is ArgumentNullException || ex is KeyNotFoundException)
                 return BadRequest(ex.Message);
 
             if (ex.InnerException != null)
-                return StatusCode(500, ex.Message + " --- inner exception --- " + ex.InnerException.ToString());
+                return StatusCode(500, ex.Message + "\n\n\n --- inner exception --- " + ex.InnerException.ToString());
 
             return StatusCode(500, ex.Message);
         }

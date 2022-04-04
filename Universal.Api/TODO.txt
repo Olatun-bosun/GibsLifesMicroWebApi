@@ -1,0 +1,215 @@
+﻿TODOS
+
+1 map risk dtos to policydetails
+2 verify policy create
+3 verify debit note create
+4 verify reciept create
+5 generate policy number code
+
+6 make enums LossType, CustomerType
+
+7 customerId generation
+8 policy documents upload
+9 roles
+10 create new claim
+11 create new policy
+12 encrypt passwords
+
+
+
+
+
+1. )
+private DNCNNote CreateNewDebitNote(Policy P, Decimal TotalSumInsured,
+Decimal TotalGrossPremium)
+        {
+            string DNCNNo = Guid.NewGuid().ToString().Split(&#39;-&#39;)[0];
+            return new DNCNNote()
+            {
+                DNCNNo = DNCNNo,
+                refDNCNNo = DNCNNo,
+                PolicyNo = P.PolicyNo,
+                CoPolicyNo = P.CoPolicyNo,
+                BranchID = “19”---P.BranchID,
+                BizSource = “DIRECT”--P.BizSource,
+                //BizOption = P.BizOption, Enums
+“NEW/ADDITIONAL/RENEWAL/RETURN/REVERSAL
+                NoteType =
+&quot;DN&quot;, ----“NEW/ADDITIONAL/RENEWA
+&quot;CN&quot;, ----“RETURNL/REVERSAL
+                BillingDate = DateTime.Now,
+                SubRiskID = P.SubRiskID,
+                SubRisk = P.SubRisk,
+                PartyID = P.PartyID,
+                Party = P.Party,
+                PartyRate = 0,
+                InsuredID = P.InsuredID,
+                //InsuredName = P.InsuredName,
+                StartDate = P.StartDate,
+                EndDate = P.EndDate,
+                SumInsured = TotalSumInsured,
+                GrossPremium = TotalGrossPremium,
+                Commission = 0,
+                PropRate = 100.0,
+                ProRataDays = 12L,
+                ProRataPremium = 0,
+                VatRate = 0.0,
+                VatAmount = 0,
+                NetAmount = 0,
+                Narration = &quot;Being policy premium  for Policy No. &quot; + P.PolicyNo,
+                ExRate = 1.0,
+                ExCurrency = &quot;NAIRA&quot;,
+                SumInsuredFrgn = 0,
+                GrossPremiumFrgn = 0,
+                Approval = 1,
+                HasTreaty = 1,
+                Remarks = &quot;NORMAL&quot;,
+                TopMostValue = 0,
+                PMLValue = 0,
+                PaymentType = &quot;NORMAL&quot;,
+                Deleted = 0,
+
+                DeletedOn = DateTime.Now,
+                Active = 1,
+                SubmittedBy = &quot;WEB_API&quot;,
+                SubmittedOn = DateTime.Now,
+                TotalRiskValue = 0,
+                TotalPremium = 0,
+                RetProp = 0.0,
+                RetValue = 0,
+                RetPremium = 0,
+                DBDate = DateTime.Now,
+                A1 = 0,
+                A2 = 0,
+                A3 = 0,
+                A4 = 0,
+                A5 = 0,
+                A6 = 0,
+                A7 = 0,
+                A8 = 0,
+                A9 = 0,
+                A10 = 0
+            };
+2    private DNCNNote CreateNewReceipt(Policy P, string refDNCNNO)
+        {
+            string DNCNNo = Guid.NewGuid().ToString().Split(&#39;-&#39;)[0];
+            return new DNCNNote()
+            {
+                DNCNNo = DNCNNo,
+                refDNCNNo = refDNCNNO,
+                ReceiptNo =RT/$BR$/$MO$/$00000$ BR=19, MO=month
+&quot;FORMAT NEEDED&quot;,
+                PolicyNo = P.PolicyNo,
+                CoPolicyNo = P.CoPolicyNo,
+                BranchID =19
+                BizSource = P.BizSource, as in debit note
+                //BizOption = P.BizOption, as in debit note
+                NoteType = &quot;RCP&quot;,
+                BillingDate = DateTime.Now,
+                SubRiskID = P.SubRiskID,
+                SubRisk = P.SubRisk,
+                PartyID = P.PartyID,
+                Party = P.Party,
+                PartyRate = 0,
+                InsuredID = P.InsuredID,
+                //InsuredName = P.InsuredName,
+                StartDate = P.StartDate,
+                EndDate = P.EndDate,
+                SumInsured = TotalSumInsured,
+                GrossPremium = TotalGrossPremium,
+                Commission = 0,
+
+                PropRate = 100.0,
+                ProRataDays = 12L,
+                ProRataPremium = 0,
+                VatRate = 0.0,
+                VatAmount = 0,
+                NetAmount = 0,
+                Narration = &quot;Being policy premium  for Policy No. &quot; + P.PolicyNo,
+                ExRate = 1.0,
+                ExCurrency = &quot;NAIRA&quot;,
+                SumInsuredFrgn = 0,
+                GrossPremiumFrgn = 0,
+                Approval = 1,
+                HasTreaty = 1,
+                Remarks = &quot;NORMAL&quot;,
+                TopMostValue = 0,
+                PMLValue = 0,
+                PaymentType = &quot;NORMAL&quot;,
+                Deleted = 0,
+                DeletedOn = DateTime.Now,
+                Active = 1,
+                SubmittedBy = &quot;WEB_API&quot;,
+                SubmittedOn = DateTime.Now,
+                TotalRiskValue = 0,
+                TotalPremium = 0,
+                RetProp = 0.0,
+                RetValue = 0,
+                RetPremium = 0,
+                DBDate = DateTime.Now,
+                A1 = 0,
+                A2 = 0,
+                A3 = 0,
+                A4 = 0,
+                A5 = 0,
+                A6 = 0,
+                A7 = 0,
+                A8 = 0,
+                A9 = 0,
+                A10 = 0
+            };
+        }
+3   private Policy CreateNewPolicy(PolicyDto policyDto, InsuredClient insured)
+        {
+            Policy policy = new Policy()
+            {
+                TransDate = policyDto.EntryDate,
+                StartDate = policyDto.StartDate,
+                EndDate = policyDto.EndDate,
+                SubRiskID = policyDto.ProductId,
+                PartyID = policyDto.AgentId,
+
+                BranchID = “19”
+                SubRisk = SubRiskSelectThis(policyDto.ProductId).SubRiskName,
+                Party = PartySelectThis(policyDto.AgentId).Party1,41$00000$$MO$
+                Branch = policyDto.BranchId, //
+BranchSelectThis(policyDto.BranchID).Description,”RETAIL OFFICE”
+                //TrackID = 100L,
+                //SourceType = policyDto.BizChannel,
+                //ExRate = 1.0,
+                //ExRateID = 1L,
+                ExCurrency = &quot;NAIRA&quot;,
+                PremiumRate = 0.0,
+                ProportionRate = 0.0,
+                SumInsured = 0,
+                GrossPremium = 0,
+                SumInsuredFrgn = 0,
+                GrossPremiumFrgn = 0,
+                ProRataDays = 0,
+                ProRataPremium = 0,
+                BizSource = policyDto.SourceId,”DIRECT”
+                Active = 1,
+                Deleted = 0,
+                SubmittedBy = &quot;WEB-API&quot;,
+                SubmittedOn = DateTime.Now,
+                PolicyNo = policyDto.PolicyNo,
+UIC/$BR2$/$SR$/$00000$/$MO$/$YR$
+                CoPolicyNo = policyDto.PolicyNo,
+                TransSTATUS = &quot;PENDING&quot;,
+
+Remarks=”RETAIL”
+InsuredID :$BR$$MO$$YR$$00000$
+                InsStateID = policyDto.Insured.StateOfOrigin,
+                InsuredID = insured.InsuredID,
+                InsSurname = insured.Surname,
+                InsFirstname = insured.FirstName,
+                InsOthernames = insured.OtherNames,
+                InsAddress = insured.Address,
+                InsMobilePhone = insured.MobilePhone,
+                InsLandPhone = insured.LandPhone,
+                InsEmail = insured.Email,
+                InsOccupation = insured.Occupation,
+                InsFaxNo = insured.ApiId,
+                //InsFullName = insured.Surname + &quot; &quot; + insured.FirstName + &quot; &quot; +
+insured.OtherNames,
+            };

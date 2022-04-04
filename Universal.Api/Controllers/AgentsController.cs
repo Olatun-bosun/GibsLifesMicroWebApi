@@ -3,11 +3,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Universal.Api.Data.Repositories;
 using Universal.Api.Contracts.V1;
-using Microsoft.AspNetCore.Authorization;
-using Universal.Api.Contracts;
-using Microsoft.AspNetCore.Http;
 
 namespace Universal.Api.Controllers
 {
@@ -25,22 +23,21 @@ namespace Universal.Api.Controllers
         /// </summary>
         /// <returns>A jwt token and it's expiry time.</returns>
         [HttpPost("Login"), AllowAnonymous]
-        public ActionResult<LoginResult> AgentLogin(LoginRequest request)
+        public async Task<ActionResult<LoginResult>> AgentLogin([FromBody] LoginRequest loginRequest)
         {
-            if (request == null)
-                return BadRequest("request body is null");
-                    return Problem("request body is null", statusCode: 400);
+            if (loginRequest is null)
+                return BadRequest("Request body is null");
 
             try
             {
-                var agent = _repository.AuthenticateAgent(request.id, request.password);
+                var agent = await _repository.PartyLoginOrNullAsync(loginRequest.Id, loginRequest.Password);
 
-                if (agent == null)
-                    return BadRequest("ID or password is incorrect");
+                if (agent is null)
+                    return BadRequest("ID or Password is incorrect");
 
                 string token = CreateToken(_settings.JwtSecret,
                                            _settings.JwtExpiresIn,
-                                           request.id, "Agent");
+                                           loginRequest.Id, "Agent");
 
                 var response = new LoginResult
                 {
@@ -61,13 +58,12 @@ namespace Universal.Api.Controllers
         /// </summary>
         /// <returns>A collection of agents.</returns>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<AgentResult>>> ListAgentsAsync(
-            [FromQuery] string searchText, [FromQuery]int pageNo, [FromQuery] int pageSize)
+        public async Task<ActionResult<IEnumerable<AgentResult>>> ListAgentsAsync([FromQuery] FilterPaging filter)
         {
             try
             {
-                var agents = await _repository.PartySelectAsync(GetCurrUserId(), searchText, pageNo, pageSize);
-                return Ok(agents.Select(a => new AgentResult(a)).ToList());
+                var agents = await _repository.PartySelectAsync(GetCurrUserId(), filter);
+                return Ok(agents.Select(x => new AgentResult(x)).ToList());
             }
             catch (Exception ex)
             {
@@ -81,16 +77,14 @@ namespace Universal.Api.Controllers
         /// <param name="agentId">Id of the agent to get.</param>
         /// <returns>The agent with the Id entered.</returns>
         [HttpGet("{agentId}")]
-        public ActionResult<AgentResult> GetAgent(string agentId)
+        public async Task<ActionResult<AgentResult>> GetAgent(string agentId)
         {
             try
             {
-                var agent = _repository.PartySelectThis(agentId);
+                var agent = await _repository.PartySelectThisOrNullAsync(agentId);
 
                 if (agent is null)
-                {
                     return NotFound();
-                }
 
                 return Ok(new AgentResult(agent));
             }
@@ -105,11 +99,11 @@ namespace Universal.Api.Controllers
         /// </summary>
         /// <returns>A newly created Agent</returns>
         [HttpPost, AllowAnonymous]
-        public ActionResult<AgentResult> Post(CreateNewAgentRequest request)
+        public async Task<ActionResult<AgentResult>> Post(CreateNewAgentRequest request)
         {
             try
             {
-                var party = _repository.PartyCreate(request);
+                var party = await _repository.PartyCreateAsync(request);
                 _repository.SaveChanges();
 
                 var uri = new Uri($"{Request.Path}/{ party.PartyID}", UriKind.Relative);

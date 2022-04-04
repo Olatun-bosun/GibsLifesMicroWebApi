@@ -1,13 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Universal.Api.Contracts
+namespace Universal.Api.Contracts.V1
 {
     public class LoginRequest
     {
         [Required]
-        public string id { get; set; }
+        public string Id { get; set; }
         [Required]
-        public string password { get; set; }
+        public string Password { get; set; }
     }
 
     public class LoginResult

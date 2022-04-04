@@ -20,13 +20,12 @@ namespace Universal.Api.Controllers
         /// </summary>
         /// <returns>A collection of products</returns>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ProductResult>>> ListProductsAsync(
-            [FromQuery] string searchText, [FromQuery] int pageNo, [FromQuery] int pageSize)
+        public async Task<ActionResult<IEnumerable<ProductResult>>> ListProductsAsync([FromQuery] FilterPaging filter)
         {
             try
             {
-                var subrisks = await _repository.SubRisksSelectAsync(searchText, pageNo, pageSize);
-                return Ok(subrisks.Select(sr => new ProductResult(sr)).ToList());
+                var subrisks = await _repository.ProductSelectAsync(filter);
+                return Ok(subrisks.Select(x => new ProductResult(x)).ToList());
             }
             catch (Exception ex)
             {
@@ -38,21 +37,19 @@ namespace Universal.Api.Controllers
         /// <summary>
         /// Fetch a single product.
         /// </summary>
-        /// <param name="subriskId">Id of the product to get.</param>
+        /// <param name="productId">Id of the product to get.</param>
         /// <returns>The product with the subrisk Id</returns>
-        [HttpGet("{subriskId}")]
-        public ActionResult<ProductResult> GetProduct(string subriskId)
+        [HttpGet("{productId}")]
+        public async Task<ActionResult<ProductResult>> GetProduct(string productId)
         {
             try
             {
-                var subrisk = _repository.SubRiskSelectThis(subriskId);
+                var product = await _repository.ProductSelectThisAsync(productId);
 
-                if (subrisk is null)
-                {
+                if (product is null)
                     return NotFound();
-                }
 
-                return Ok(new ProductResult(subrisk));
+                return Ok(new ProductResult(product));
             }
             catch (Exception ex)
             {

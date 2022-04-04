@@ -5,6 +5,21 @@ namespace Universal.Api.Contracts.V1
 {
     public class FilterPaging
     {
+        private string[] _searchItems = { };
+
+        public string SearchText
+        {
+            get
+            {
+                return string.Join(' ', _searchItems);
+            }
+            set
+            {
+                char[] chArray = new char[1] { ' ' };
+                _searchItems = value.Split(chArray, StringSplitOptions.RemoveEmptyEntries);
+            }
+        }
+
         public DateTime? DateFrom { get; set; }
 
         public DateTime? DateTo { get; set; }
@@ -48,6 +63,22 @@ namespace Universal.Api.Contracts.V1
             get
             {
                 return (DateFrom.HasValue && DateTo.HasValue);
+            }
+        }
+
+        internal bool CanSearchText
+        {
+            get
+            {
+                return _searchItems.Length > 0;
+            }
+        }
+
+        internal string[] SearchTextItems
+        {
+            get
+            {
+                return _searchItems;
             }
         }
     }

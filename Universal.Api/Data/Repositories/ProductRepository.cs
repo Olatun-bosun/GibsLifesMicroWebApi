@@ -1,47 +1,37 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
 using Universal.Api.Models;
+using Universal.Api.Contracts.V1;
 
 namespace Universal.Api.Data.Repositories
 {
     public partial class Repository
     {
-        public SubRisk SubRiskSelectThis(string subRiskID)
+        public Task<SubRisk> ProductSelectThisAsync(string productId)
         {
-            if (string.IsNullOrWhiteSpace(subRiskID))
-                throw new ArgumentNullException("SubRisk ID cannot be empty ", nameof(subRiskID));
+            if (string.IsNullOrWhiteSpace(productId))
+                throw new ArgumentNullException(nameof(productId));
 
-            var subRisk = _db.SubRisks.Where(O => O.SubRiskID == subRiskID).SingleOrDefault();
-
-            if (subRisk != null)
-                return subRisk;
-
-            throw new KeyNotFoundException("SubRisk ID does not exist");
+            return _db.SubRisks.Where(x => x.SubRiskID == productId).SingleOrDefaultAsync();
         }
 
-        public async Task<List<SubRisk>> SubRisksSelectAsync(string searchText, int pageNo, int pageSize)
+        public Task<List<SubRisk>> ProductSelectAsync(FilterPaging filter)
         {
-            if (pageNo <= 0)
-                pageNo = 1;
-            if (pageSize <= 0)
-                pageSize = 25;
+            if (filter == null)
+                filter = new FilterPaging();
 
             var query = _db.SubRisks.AsQueryable();
 
-            if (!string.IsNullOrWhiteSpace(searchText))
-            {
-                char[] chArray = new char[1] { ' ' };
-                foreach (string A in searchText.Split(chArray))
-                {
-                    query = query.Where(O => O.SubRiskName.Contains(A));
-                }
-            }
+            foreach (string item in filter.SearchTextItems)
+                query = query.Where(x => x.SubRiskName.Contains(item)).AsQueryable();
 
-            var subRisks = await query.OrderBy(o => o.SubRiskName).Skip((pageNo - 1) * pageSize).Take(pageSize).ToListAsync();
-            return subRisks;
+            return query.OrderBy(x => x.SubRiskName)
+                        .Skip(filter.SkipCount)
+                        .Take(filter.PageSize)
+                        .ToListAsync();
         }
     }
 }

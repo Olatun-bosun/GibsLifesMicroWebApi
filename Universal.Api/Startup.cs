@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.SqlServer.Query.Internal;
@@ -41,7 +42,7 @@ namespace Universal.Api
             var settings = section.Get<Settings>();
             services.Configure<Settings>(section);
 
-            services.AddDbContext<UICContext>(options =>
+            services.AddDbContext<DataContext>(options =>
             {
                 options
                     .UseLazyLoadingProxies()
@@ -57,11 +58,15 @@ namespace Universal.Api
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 s.IncludeXmlComments(xmlPath);
-                s.CustomOperationIds(apiDescription =>
+
+
+                s.CustomOperationIds(e =>
                 {
-                    return apiDescription.TryGetMethodInfo(out MethodInfo methodInfo) ? methodInfo.Name : null;
+                    return e.TryGetMethodInfo(out MethodInfo methodInfo) ? methodInfo.Name : null;
+
+                    //var controllerAction = (ControllerActionDescriptor)e.ActionDescriptor;
+                    //return controllerAction.ActionName;
                 });
-                s.AddServer(new Microsoft.OpenApi.Models.OpenApiServer() { Url = "http://uic-middleware-api.gibsonline.com" });
 
                 s.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {

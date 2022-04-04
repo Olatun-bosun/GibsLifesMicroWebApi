@@ -13,7 +13,7 @@ namespace Universal.Api.Models
         public string StateID { get; set; }
 
         [Column("Party")]
-        public string Party1 { get; set; }
+        public string PartyName { get; set; }
 
         public string Description { get; set; }
 

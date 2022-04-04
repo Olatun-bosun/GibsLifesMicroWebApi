@@ -1,82 +1,75 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using Universal.Api.Contracts.V1;
 using Universal.Api.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Universal.Api.Data.Repositories
 {
     public partial class Repository
     {
-        public Party AuthenticateAgent(string apiId, string password)
+        public Task<Party> PartyLoginOrNullAsync(string apiId, string password)
         {
             return _db.Parties
-                        .Where(a => a.ApiId == apiId
-                                && a.ApiPassword == password
-                                && a.ApiStatus == "ENABLED").SingleOrDefault();
+                      .Where(x => x.ApiId == apiId
+                               && x.ApiPassword == password
+                               && x.ApiStatus == "ENABLED").SingleOrDefaultAsync();
         }
 
-        public async Task<List<Party>> PartySelectAsync(string partyId, string searchText, int pageNo, int pageSize)
+        public Task<List<Party>> PartySelectAsync(string partyId, FilterPaging filter)
         {
-            if (pageNo <= 0)
-                pageNo = 1;
-            if (pageSize <= 0)
-                pageSize = 25;
+            if (filter == null)
+                filter = new FilterPaging();
 
-            var query = _db.Parties.Where(p => p.PartyID == partyId);
+            var query = _db.Parties.Where(x => x.PartyID == partyId);
 
-            if (!string.IsNullOrWhiteSpace(searchText))
-            {
-                char[] chArray = new char[1] { ' ' };
-                foreach (string A in searchText.Split(chArray))
-                {
-                    query = query.Where(O => O.Party1.Contains(A)).AsQueryable();
-                }
-            }
+            foreach (string item in filter.SearchTextItems)
+                query = query.Where(x => x.PartyName.Contains(item)).AsQueryable();
 
-            var agents = await query.OrderBy(o => o.Party1).Skip((pageNo - 1) * pageSize).Take(pageSize).ToListAsync();
-            return agents;
+            return query.OrderBy(x => x.PartyName)
+                        .Skip(filter.SkipCount)
+                        .Take(filter.PageSize)
+                        .ToListAsync();
         }
 
-        public Party PartySelectThis(string agentID)
+        public Task<Party> PartySelectThisOrNullAsync(string agentID)
         {
             if (string.IsNullOrWhiteSpace(agentID))
                 throw new ArgumentNullException("Agent ID cannot be empty ", "AgentID");
 
-            var party = _db.Parties.Where(O => O.PartyID == agentID).SingleOrDefault();
-
-            if (party != null)
-                return party;
-
-            throw new KeyNotFoundException("Agent ID does not exist");
+            return _db.Parties.Where(x => x.PartyID == agentID).SingleOrDefaultAsync();
         }
 
-        public Party PartyCreate(CreateNewAgentRequest agentDto)
+        public async Task<Party> PartyCreateAsync(CreateNewAgentRequest newAgentDto)
         {
             //check for duplicate
-            var foundAgent = _db.Parties.Where(p => p.PartyID == agentDto.PhoneLine1 || p.Email == agentDto.Email).FirstOrDefault();
-            if (foundAgent != null)
+            var existing = await _db.Parties.Where(x => x.PartyID == newAgentDto.PhoneLine1 || 
+                                                        x.Email   == newAgentDto.Email).FirstOrDefaultAsync();
+            if (existing != null)
                 throw new ArgumentException("Duplicate agent found");
 
             Party agent = new Party()
             {
-                Party1 = agentDto.AgentName,
-                Address = agentDto.Address,
-                LandPhone = agentDto.PhoneLine2,
-                mobilePhone = agentDto.PhoneLine1,
-                Email = agentDto.Email,
+                PartyID = "DEMO-" + Guid.NewGuid().ToString().ToUpper(),
+
+                PartyName = newAgentDto.AgentName,
+                Address = newAgentDto.Address,
+                LandPhone = newAgentDto.PhoneLine2,
+                mobilePhone = newAgentDto.PhoneLine1,
+                Email = newAgentDto.Email,
                 //ComRate = agentDto.CommissionRate,
                 //CreditLimit = agentDto.CreditLimit,
                 PartyType = "AG",
-                InsContact = agentDto.InsuranceContact,
+                //InsContact = agentDto.InsuranceContact,
                 //FinContact = agentDto.FinancialContact,
-                Remarks = agentDto.Remarks,
-                ApiId = agentDto.Email,
-                ApiPassword = "password",
+                Remarks = newAgentDto.Remarks,
+                ApiId = newAgentDto.Email,
+                ApiPassword = newAgentDto.Password,
                 ApiStatus = "PENDING"
             };
+
             _db.Parties.Add(agent);
             return agent;
         }

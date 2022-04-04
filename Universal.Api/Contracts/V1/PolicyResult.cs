@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
+﻿using System;
 
 namespace Universal.Api.Contracts.V1
 {
@@ -31,25 +29,6 @@ namespace Universal.Api.Contracts.V1
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public CustomerResult Insured { get; set; } = new CustomerResult();
-    }
-
-    public class CreateNew<T> where T : PolicyRequest
-    {
-        public string AgentId { get; set; }
-        public string CustomerId { get; set; }
-        public string ProductId { get; set; }
-        public DateTime EntryDate { get; set; }
-        public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
-
-        public List<T> PolicyDetails { get; set; }
-        public List<Document> Documents { get; set; }
-    }
-
-    public class Document
-    {
-        public string FilePath { get; set; }
-        public string Description { get; set; }
     }
 
 }

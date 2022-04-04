@@ -20,7 +20,7 @@ namespace Universal.Api.Contracts.V1
             try
             {
                 var policy = await _repository.PolicySelectAsync(filter, GetCurrUserId());
-                return policy.Select((O => new PolicyResult(O))).ToList();
+                return policy.Select(x => new PolicyResult(x)).ToList();
             }
             catch (Exception ex)
             {
@@ -29,17 +29,15 @@ namespace Universal.Api.Contracts.V1
         }
 
         [HttpGet("{policyNo}")]
-        public ActionResult<PolicyResult> GetPolicy(string policyNo)
+        public async Task<ActionResult<PolicyResult>> GetPolicy(string policyNo)
         {
             try
             {
-                //this.CheckApiKey(ApiKey);
-                var policy = _repository.PolicySelectThis(policyNo);
+                var policy = await _repository.PolicySelectThisAsync(policyNo);
 
                 if(policy is null)
-                {
                     return NotFound();
-                }
+
                 return Ok(new PolicyResult(policy));
             }
             catch (Exception ex)
@@ -85,78 +83,69 @@ namespace Universal.Api.Contracts.V1
         #region Create Policy
 
         [HttpPost("aviation")]
-        public ActionResult<PolicyResult> NewAviationPolicy(CreateNewPolicyAsAviation policyDto)
+        public Task<ActionResult<PolicyResult>> NewAviationPolicy(CreateNewPolicyAsAviation policyDto)
         {
-            return NewPolicy(policyDto, policyDto.PolicyDetails);
+            return NewPolicy(policyDto);
         }
 
         [HttpPost("bond")]
-        public ActionResult<PolicyResult> NewBondPolicy(CreateNewPolicyAsBond policyDto)
+        public Task<ActionResult<PolicyResult>> NewBondPolicy(CreateNewPolicyAsBond policyDto)
         {
-            return NewPolicy(policyDto, policyDto.PolicyDetails);
+            return NewPolicy(policyDto);
         }
 
         [HttpPost("engineering")]
-        public ActionResult<PolicyResult> NewEngineeringPolicy(CreateNewPolicyAsEngineering policyDto)
+        public Task<ActionResult<PolicyResult>> NewEngineeringPolicy(CreateNewPolicyAsEngineering policyDto)
         {
-            return NewPolicy(policyDto, policyDto.PolicyDetails);
+            return NewPolicy(policyDto);
         }
 
         [HttpPost("fire")]
-        public ActionResult<PolicyResult> NewFirePolicy(CreateNewPolicyAsFire policyDto)
+        public Task<ActionResult<PolicyResult>> NewFirePolicy(CreateNewPolicyAsFire policyDto)
         {
-            return NewPolicy(policyDto, policyDto.PolicyDetails);
+            return NewPolicy(policyDto);
         }
 
         [HttpPost("accident")]
-        public ActionResult<PolicyResult> NewAccidentPolicy(CreateNewPolicyAsGeneralAccident policyDto)
+        public Task<ActionResult<PolicyResult>> NewAccidentPolicy(CreateNewPolicyAsGeneralAccident policyDto)
         {
-            return NewPolicy(policyDto, policyDto.PolicyDetails);
+            return NewPolicy(policyDto);
         }
 
         [HttpPost("marinecargo")]
-        public ActionResult<PolicyResult> NewMarineCargoPolicy(CreateNewPolicyAsMarineCargo policyDto)
+        public Task<ActionResult<PolicyResult>> NewMarineCargoPolicy(CreateNewPolicyAsMarineCargo policyDto)
         {
-            return NewPolicy(policyDto, policyDto.PolicyDetails);
+            return NewPolicy(policyDto);
         }
 
         [HttpPost("marinehull")]
-        public ActionResult<PolicyResult> NewMarineHullPolicy(CreateNewPolicyAsMarineHull policyDto)
+        public Task<ActionResult<PolicyResult>> NewMarineHullPolicy(CreateNewPolicyAsMarineHull policyDto)
         {
-            return NewPolicy(policyDto, policyDto.PolicyDetails);
+            return NewPolicy(policyDto);
         }
 
         [HttpPost("motor")]
-        public ActionResult<PolicyResult> NewMotorPolicy(CreateNewPolicyAsMotor policyDto)
+        public Task<ActionResult<PolicyResult>> NewMotorPolicy(CreateNewPolicyAsMotor policyDto)
         {
-            return NewPolicy(policyDto, policyDto.PolicyDetails);
+            return NewPolicy(policyDto);
         }
 
         [HttpPost("oilgas")]
-        public ActionResult<PolicyResult> NewOilGasPolicy(CreateNewPolicyAsOilGas policyDto)
+        public Task<ActionResult<PolicyResult>> NewOilGasPolicy(CreateNewPolicyAsOilGas policyDto)
         {
-            return NewPolicy(policyDto, policyDto.PolicyDetails);
+            return NewPolicy(policyDto);
         }
 
-        private ActionResult<PolicyResult> NewPolicy<T>(CreateNew<T> policyDto, 
-                                                     IEnumerable<PolicyRequest> sectionsDto) 
+        private async Task<ActionResult<PolicyResult>> NewPolicy<T>(CreateNew<T> newPolicyDto) 
             where T : PolicyRequest
         {
             try
             {
-                //var policy = _repository.PolicyCreate(policyDto, sectionsDto);
-                //_repository.SaveChanges();
+                var policy = await _repository.PolicyCreateAsync(newPolicyDto);
+                _repository.SaveChanges();
 
-                ////var to = policy.InsEmail;
-                ////var cc = "jelamah@cornerstone.com.ng";
-                ////var bcc = "oseniwasiu@inttecktechnologies.com";
-                ////var pdf = Documents.Certificate.ToPdfStream(policy);
-
-                ////Documents.Certificate.SendEmailAsync(to, cc, bcc, pdf);
-
-                var uri = new Uri($"{Request.Path}/demo_policy_number", UriKind.Relative);
-
-                return Created(uri, null);
+                var uri = new Uri($"{Request.Path}/{policy.PolicyNo}", UriKind.Relative);
+                return Created(uri, new PolicyResult(policy));
             }
             catch (Exception ex)
             {
