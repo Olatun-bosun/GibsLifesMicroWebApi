@@ -13,6 +13,8 @@ namespace Universal.Api.Data
         {
         }
 
+        public DbSet<AutoNumber> AutoNumbers { get; set; }
+        public DbSet<Branch> Branches { get; set; }
         public DbSet<SubRisk> SubRisks { get; set; }
         public DbSet<Policy> Policies { get; set; }
         public DbSet<Party> Parties { get; set; }

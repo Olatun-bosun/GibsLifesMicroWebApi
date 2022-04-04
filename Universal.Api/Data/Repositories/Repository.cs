@@ -5,6 +5,9 @@ namespace Universal.Api.Data.Repositories
     public partial class Repository 
     {
         private readonly DataContext _db;
+        private const string BRANCH_ID = "19";
+        private const string BRANCH_NAME = "RETAIL OFFICE";
+        private const string SUBMITTED_BY = "WEB-API";
 
         public Repository(DataContext db)
         {

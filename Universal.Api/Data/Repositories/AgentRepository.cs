@@ -52,22 +52,27 @@ namespace Universal.Api.Data.Repositories
 
             Party agent = new Party()
             {
-                PartyID = "DEMO-" + Guid.NewGuid().ToString().ToUpper(),
+                PartyID = GetNextAutoNumber("[AUTO]", "AGENTS", BRANCH_ID),
 
                 PartyName = newAgentDto.AgentName,
                 Address = newAgentDto.Address,
                 LandPhone = newAgentDto.PhoneLine2,
                 mobilePhone = newAgentDto.PhoneLine1,
                 Email = newAgentDto.Email,
-                //ComRate = agentDto.CommissionRate,
-                //CreditLimit = agentDto.CreditLimit,
+                ComRate = null,
+                CreditLimit = null,
                 PartyType = "AG",
-                //InsContact = agentDto.InsuranceContact,
-                //FinContact = agentDto.FinancialContact,
+                InsContact = null,
+                FinContact = null,
                 Remarks = newAgentDto.Remarks,
+                SubmittedBy = SUBMITTED_BY,
+                SubmittedOn = DateTime.Now,
+                Active = 1,
+                Deleted = 0,
+
                 ApiId = newAgentDto.Email,
                 ApiPassword = newAgentDto.Password,
-                ApiStatus = "PENDING"
+                ApiStatus = "PENDING",
             };
 
             _db.Parties.Add(agent);

@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
 using Universal.Api.Contracts.V1;
 using Universal.Api.Models;
 
@@ -31,11 +31,12 @@ namespace Universal.Api.Data.Repositories
 
             var newInsured = new InsuredClient
             {
-                InsuredID = "DEMO-" + Guid.NewGuid().ToString().ToUpper(),
+                InsuredID = GetNextAutoNumber("[AUTO]", "INSURED", BRANCH_ID),
 
                 Address = newCustomerDto.Address,
                 Email = newCustomerDto.Email,
                 FirstName = newCustomerDto.FirstName,
+                Surname = newCustomerDto.LastName,
                 //FullName = policyDto.Title + " " + policyDto.LastName + " " + policyDto.FirstName + " " + policyDto.LastName,
                 //DOB = policyDto.DateOfBirth,
                 //InsuredType = policyDto.InsuredType,
@@ -46,15 +47,14 @@ namespace Universal.Api.Data.Repositories
                 Occupation = newCustomerDto.Industry,
                 OtherNames = newCustomerDto.OtherName,
                 //Profile = policyDto.RiskProfiling,
-                SubmittedBy = "E-CHANNEL",
+                SubmittedBy = SUBMITTED_BY,
                 SubmittedOn = DateTime.Now,
-                Surname = newCustomerDto.LastName,
                 Active = 1,
                 Deleted = 0,
 
                 ApiId = $"{agentId}/{newCustomerDto.PhoneLine1}",
                 ApiPassword = newCustomerDto.Password,
-                ApiStatus = "ACTIVE",
+                ApiStatus = "ACTIVE", 
             };
 
             _db.InsuredClients.Add(newInsured);

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace Gibs.OpenApi.Models
+namespace Universal.Api.Models
 {
     public class Branch
     {

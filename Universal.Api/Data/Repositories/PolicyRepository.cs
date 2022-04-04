@@ -79,14 +79,16 @@ namespace Universal.Api.Data.Repositories
 
         private DNCNNote CreateNewDebitNote(Policy policy)
         {
-            string dncnNo = Guid.NewGuid().ToString().Split('-')[0];
+            //string dncnNo = Guid.NewGuid().ToString().Split('-')[0];
+            string dncnNo = GetNextAutoNumber("[AUTO]", "DNOTE", BRANCH_ID, policy.SubRiskID);
+
             return new DNCNNote()
             {
                 DNCNNo = dncnNo,
                 refDNCNNo = dncnNo,
                 PolicyNo = policy.PolicyNo,
                 CoPolicyNo = policy.CoPolicyNo,
-                BranchID = "19",
+                BranchID = BRANCH_ID,
                 BizSource = "DIRECT",
                 //BizOption = P.BizOption,
                 NoteType = "DN",
@@ -123,7 +125,7 @@ namespace Universal.Api.Data.Repositories
                 Deleted = 0,
                 DeletedOn = DateTime.Now,
                 Active = 1,
-                SubmittedBy = "WEB_API",
+                SubmittedBy = SUBMITTED_BY,
                 SubmittedOn = DateTime.Now,
                 TotalRiskValue = 0,
                 TotalPremium = 0,
@@ -147,11 +149,13 @@ namespace Universal.Api.Data.Repositories
         private DNCNNote CreateNewReceipt(Policy policy, string refDnCnNo)
         {
             string dncnNo = Guid.NewGuid().ToString().Split('-')[0];
+            string receiptNo = GetNextAutoNumber("[AUTO]", "RECEIPT", BRANCH_ID, policy.SubRiskID);
+
             return new DNCNNote()
             {
                 DNCNNo = dncnNo,
                 refDNCNNo = refDnCnNo,
-                ReceiptNo = $"RT/19/{DateTime.Today.Month}/$00000$",
+                ReceiptNo = receiptNo,
                 PolicyNo = policy.PolicyNo,
                 CoPolicyNo = policy.CoPolicyNo,
                 BranchID = policy.BranchID,
@@ -191,7 +195,7 @@ namespace Universal.Api.Data.Repositories
                 Deleted = 0,
                 DeletedOn = DateTime.Now,
                 Active = 1,
-                SubmittedBy = "WEB_API",
+                SubmittedBy = SUBMITTED_BY,
                 SubmittedOn = DateTime.Now,
                 TotalRiskValue = 0,
                 TotalPremium = 0,
@@ -215,9 +219,7 @@ namespace Universal.Api.Data.Repositories
         private async Task<Policy> CreateNewPolicyAsync<T>(CreateNew<T> newPolicyDto, InsuredClient insured)
              where T : PolicyRequest
         {
-            var policyNo = GeneratePolicyNo(newPolicyDto.ProductId,
-                                            "newPolicyDto.BranchId",
-                                            "newPolicyDto.SourceId");
+            var policyNo = GetNextAutoNumber("[AUTO]", "POLICY", BRANCH_ID, newPolicyDto.ProductId);
 
             var subRisk = await ProductSelectThisAsync(newPolicyDto.ProductId);
             var party = await PartySelectThisOrNullAsync(newPolicyDto.AgentId);
@@ -231,8 +233,8 @@ namespace Universal.Api.Data.Repositories
                 PartyID = newPolicyDto.AgentId,
                 SubRisk = subRisk.SubRiskName,
                 Party = party.PartyName,
-                BranchID = "19",
-                Branch = "RETAIL OFFICE",
+                BranchID = BRANCH_ID,
+                Branch = BRANCH_NAME,
                 //TrackID = 100L,
                 //SourceType = policyDto.BizChannel,
                 //ExRate = 1.0,
@@ -249,7 +251,7 @@ namespace Universal.Api.Data.Repositories
                 //BizSource = policyDto.SourceId,
                 Active = 1,
                 Deleted = 0,
-                SubmittedBy = "WEB_API",
+                SubmittedBy = SUBMITTED_BY,
                 SubmittedOn = DateTime.Now,
                 PolicyNo = policyNo,
                 CoPolicyNo = policyNo,
@@ -271,48 +273,50 @@ namespace Universal.Api.Data.Repositories
             };
         }
 
-        private string GeneratePolicyNo(string productID, string branchID, string bizSource)
-        {
-            //InsuredID: $BR$$MO$$YR$$00000$
+        //private string GeneratePolicyNo(string productID, string branchID, string bizSource)
+        //{
+        //    //InsuredID: $BR$$MO$$YR$$00000$
+        //                 $BR2$$MO$$YR$$00000$
 
-            //PartyID: 41$00000$$MO$
+        //    //PartyID: 41$00000$$MO$
 
-            //PolicyNo: UIC/$BR2$/$SR$/$00000$/$MO$/$YR$
-
-
-
-
+        //    //PolicyNo: UIC/$BR2$/$SR$/$00000$/$MO$/$YR$
+        //                UIC/$BR2$/$SR$/$00000$/$MO$/$YR$
 
 
 
 
 
 
-            //var subRisk = SubRiskSelectThis(productID);
-            //var policyAutoNumber = PolicyAutoNumberSelectThis(productID, branchID);
-            //var nextValue = policyAutoNumber.NextValue;
 
-            //long? nullable1 = (nextValue.Value > 0 ? (nextValue.HasValue ? 1 : 0) : 0) == 0 ? 1 : policyAutoNumber.NextValue;
 
-            ////TODO here
 
-            //string str;
 
-            //if (bizSource == "ACCEPTED")
-            //    str = "IN/" + branchID + "/" + policyAutoNumber.RiskID + "/" + DateTime.Today.Year + "/" + nullable1.Value.ToString("00000");
+        //    //var subRisk = SubRiskSelectThis(productID);
+        //    //var policyAutoNumber = PolicyAutoNumberSelectThis(productID, branchID);
+        //    //var nextValue = policyAutoNumber.NextValue;
 
-            ////else if (subRisk.MidRiskID == "401")
-            ////    str = "OC/" + branchID + "/" + policyAutoNumber.RiskID + "/" + DateTime.Today.Year + "/" + nullable1.Value.ToString("00000");
-            //else
-            //    str = "P/" + branchID + "/" + policyAutoNumber.RiskID + "/" + DateTime.Today.Year + "/" + nullable1.Value.ToString("00000");
+        //    //long? nullable1 = (nextValue.Value > 0 ? (nextValue.HasValue ? 1 : 0) : 0) == 0 ? 1 : policyAutoNumber.NextValue;
 
-            //long? SerialNo = nullable1.HasValue ? new long?(nullable1.GetValueOrDefault() + 1) : new long?();
+        //    ////TODO here
 
-            //PolicyAutoNumberUpdateNextValue(policyAutoNumber.RiskID, policyAutoNumber.BranchID, SerialNo);
-            //return str;
+        //    //string str;
 
-            return null;
-        }
+        //    //if (bizSource == "ACCEPTED")
+        //    //    str = "IN/" + branchID + "/" + policyAutoNumber.RiskID + "/" + DateTime.Today.Year + "/" + nullable1.Value.ToString("00000");
+
+        //    ////else if (subRisk.MidRiskID == "401")
+        //    ////    str = "OC/" + branchID + "/" + policyAutoNumber.RiskID + "/" + DateTime.Today.Year + "/" + nullable1.Value.ToString("00000");
+        //    //else
+        //    //    str = "P/" + branchID + "/" + policyAutoNumber.RiskID + "/" + DateTime.Today.Year + "/" + nullable1.Value.ToString("00000");
+
+        //    //long? SerialNo = nullable1.HasValue ? new long?(nullable1.GetValueOrDefault() + 1) : new long?();
+
+        //    //PolicyAutoNumberUpdateNextValue(policyAutoNumber.RiskID, policyAutoNumber.BranchID, SerialNo);
+        //    //return str;
+
+        //    return null;
+        //}
 
     }
 }
