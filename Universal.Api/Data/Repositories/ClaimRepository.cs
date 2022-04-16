@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
 using Universal.Api.Contracts.V1;
 using Universal.Api.Models;
 
@@ -10,31 +10,22 @@ namespace Universal.Api.Data.Repositories
 {
     public partial class Repository
     {
-        public Task<List<Claim>> SelectAgentClaimsAsync(string partyId, FilterPaging filter)
+        public Task<List<Claim>> SelectClaimsAsync(FilterPaging filter)
         {
             if (filter == null)
                 filter = new FilterPaging();
 
-            var query = _db.ClaimsReserved.Where(x => x.PartyID == partyId);
+            var query = _db.ClaimsReserved.Where(x => x.Deleted == 0);
 
-            if (filter.CanSearchDate)
-            {
-                query = query.Where(x => (x.EntryDate >= filter.DateFrom) &&
-                                         (x.EntryDate <= filter.DateTo));
-            }
+            if (_authContext.User is AppUser u)
+                query = query.Where(x => x.SubmittedBy == $"{SUBMITTED_BY}/{u.AppId}");
 
-            return query.OrderByDescending(x => x.EntryDate)
-                        .Skip(filter.SkipCount)
-                        .Take(filter.PageSize)
-                        .ToListAsync();
-        }
+            else if (_authContext.User is AgentUser a)
+                query = query.Where(x => x.PartyID == a.PartyId);
 
-        public Task<List<Claim>> SelectCustomerClaimsAsync(string insuredId, FilterPaging filter)
-        {
-            if (filter == null)
-                filter = new FilterPaging();
+            else if (_authContext.User is CustomerUser c)
+                query = query.Where(x => x.InsuredID == c.InsuredId);
 
-            var query = _db.ClaimsReserved.Where(x => x.InsuredID == insuredId);
             if (filter.CanSearchDate)
             {
                 query = query.Where(x => (x.EntryDate >= filter.DateFrom) &&
@@ -66,8 +57,8 @@ namespace Universal.Api.Data.Repositories
             {
                 //NotificatnNo = GenerateNotificationNo(policy.SubRiskID, policy.BranchID),
                 PolicyNo = claimDto.PolicyNo,
-                NotifyDate = claimDto.LossNotifyDate.ToUniversalTime(),
-                LossDate = claimDto.LossDate.ToUniversalTime(),
+                NotifyDate = claimDto.LossNotifyDate,
+                LossDate = claimDto.LossDate,
                 LossDetails = claimDto.LossDescription,
                 //InsuredName = policy.InsFullName,
                 BranchID = policy.BranchID,
@@ -76,7 +67,7 @@ namespace Universal.Api.Data.Repositories
                 //RegStatus = "PENDING",
                 Approval = 0,
                 Active = 1,
-                SubmittedBy = "E-CHANNEL",
+                SubmittedBy = $"{SUBMITTED_BY}/{_authContext.User.AppId}",
                 SubmittedOn = DateTime.Now,
                 StartDate = DateTime.Now,
                 EndDate = DateTime.Now.AddYears(1).AddDays(-1.0),

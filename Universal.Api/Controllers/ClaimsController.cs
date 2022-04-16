@@ -3,14 +3,17 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Universal.Api.Contracts.V1;
 using Universal.Api.Data.Repositories;
+using Universal.Api.Data;
 
 namespace Universal.Api.Controllers
 {
+    [Authorize(Roles = "APP,AGENT,CUST")]
     public class ClaimsController : SecureControllerBase
     {
-        public ClaimsController(Repository repository) : base(repository)
+        public ClaimsController(Repository repository, AuthContext authContext) : base(repository, authContext)
         {
         }
 
@@ -20,20 +23,12 @@ namespace Universal.Api.Controllers
         /// <param name="filter"></param>
         /// <returns>A collection of Claims.</returns>
         [HttpGet()]
-        public async Task<ActionResult<IEnumerable<ClaimResult>>> ListClaimsAsync([FromQuery] FilterPaging filter)
+        public async Task<ActionResult<IEnumerable<ClaimResult>>> ListClaims([FromQuery] FilterPaging filter)
         {
             try
             {
-                if (User.IsAgent())
-                {
-                    var claims = await _repository.SelectAgentClaimsAsync(GetCurrUserId(), filter);
-                    return claims.Select((x => new ClaimResult(x))).ToList();
-                }
-                else
-                {
-                    var claims = await _repository.SelectCustomerClaimsAsync(GetCurrUserId(), filter);
-                    return claims.Select((x => new ClaimResult(x))).ToList();
-                }
+                var claims = await _repository.SelectClaimsAsync(filter);
+                return claims.Select((x => new ClaimResult(x))).ToList();
             }
             catch (Exception ex)
             {
@@ -84,7 +79,5 @@ namespace Universal.Api.Controllers
                 return ExceptionResult(ex);
             }
         }
-
-        
     }
 }

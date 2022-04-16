@@ -94,7 +94,7 @@ namespace Universal.Api.Data.Repositories
                         strAutoNum = strAutoNum.Replace("$P$", GetEndorsementCode(endorseType));
                     }
 
-                    return strAutoNum;
+                    return strAutoNum.ToUpper();
                 }
                 else
                 {
@@ -103,7 +103,7 @@ namespace Universal.Api.Data.Repositories
             }
             catch 
             {
-                return string.Empty;
+                throw new InvalidOperationException("Error in GetNextAutoNumber()");
             }
         }
 
@@ -191,7 +191,7 @@ namespace Universal.Api.Data.Repositories
             }
             catch 
             {
-                return string.Empty;
+                throw new InvalidOperationException("Error in GetSerialNoFormat()");
             }
         }
     }

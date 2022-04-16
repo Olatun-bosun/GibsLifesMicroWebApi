@@ -7,25 +7,22 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authorization;
 using Universal.Api.Data.Repositories;
+using Universal.Api.Data;
 
 namespace Universal.Api.Controllers
 {
-    [Authorize]
     [ApiController]
     [Route("api/v1/[controller]")]
     [ApiConventionType(typeof(DefaultApiConventions))]
     public class SecureControllerBase : ControllerBase
     {
         protected readonly Repository _repository;
+        protected readonly AuthContext _authContext;
 
-        public SecureControllerBase(Repository repository)
+        public SecureControllerBase(Repository repository, AuthContext authContext)
         {
             _repository = repository;
-        }
-
-        protected string GetCurrUserId()
-        {
-            return User?.FindFirst(c => c.Type == ClaimTypes.Name).Value;
+            _authContext = authContext;
         }
 
         protected ActionResult ExceptionResult(Exception ex)
@@ -42,7 +39,8 @@ namespace Universal.Api.Controllers
             return StatusCode(500, ex.Message);
         }
 
-        protected string CreateToken(string secret, int expiresIn, string username, string primaryRole)
+        protected string CreateToken(string secret, int expiresIn, 
+                                     string appId, string userId, string tableId, string role)
         {
             var key = Encoding.UTF8.GetBytes(secret);
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -50,14 +48,15 @@ namespace Universal.Api.Controllers
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                             new Claim(ClaimTypes.Email, username),
-                             new Claim(ClaimTypes.Name, username),
-                             new Claim(ClaimTypes.Role, primaryRole)
+                    new Claim("AppID", appId),
+                    new Claim("UserID", userId),
+                    new Claim("TableID", tableId),
+                    new Claim(ClaimTypes.Name, $"{appId}/{userId}"),
+                    new Claim(ClaimTypes.Role, role)
                 }),
                 Expires = DateTime.UtcNow.AddSeconds(expiresIn),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
                 SecurityAlgorithms.HmacSha256Signature),
-
             };
 
             var token = tokenHandler.CreateToken(tokenDescriptor);

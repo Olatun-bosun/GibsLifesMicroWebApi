@@ -10,7 +10,7 @@ namespace Universal.Api.Contracts.V1
 
         public AgentResult(Models.Party party)
         {
-            AgentId = party.ApiId;
+            AgentId = party.PartyID;
             AgentName = party.PartyName;
             Address = party.Address;
             PhoneLine2 = party.LandPhone;
@@ -20,7 +20,7 @@ namespace Universal.Api.Contracts.V1
             //CreditLimit = (decimal)party.CreditLimit;
             //InsuranceContact = party.InsContact;
             //FinancialContact = party.FinContact;
-            Remarks = party.Remarks;
+            Remarks = party.Remarks; 
         }
 
         [Required]
@@ -50,10 +50,11 @@ namespace Universal.Api.Contracts.V1
         public string Password { get; set; }
         [Required]
         public string Address { get; set; }
-        [Required]
+        [Required, EmailAddress]
         public string Email { get; set; }
-        [Required]
+        [Required, Phone]
         public string PhoneLine1 { get; set; }
+        [Phone]
         public string PhoneLine2 { get; set; }
         //public string InsuranceContact { get; set; }
         public string Remarks { get; set; }

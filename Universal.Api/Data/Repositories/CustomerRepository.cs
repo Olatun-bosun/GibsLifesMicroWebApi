@@ -10,21 +10,18 @@ namespace Universal.Api.Data.Repositories
 {
     public partial class Repository
     {
-        public Task<InsuredClient> CustomerLoginAsync(string agentId, string customerId, string password)
+        public Task<InsuredClient> CustomerLoginAsync(string appId, string customerId, string password)
         {
             return _db.InsuredClients
-                      .Where(x => x.ApiId == $"{agentId}/{customerId}"
-                               && x.ApiPassword == password
-                               && x.ApiStatus == "ENABLED").SingleOrDefaultAsync();
+                      .Where(x => (x.InsuredID == customerId || x.Email == customerId)
+                                && x.ApiPassword == password
+                                && x.SubmittedBy == $"{SUBMITTED_BY}/{appId}").SingleOrDefaultAsync();
         }
 
-        public async Task<InsuredClient> CustomerCreateAsync(CreateNewCustomerRequest newCustomerDto, string agentId)
+        public async Task<InsuredClient> CustomerCreateAsync(CreateNewCustomerRequest newCustomerDto)
         {
-            if (string.IsNullOrWhiteSpace(agentId))
-                throw new ArgumentNullException(nameof(agentId), "The agent id is required.");
-
             //check for duplicate
-            var duplicate = await CustomerSelectThisAsync(newCustomerDto.PhoneLine1);
+            var duplicate = await CustomerSelectThisAsync(newCustomerDto.Email);
 
             if (duplicate != null)
                 throw new ArgumentException("Customer already exists");
@@ -39,7 +36,7 @@ namespace Universal.Api.Data.Repositories
                 Surname = newCustomerDto.LastName,
                 //FullName = policyDto.Title + " " + policyDto.LastName + " " + policyDto.FirstName + " " + policyDto.LastName,
                 //DOB = policyDto.DateOfBirth,
-                //InsuredType = policyDto.InsuredType,
+                //InsuredType = policyDto.InsuredType, 
                 LandPhone = newCustomerDto.PhoneLine2,
                 MobilePhone = newCustomerDto.PhoneLine1,
                 //MeansID = policyDto.Identification,
@@ -47,26 +44,26 @@ namespace Universal.Api.Data.Repositories
                 Occupation = newCustomerDto.Industry,
                 OtherNames = newCustomerDto.OtherName,
                 //Profile = policyDto.RiskProfiling,
-                SubmittedBy = SUBMITTED_BY,
+                SubmittedBy = $"{SUBMITTED_BY}/{_authContext.User.AppId}",
                 SubmittedOn = DateTime.Now,
                 Active = 1,
                 Deleted = 0,
 
-                ApiId = $"{agentId}/{newCustomerDto.PhoneLine1}",
+                ApiId = newCustomerDto.Email,
                 ApiPassword = newCustomerDto.Password,
-                ApiStatus = "ACTIVE", 
+                ApiStatus = "ENABLED", 
             };
 
             _db.InsuredClients.Add(newInsured);
             return newInsured;
         }
 
-        public Task<InsuredClient> CustomerSelectThisAsync(string customerID)
+        public Task<InsuredClient> CustomerSelectThisAsync(string customerId)
         {
-            if (string.IsNullOrWhiteSpace(customerID))
-                throw new ArgumentNullException(nameof(customerID));
+            if (string.IsNullOrWhiteSpace(customerId))
+                throw new ArgumentNullException(nameof(customerId));
 
-            return _db.InsuredClients.Where(x => x.InsuredID == customerID).SingleOrDefaultAsync();
+            return _db.InsuredClients.Where(x => x.InsuredID == customerId).SingleOrDefaultAsync();
         }
 
         public Task<List<InsuredClient>> CustomerSelectAsync(FilterPaging filter)
@@ -75,6 +72,12 @@ namespace Universal.Api.Data.Repositories
                 filter = new FilterPaging();
 
             var query = _db.InsuredClients.AsQueryable();
+
+            if (_authContext.User is AppUser u)
+                query = query.Where(x => x.SubmittedBy == $"{SUBMITTED_BY}/{u.AppId}");
+
+            //else if (_authContext.User is AgentUser a)
+            //    query = query.Where(x => x.PartyID == a.PartyId);
 
             foreach (string item in filter.SearchTextItems)
                 query = query.Where(x => x.Surname.Contains(item) || x.FirstName.Contains(item)).AsQueryable();

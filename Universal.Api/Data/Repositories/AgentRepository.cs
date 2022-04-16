@@ -2,28 +2,28 @@
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
 using Universal.Api.Contracts.V1;
 using Universal.Api.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace Universal.Api.Data.Repositories
 {
     public partial class Repository
     {
-        public Task<Party> PartyLoginOrNullAsync(string apiId, string password)
+        public Task<Party> PartyLoginOrNullAsync(string appId, string agentId, string password)
         {
             return _db.Parties
-                      .Where(x => x.ApiId == apiId
-                               && x.ApiPassword == password
-                               && x.ApiStatus == "ENABLED").SingleOrDefaultAsync();
+                      .Where(x => (x.PartyID == agentId || x.Email == agentId)
+                                && x.ApiPassword == password
+                                && x.SubmittedBy == $"{SUBMITTED_BY}/{appId}").SingleOrDefaultAsync();
         }
 
-        public Task<List<Party>> PartySelectAsync(string partyId, FilterPaging filter)
+        public Task<List<Party>> PartySelectAsync(FilterPaging filter)
         {
             if (filter == null)
                 filter = new FilterPaging();
 
-            var query = _db.Parties.Where(x => x.PartyID == partyId);
+            var query = _db.Parties.Where(x => x.Active == 1);
 
             foreach (string item in filter.SearchTextItems)
                 query = query.Where(x => x.PartyName.Contains(item)).AsQueryable();
@@ -34,23 +34,23 @@ namespace Universal.Api.Data.Repositories
                         .ToListAsync();
         }
 
-        public Task<Party> PartySelectThisOrNullAsync(string agentID)
+        public Task<Party> PartySelectThisOrNullAsync(string agentId)
         {
-            if (string.IsNullOrWhiteSpace(agentID))
-                throw new ArgumentNullException("Agent ID cannot be empty ", "AgentID");
+            if (string.IsNullOrWhiteSpace(agentId))
+                throw new ArgumentNullException("Agent ID cannot be empty", "AgentID");
 
-            return _db.Parties.Where(x => x.PartyID == agentID).SingleOrDefaultAsync();
+            return _db.Parties.Where(x => x.PartyID == agentId).SingleOrDefaultAsync();
         }
 
         public async Task<Party> PartyCreateAsync(CreateNewAgentRequest newAgentDto)
         {
             //check for duplicate
-            var existing = await _db.Parties.Where(x => x.PartyID == newAgentDto.PhoneLine1 || 
-                                                        x.Email   == newAgentDto.Email).FirstOrDefaultAsync();
+            var existing = await _db.Parties.Where(x => x.ApiId.Contains(newAgentDto.Email) || 
+                                                        x.mobilePhone == newAgentDto.PhoneLine1).FirstOrDefaultAsync();
             if (existing != null)
                 throw new ArgumentException("Duplicate agent found");
 
-            Party agent = new Party()
+            Party party = new Party()
             {
                 PartyID = GetNextAutoNumber("[AUTO]", "AGENTS", BRANCH_ID),
 
@@ -65,7 +65,7 @@ namespace Universal.Api.Data.Repositories
                 InsContact = null,
                 FinContact = null,
                 Remarks = newAgentDto.Remarks,
-                SubmittedBy = SUBMITTED_BY,
+                SubmittedBy = $"{SUBMITTED_BY}/{_authContext.User.AppId}",
                 SubmittedOn = DateTime.Now,
                 Active = 1,
                 Deleted = 0,
@@ -75,8 +75,8 @@ namespace Universal.Api.Data.Repositories
                 ApiStatus = "PENDING",
             };
 
-            _db.Parties.Add(agent);
-            return agent;
+            _db.Parties.Add(party);
+            return party;
         }
     }
 }

@@ -6,35 +6,44 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Universal.Api.Contracts.V1;
 using Universal.Api.Data.Repositories;
+using Universal.Api.Data;
 
 namespace Universal.Api.Controllers
 {
-    [Authorize(Roles = "Agent")]
+    [Authorize(Roles = "APP,AGENT")]
     public class CustomersController : SecureControllerBase
     {
         private readonly Settings _settings;
-        public CustomersController(Repository repository, Settings settings) : base(repository)
+        public CustomersController(Repository repository, AuthContext authContext, Settings settings) : base(repository, authContext)
         {
             _settings = settings;
         }
 
-        [HttpPost("Login/{agentId}"), AllowAnonymous]
-        public async Task<ActionResult<LoginResult>> CustomerLogin(LoginRequest loginRequest, string agentId)
+        /// <summary>
+        /// Customers should Login using this endpoint. It creates a JWT Token that can be used to access secured endpoints of the API.
+        /// </summary>
+        /// <returns>A JWT Token and it's expiry time.</returns>
+        [HttpPost("Login"), AllowAnonymous]
+        public async Task<ActionResult<LoginResult>> CustomerLogin(CustomerLoginRequest login)
         {
-            if (loginRequest is null)
+            if (login is null)
                 return BadRequest("Request body is null");
 
             try
             {
-                var insured = await _repository.CustomerLoginAsync(agentId, loginRequest.Id, loginRequest.Password);
+                var insured = await _repository.CustomerLoginAsync(login.AppId, login.CustomerId, login.Password);
 
                 if (insured is null)
-                    return BadRequest("ID or Password is incorrect");
+                    return NotFound("ID or Password is incorrect");
+
+                else if (insured.ApiStatus != "ENABLED")
+                    return Unauthorized("This Customer has not been activated");
 
                 string token = CreateToken(_settings.JwtSecret,
                                            _settings.JwtExpiresIn,
-                                           loginRequest.Id, "Customer");
-
+                                           login.AppId, 
+                                           login.CustomerId, 
+                                           insured.InsuredID, "CUST");
                 var response = new LoginResult
                 {
                     TokenType = "Bearer",
@@ -50,14 +59,12 @@ namespace Universal.Api.Controllers
             }
         }
 
-
         /// <summary>
         /// Fetch a collection of Customers.
         /// </summary>
-        /// <returns>A collection of customers.</returns>
+        /// <returns>A collection of Customers.</returns>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<CustomerResult>>> ListCustomersAsync(
-            [FromQuery] FilterPaging filter)
+        public async Task<ActionResult<IEnumerable<CustomerResult>>> ListCustomers([FromQuery] FilterPaging filter)
         {
             try
             {
@@ -71,10 +78,10 @@ namespace Universal.Api.Controllers
         }
 
         /// <summary>
-        /// Fetch a single customer.
+        /// Fetch a single Customer.
         /// </summary>
-        /// <param name="customerId">Id of the customer to get.</param>
-        /// <returns>The customer with the Id entered.</returns>
+        /// <param name="customerId">Id of the Customer to get.</param>
+        /// <returns>The Customer with the Id entered.</returns>
         [HttpGet("{customerId}")]
         public async Task<ActionResult<CustomerResult>> GetCustomer(string customerId)
         {
@@ -94,18 +101,18 @@ namespace Universal.Api.Controllers
         }
 
         /// <summary>
-        /// Create a customer.
+        /// Create a Customer.
         /// </summary>
-        /// <returns>A newly created customer</returns>
-        [HttpPost("{agentId}"), AllowAnonymous]
-        public async Task<ActionResult<CustomerResult>> Post(CreateNewCustomerRequest request, string agentId)
+        /// <returns>A newly created Customer</returns>
+        [HttpPost]
+        public async Task<ActionResult<CustomerResult>> CreateCustomer(CreateNewCustomerRequest request)
         {
             try
             {
-                var customer = await _repository.CustomerCreateAsync(request, agentId);
+                var customer = await _repository.CustomerCreateAsync(request);
                 _repository.SaveChanges();
 
-                var uri = new Uri($"{Request.Path}/{customer.InsuredID}", UriKind.Relative);
+                var uri = new Uri($"{Request.Path}/{customer.ApiId}", UriKind.Relative);
                 return Created(uri, new CustomerResult(customer));
             }
             catch (Exception ex)

@@ -3,23 +3,27 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Universal.Api.Controllers;
 using Universal.Api.Data.Repositories;
+using Universal.Api.Data;
 
 namespace Universal.Api.Contracts.V1
 {
+    [Authorize(Roles = "APP,AGENT,CUST")]
     public class PoliciesController : SecureControllerBase
     {
-        public PoliciesController(Repository repository) : base(repository)
+        public PoliciesController(Repository repository, AuthContext authContext) : base(repository, authContext)
         {
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<PolicyResult>>> ListPoliciesAsync([FromQuery] FilterPaging filter)
+        public async Task<ActionResult<IEnumerable<PolicyResult>>> ListPolicies([FromQuery] FilterPaging filter)
         {
             try
             {
-                var policy = await _repository.PolicySelectAsync(filter, GetCurrUserId());
+                var policy = await _repository.PolicySelectAsync(filter);
                 return policy.Select(x => new PolicyResult(x)).ToList();
             }
             catch (Exception ex)
@@ -136,6 +140,8 @@ namespace Universal.Api.Contracts.V1
             return NewPolicy(policyDto);
         }
 
+        #endregion
+
         private async Task<ActionResult<PolicyResult>> NewPolicy<T>(CreateNew<T> newPolicyDto) 
             where T : PolicyRequest
         {
@@ -152,7 +158,5 @@ namespace Universal.Api.Contracts.V1
                 return ExceptionResult(ex);
             }
         }
-
-        #endregion
     }
 }

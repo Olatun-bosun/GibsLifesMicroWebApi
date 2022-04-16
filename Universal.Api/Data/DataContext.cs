@@ -9,10 +9,13 @@ namespace Universal.Api.Data
         {
         }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        protected override void OnModelCreating(ModelBuilder builder)
         {
+            builder.Entity<PolicyAutoNumber>().HasKey(p => new { p.NumType, p.RiskID, p.BranchID, p.CompanyID });
         }
 
+        public DbSet<Document> Documents { get; set; }
+        public DbSet<ApiUser> OpenApiUsers { get; set; }
         public DbSet<AutoNumber> AutoNumbers { get; set; }
         public DbSet<Branch> Branches { get; set; }
         public DbSet<SubRisk> SubRisks { get; set; }

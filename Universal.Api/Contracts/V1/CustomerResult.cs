@@ -6,7 +6,7 @@ namespace Universal.Api.Contracts.V1
     public class CreateNewCustomerRequest
     {
         [Required]
-        public string CustomerType { get; set; } //TODO: make enum list
+        public bool IsCorporate { get; set; } 
         [Required]
         public string Password { get; set; }
         public string Title { get; set; }
@@ -15,12 +15,13 @@ namespace Universal.Api.Contracts.V1
         [Required]
         public string LastName { get; set; }
         public string OtherName { get; set; }
-        [Required]
+        [Required, EmailAddress]
         public string Email { get; set; }
         [Required]
         public string Address { get; set; }
-        [Required]
+        [Required, Phone]
         public string PhoneLine1 { get; set; }
+        [Phone]
         public string PhoneLine2 { get; set; }
         public string LocalGovtArea { get; set; }
         public string StateOfOrigin { get; set; }
@@ -39,33 +40,36 @@ namespace Universal.Api.Contracts.V1
 
         public CustomerResult(Models.InsuredClient client)
         {
-            //todo
-            var splittedArray = client.ApiId.Split('/');
+            IsCorporate = false;
+            Password = null;
+            Title = null;
 
-
-            CustomerId = splittedArray[1];
-            //CustomerType=customer.
-            //Title = Custom
+            CustomerId = client.InsuredID;
             FirstName = client.FirstName;
             LastName = client.Surname;
             OtherName = client.OtherNames;
+            Email = client.Email;
             Address = client.Address;
             PhoneLine2 = client.LandPhone;
             PhoneLine1 = client.MobilePhone;
-            Email = client.Email;
-            //IdentificationNo = customer.
-            //IdentificationType
 
+            LocalGovtArea = null;
+            StateOfOrigin = null;
+            Nationality = null;
+            //DateOfBirth = null;
+            IdentificationType = null;
+            IdentificationNo = null;
             Industry = client.Occupation;
-
         }
 
         public CustomerResult(Models.Policy policy)
         {
-            //todo
-            var splittedArray = policy.InsFaxNo.Split('/');
+            IsCorporate = false;
+            Password = null;
+            Title = null;
 
-            CustomerId = splittedArray[1];
+            //CustomerId = policy.InsFaxNo; //ApiId
+            CustomerId = policy.InsuredID; 
             LastName = policy.InsSurname;
             FirstName = policy.InsFirstname;
             OtherName = policy.InsOthernames;
@@ -75,6 +79,14 @@ namespace Universal.Api.Contracts.V1
             Email = policy.InsEmail;
             Industry = policy.InsOccupation;
             StateOfOrigin = policy.InsStateID;
+
+            LocalGovtArea = null;
+            //StateOfOrigin = null;
+            Nationality = null;
+            //DateOfBirth = null;
+            IdentificationType = null;
+            IdentificationNo = null;
+            //Industry = client.Occupation;
         }
 
         public string CustomerId { get; set; }

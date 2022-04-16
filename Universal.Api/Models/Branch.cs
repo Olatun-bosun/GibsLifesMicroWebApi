@@ -8,8 +8,6 @@ namespace Universal.Api.Models
         [Key]
         public string BranchID { get; set; }
 
-        public string CompanyID { get; set; }
-
         public string RegionID { get; set; }
 
         public string StateID { get; set; }

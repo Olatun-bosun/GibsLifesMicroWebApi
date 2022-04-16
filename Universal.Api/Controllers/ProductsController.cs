@@ -3,24 +3,26 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Universal.Api.Data.Repositories;
 using Universal.Api.Contracts.V1;
+using Universal.Api.Data;
 
 namespace Universal.Api.Controllers
 {
+    [Authorize(Roles = "APP,AGENT,CUST")]
     public class ProductsController : SecureControllerBase
     {
-        public ProductsController(Repository repository) : base(repository)
+        public ProductsController(Repository repository, AuthContext authContext) : base(repository, authContext)
         {
         }
-
 
         /// <summary>
         /// Fetch a collection of products.
         /// </summary>
         /// <returns>A collection of products</returns>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ProductResult>>> ListProductsAsync([FromQuery] FilterPaging filter)
+        public async Task<ActionResult<IEnumerable<ProductResult>>> ListProducts([FromQuery] FilterPaging filter)
         {
             try
             {
@@ -32,7 +34,6 @@ namespace Universal.Api.Controllers
                 return ExceptionResult(ex);
             }
         }
-
 
         /// <summary>
         /// Fetch a single product.

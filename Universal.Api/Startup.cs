@@ -1,9 +1,10 @@
+using System;
+using System.IO;
+using System.Reflection;
+using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.SqlServer.Query.Internal;
@@ -13,13 +14,11 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
-using Swashbuckle.AspNetCore.SwaggerGen;
-using System;
-using System.IO;
-using System.Reflection;
-using System.Text;
 using Universal.Api.Data;
 using Universal.Api.Data.Repositories;
+using Swashbuckle.AspNetCore.SwaggerGen;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Http;
 
 namespace Universal.Api
 {
@@ -35,7 +34,6 @@ namespace Universal.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddScoped<Repository>();
 
             // configure strongly typed settings objects
             var section = Configuration.GetSection("AppSettings");
@@ -59,7 +57,6 @@ namespace Universal.Api
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 s.IncludeXmlComments(xmlPath);
 
-
                 s.CustomOperationIds(e =>
                 {
                     return e.TryGetMethodInfo(out MethodInfo methodInfo) ? methodInfo.Name : null;
@@ -70,12 +67,33 @@ namespace Universal.Api
 
                 s.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
-                    Description = "JWT Authorization header using the Bearer scheme (Example: 'Bearer 12345abcdef')",
+                    Description = @"JWT Authorization header using the Bearer scheme. \r\n\r\n 
+                                    Enter 'Bearer' [space] and then your token in the text input below.
+                                    \r\n\r\nExample: 'Bearer 12345abcdef'",
                     Name = "Authorization",
                     In = ParameterLocation.Header,
-                    Type = SecuritySchemeType.Http,
+                    Type = SecuritySchemeType.ApiKey,
                     Scheme = "Bearer"
                 });
+
+                s.AddSecurityRequirement(new OpenApiSecurityRequirement()
+                  {
+                    {
+                      new OpenApiSecurityScheme
+                      {
+                        Reference = new OpenApiReference
+                          {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                          },
+                          Scheme = "oauth2",
+                          Name = "Bearer",
+                          In = ParameterLocation.Header,
+
+                        },
+                        new List<string>()
+                      }
+                    });
             });
 
             services.AddAuthentication(x =>
@@ -96,7 +114,10 @@ namespace Universal.Api
                 };
             });
 
+            services.AddScoped<AuthContext>();
+            services.AddScoped<Repository>();
             services.AddSingleton(settings);
+            services.AddHttpContextAccessor();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
