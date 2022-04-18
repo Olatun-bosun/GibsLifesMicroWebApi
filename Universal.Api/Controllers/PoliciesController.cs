@@ -86,55 +86,55 @@ namespace Universal.Api.Contracts.V1
 
         #region Create Policy
 
-        [HttpPost("aviation")]
+        [HttpPost("Aviation")]
         public Task<ActionResult<PolicyResult>> NewAviationPolicy(CreateNewPolicyAsAviation policyDto)
         {
             return NewPolicy(policyDto);
         }
 
-        [HttpPost("bond")]
+        [HttpPost("Bond")]
         public Task<ActionResult<PolicyResult>> NewBondPolicy(CreateNewPolicyAsBond policyDto)
         {
             return NewPolicy(policyDto);
         }
 
-        [HttpPost("engineering")]
+        [HttpPost("Engineering")]
         public Task<ActionResult<PolicyResult>> NewEngineeringPolicy(CreateNewPolicyAsEngineering policyDto)
         {
             return NewPolicy(policyDto);
         }
 
-        [HttpPost("fire")]
+        [HttpPost("Fire")]
         public Task<ActionResult<PolicyResult>> NewFirePolicy(CreateNewPolicyAsFire policyDto)
         {
             return NewPolicy(policyDto);
         }
 
-        [HttpPost("accident")]
+        [HttpPost("Accident")]
         public Task<ActionResult<PolicyResult>> NewAccidentPolicy(CreateNewPolicyAsGeneralAccident policyDto)
         {
             return NewPolicy(policyDto);
         }
 
-        [HttpPost("marinecargo")]
+        [HttpPost("MarineCargo")]
         public Task<ActionResult<PolicyResult>> NewMarineCargoPolicy(CreateNewPolicyAsMarineCargo policyDto)
         {
             return NewPolicy(policyDto);
         }
 
-        [HttpPost("marinehull")]
+        [HttpPost("MarineHull")]
         public Task<ActionResult<PolicyResult>> NewMarineHullPolicy(CreateNewPolicyAsMarineHull policyDto)
         {
             return NewPolicy(policyDto);
         }
 
-        [HttpPost("motor")]
+        [HttpPost("Motor")]
         public Task<ActionResult<PolicyResult>> NewMotorPolicy(CreateNewPolicyAsMotor policyDto)
         {
             return NewPolicy(policyDto);
         }
 
-        [HttpPost("oilgas")]
+        [HttpPost("OilGas")]
         public Task<ActionResult<PolicyResult>> NewOilGasPolicy(CreateNewPolicyAsOilGas policyDto)
         {
             return NewPolicy(policyDto);

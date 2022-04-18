@@ -59,7 +59,7 @@ namespace Universal.Api.Data.Repositories
             var insured = await CustomerSelectThisAsync(newPolicyDto.CustomerId);
 
             if (insured is null)
-                throw new ArgumentNullException($"This customer {newPolicyDto.CustomerId} does not exist");
+                throw new ArgumentOutOfRangeException($"This CustomerId [{newPolicyDto.CustomerId}] does not exist");
 
             // create the policy
             var policy = await CreateNewPolicyAsync(newPolicyDto, insured);
@@ -232,6 +232,12 @@ namespace Universal.Api.Data.Repositories
 
             var subRisk = await ProductSelectThisAsync(newPolicyDto.ProductId);
             var party = await PartySelectThisOrNullAsync(newPolicyDto.AgentId);
+
+            if (subRisk is null)
+                throw new ArgumentOutOfRangeException($"This ProductId [{newPolicyDto.ProductId}] does not exist");
+
+            if (party is null)
+                throw new ArgumentOutOfRangeException($"This AgentId [{newPolicyDto.AgentId}] does not exist");
 
             return new Policy()
             {

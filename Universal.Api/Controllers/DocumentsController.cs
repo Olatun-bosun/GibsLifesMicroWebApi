@@ -42,7 +42,7 @@ namespace Universal.Api.Controllers
         /// </summary>
         /// <param name="documentId"></param>
         /// <returns>The Document with the DocumentId supplied</returns>
-        [HttpGet("{documentId}")]
+        [HttpGet("Search/{documentId}")]
         public async Task<ActionResult> GetDocument(string documentId)
         {
             try
