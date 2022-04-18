@@ -148,7 +148,7 @@ namespace Universal.Api.Contracts.V1
             try
             {
                 var policy = await _repository.PolicyCreateAsync(newPolicyDto);
-                _repository.SaveChanges();
+                await _repository.SaveChangesAsync();
 
                 var uri = new Uri($"{Request.Path}/{policy.PolicyNo}", UriKind.Relative);
                 return Created(uri, new PolicyResult(policy));

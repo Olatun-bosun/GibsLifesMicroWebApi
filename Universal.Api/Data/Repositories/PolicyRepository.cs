@@ -10,6 +10,14 @@ namespace Universal.Api.Data.Repositories
 {
     public partial class Repository
     {
+        public Task<Policy> PolicySelectThisAsync(string policyNo)
+        {
+            if (string.IsNullOrWhiteSpace(policyNo))
+                throw new ArgumentNullException(nameof(policyNo));
+
+            return _db.Policies.Where(x => x.PolicyNo == policyNo).SingleOrDefaultAsync();
+        }
+
         public Task<List<Policy>> PolicySelectAsync(FilterPaging filter)
         {
             if (filter == null)
@@ -38,14 +46,6 @@ namespace Universal.Api.Data.Repositories
                         .ToListAsync();
         }
 
-        public Task<Policy> PolicySelectThisAsync(string policyNo)
-        {
-            if (string.IsNullOrWhiteSpace(policyNo))
-                throw new ArgumentNullException(nameof(policyNo));
-
-            return _db.Policies.Where(x => x.PolicyNo == policyNo).SingleOrDefaultAsync();
-        }
-
         public async Task<Policy> PolicyCreateAsync<T>(CreateNew<T> newPolicyDto)
             where T : PolicyRequest
         {
@@ -55,14 +55,22 @@ namespace Universal.Api.Data.Repositories
             if (newPolicyDto.PolicyDetails is null)
                 throw new ArgumentNullException(nameof(newPolicyDto.PolicyDetails));
 
-            // check for insured
+            // check for insured, party, product
             var insured = await CustomerSelectThisAsync(newPolicyDto.CustomerId);
-
             if (insured is null)
                 throw new ArgumentOutOfRangeException($"This CustomerId [{newPolicyDto.CustomerId}] does not exist");
 
+            var subRisk = await ProductSelectThisAsync(newPolicyDto.ProductId);
+            if (subRisk is null)
+                throw new ArgumentOutOfRangeException($"This ProductId [{newPolicyDto.ProductId}] does not exist");
+
+            var party = await PartySelectThisAsync(newPolicyDto.AgentId);
+            if (party is null)
+                throw new ArgumentOutOfRangeException($"This AgentId [{newPolicyDto.AgentId}] does not exist");
+
+
             // create the policy
-            var policy = await CreateNewPolicyAsync(newPolicyDto, insured);
+            var policy = CreateNewPolicy(newPolicyDto, insured, party, subRisk);
             _db.Policies.Add(policy);
 
             // create the policy details
@@ -84,6 +92,60 @@ namespace Universal.Api.Data.Repositories
 
             //return the policy number
             return policy;
+        }
+
+        private Policy CreateNewPolicy<T>(CreateNew<T> newPolicyDto, InsuredClient insured, Party party, SubRisk subRisk)
+             where T : PolicyRequest
+        {
+            var policyNo = GetNextAutoNumber("[AUTO]", "POLICY", BRANCH_ID, newPolicyDto.ProductId);
+
+            return new Policy()
+            {
+                TransDate = newPolicyDto.TransactionDate,
+                StartDate = newPolicyDto.StartDate,
+                EndDate = newPolicyDto.EndDate,
+                SubRiskID = newPolicyDto.ProductId,
+                SubRisk = subRisk.SubRiskName,
+                PartyID = party.PartyID,
+                Party = party.PartyName,
+                BranchID = BRANCH_ID,
+                Branch = BRANCH_NAME,
+                //TrackID = 100L,
+                //SourceType = policyDto.BizChannel,
+                //ExRate = 1.0,
+                //ExRateID = 1L,
+                ExCurrency = "NAIRA",
+                PremiumRate = 0.0,
+                ProportionRate = 0.0,
+                SumInsured = newPolicyDto.TotalSumInsured,
+                GrossPremium = newPolicyDto.TotalGrossPremium,
+                SumInsuredFrgn = 0,
+                GrossPremiumFrgn = 0,
+                ProRataDays = 0,
+                ProRataPremium = 0,
+                //BizSource = policyDto.SourceId,
+                Active = 1,
+                Deleted = 0,
+                SubmittedBy = $"{SUBMITTED_BY}/{_authContext.User.AppId}",
+                SubmittedOn = DateTime.Now,
+                PolicyNo = policyNo,
+                CoPolicyNo = policyNo,
+                TransSTATUS = "PENDING",
+                Remarks = "RETAIL",
+
+                //InsStateID = insured.StateOfOrigin,
+                InsuredID = insured.InsuredID,
+                InsSurname = insured.Surname,
+                InsFirstname = insured.FirstName,
+                InsOthernames = insured.OtherNames,
+                InsAddress = insured.Address,
+                InsMobilePhone = insured.MobilePhone,
+                InsLandPhone = insured.LandPhone,
+                InsEmail = insured.Email,
+                InsOccupation = insured.Occupation,
+                InsFaxNo = insured.ApiId,
+                //InsFullName = insured.Surname + " " + insured.FirstName + " " + insured.OtherNames,
+            };
         }
 
         private DNCNNote CreateNewDebitNote(Policy policy)
@@ -222,69 +284,6 @@ namespace Universal.Api.Data.Repositories
                 A8 = 0,
                 A9 = 0,
                 A10 = 0
-            };
-        }
-
-        private async Task<Policy> CreateNewPolicyAsync<T>(CreateNew<T> newPolicyDto, InsuredClient insured)
-             where T : PolicyRequest
-        {
-            var policyNo = GetNextAutoNumber("[AUTO]", "POLICY", BRANCH_ID, newPolicyDto.ProductId);
-
-            var subRisk = await ProductSelectThisAsync(newPolicyDto.ProductId);
-            var party = await PartySelectThisOrNullAsync(newPolicyDto.AgentId);
-
-            if (subRisk is null)
-                throw new ArgumentOutOfRangeException($"This ProductId [{newPolicyDto.ProductId}] does not exist");
-
-            if (party is null)
-                throw new ArgumentOutOfRangeException($"This AgentId [{newPolicyDto.AgentId}] does not exist");
-
-            return new Policy()
-            {
-                TransDate = newPolicyDto.TransactionDate,
-                StartDate = newPolicyDto.StartDate,
-                EndDate = newPolicyDto.EndDate,
-                SubRiskID = newPolicyDto.ProductId,
-                SubRisk = subRisk.SubRiskName,
-                PartyID = party.PartyID,
-                Party = party.PartyName,
-                BranchID = BRANCH_ID,
-                Branch = BRANCH_NAME,
-                //TrackID = 100L,
-                //SourceType = policyDto.BizChannel,
-                //ExRate = 1.0,
-                //ExRateID = 1L,
-                ExCurrency = "NAIRA",
-                PremiumRate = 0.0,
-                ProportionRate = 0.0,
-                SumInsured = newPolicyDto.TotalSumInsured,
-                GrossPremium = newPolicyDto.TotalGrossPremium,
-                SumInsuredFrgn = 0,
-                GrossPremiumFrgn = 0,
-                ProRataDays = 0,
-                ProRataPremium = 0,
-                //BizSource = policyDto.SourceId,
-                Active = 1,
-                Deleted = 0,
-                SubmittedBy = $"{SUBMITTED_BY}/{_authContext.User.AppId}",
-                SubmittedOn = DateTime.Now,
-                PolicyNo = policyNo,
-                CoPolicyNo = policyNo,
-                TransSTATUS = "PENDING",
-                Remarks = "RETAIL",
-
-                //InsStateID = insured.StateOfOrigin,
-                InsuredID = insured.InsuredID,
-                InsSurname = insured.Surname,
-                InsFirstname = insured.FirstName,
-                InsOthernames = insured.OtherNames,
-                InsAddress = insured.Address,
-                InsMobilePhone = insured.MobilePhone,
-                InsLandPhone = insured.LandPhone,
-                InsEmail = insured.Email,
-                InsOccupation = insured.Occupation,
-                InsFaxNo = insured.ApiId,
-                //InsFullName = insured.Surname + " " + insured.FirstName + " " + insured.OtherNames,
             };
         }
     }

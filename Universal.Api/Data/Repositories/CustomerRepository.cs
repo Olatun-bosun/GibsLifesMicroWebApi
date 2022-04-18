@@ -10,12 +10,20 @@ namespace Universal.Api.Data.Repositories
 {
     public partial class Repository
     {
-        public Task<InsuredClient> CustomerLoginAsync(string appId, string customerId, string password)
+        public Task<InsuredClient> CustomerSelectThisAsync(string appId, string customerId, string password)
         {
             return _db.InsuredClients
                       .Where(x => (x.InsuredID == customerId || x.Email == customerId)
                                 && x.ApiPassword == password
                                 && x.SubmittedBy == $"{SUBMITTED_BY}/{appId}").SingleOrDefaultAsync();
+        }
+
+        public Task<InsuredClient> CustomerSelectThisAsync(string customerId)
+        {
+            if (string.IsNullOrWhiteSpace(customerId))
+                throw new ArgumentNullException(nameof(customerId));
+
+            return _db.InsuredClients.Where(x => x.InsuredID == customerId).SingleOrDefaultAsync();
         }
 
         public async Task<InsuredClient> CustomerCreateAsync(CreateNewCustomerRequest newCustomerDto)
@@ -56,14 +64,6 @@ namespace Universal.Api.Data.Repositories
 
             _db.InsuredClients.Add(newInsured);
             return newInsured;
-        }
-
-        public Task<InsuredClient> CustomerSelectThisAsync(string customerId)
-        {
-            if (string.IsNullOrWhiteSpace(customerId))
-                throw new ArgumentNullException(nameof(customerId));
-
-            return _db.InsuredClients.Where(x => x.InsuredID == customerId).SingleOrDefaultAsync();
         }
 
         public Task<List<InsuredClient>> CustomerSelectAsync(FilterPaging filter)

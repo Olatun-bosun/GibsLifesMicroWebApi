@@ -31,7 +31,7 @@ namespace Universal.Api.Controllers
 
             try
             {
-                var insured = await _repository.CustomerLoginAsync(login.AppId, login.CustomerId, login.Password);
+                var insured = await _repository.CustomerSelectThisAsync(login.AppId, login.CustomerId, login.Password);
 
                 if (insured is null)
                     return NotFound("ID or Password is incorrect");
@@ -110,7 +110,7 @@ namespace Universal.Api.Controllers
             try
             {
                 var customer = await _repository.CustomerCreateAsync(request);
-                _repository.SaveChanges();
+                await _repository.SaveChangesAsync();
 
                 var uri = new Uri($"{Request.Path}/{customer.ApiId}", UriKind.Relative);
                 return Created(uri, new CustomerResult(customer));

@@ -31,7 +31,7 @@ namespace Universal.Api.Controllers
 
             try
             {
-                var party = await _repository.PartyLoginOrNullAsync(login.AppId, login.AgentId, login.Password);
+                var party = await _repository.PartySelectThisAsync(login.AppId, login.AgentId, login.Password);
 
                 if (party is null)
                     return NotFound("AgentID or Password is incorrect");
@@ -86,7 +86,7 @@ namespace Universal.Api.Controllers
         {
             try
             {
-                var agent = await _repository.PartySelectThisOrNullAsync(agentId);
+                var agent = await _repository.PartySelectThisAsync(agentId);
 
                 if (agent is null)
                     return NotFound();
@@ -109,7 +109,7 @@ namespace Universal.Api.Controllers
             try
             {
                 var party = await _repository.PartyCreateAsync(request);
-                _repository.SaveChanges();
+                await _repository.SaveChangesAsync();
 
                 var uri = new Uri($"{Request.Path}/{party.PartyID}", UriKind.Relative);
                 return Created(uri, new AgentResult(party));

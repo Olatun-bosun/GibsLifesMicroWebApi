@@ -10,12 +10,20 @@ namespace Universal.Api.Data.Repositories
 {
     public partial class Repository
     {
-        public Task<Party> PartyLoginOrNullAsync(string appId, string agentId, string password)
+        public Task<Party> PartySelectThisAsync(string appId, string agentId, string password)
         {
             return _db.Parties
                       .Where(x => (x.PartyID == agentId || x.Email == agentId)
                                 && x.ApiPassword == password
                                 && x.SubmittedBy == $"{SUBMITTED_BY}/{appId}").SingleOrDefaultAsync();
+        }
+
+        public Task<Party> PartySelectThisAsync(string agentId)
+        {
+            if (string.IsNullOrWhiteSpace(agentId))
+                throw new ArgumentNullException("Agent ID cannot be empty", "AgentID");
+
+            return _db.Parties.Where(x => x.PartyID == agentId).SingleOrDefaultAsync();
         }
 
         public Task<List<Party>> PartySelectAsync(FilterPaging filter)
@@ -32,14 +40,6 @@ namespace Universal.Api.Data.Repositories
                         .Skip(filter.SkipCount)
                         .Take(filter.PageSize)
                         .ToListAsync();
-        }
-
-        public Task<Party> PartySelectThisOrNullAsync(string agentId)
-        {
-            if (string.IsNullOrWhiteSpace(agentId))
-                throw new ArgumentNullException("Agent ID cannot be empty", "AgentID");
-
-            return _db.Parties.Where(x => x.PartyID == agentId).SingleOrDefaultAsync();
         }
 
         public async Task<Party> PartyCreateAsync(CreateNewAgentRequest newAgentDto)
