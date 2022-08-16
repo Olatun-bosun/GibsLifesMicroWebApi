@@ -1,62 +1,66 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace Universal.Api.Contracts.V1
 {
-    public class AgentResult
-    {
-        public AgentResult()
-        {
-        }
-
-        public AgentResult(Models.Party party)
-        {
-            AgentId = party.PartyID;
-            AgentName = party.PartyName;
-            Address = party.Address;
-            PhoneLine2 = party.LandPhone;
-            PhoneLine1 = party.mobilePhone;
-            Email = party.Email;
-            //CommissionRate = (decimal)party.ComRate;
-            //CreditLimit = (decimal)party.CreditLimit;
-            //InsuranceContact = party.InsContact;
-            //FinancialContact = party.FinContact;
-            Remarks = party.Remarks; 
-        }
-
-        [Required]
-        public string AgentId { get; set; }
-        [Required]
-        public string AgentName { get; set; }
-        [Required]
-        public string Address { get; set; }
-        [Required]
-        public string PhoneLine1 { get; set; }
-        public string PhoneLine2 { get; set; }
-        [Required]
-        public string Email { get; set; }
-        //public decimal CommissionRate { get; set; }
-        //public decimal CreditLimit { get; set; }
-        //public string RPCNumber { get; set; }
-        //public string InsuranceContact { get; set; }
-        //public string FinancialContact { get; set; }
-        public string Remarks { get; set; }
-    }
-
-    public class CreateNewAgentRequest
+    public class CreateNewAgentRequest : PersonRequest
     {
         [Required]
         public string AgentName { get; set; }
         [Required]
         public string Password { get; set; }
-        [Required]
-        public string Address { get; set; }
-        [Required, EmailAddress]
-        public string Email { get; set; }
-        [Required, Phone]
-        public string PhoneLine1 { get; set; }
-        [Phone]
-        public string PhoneLine2 { get; set; }
-        //public string InsuranceContact { get; set; }
-        public string Remarks { get; set; }
+
+
+        public string CityLGA { get; set; }
+
+        public string StateID { get; set; }
+
+        public string Nationality { get; set; }
+
+        public DateTime? DateOfBirth { get; set; }
+
+        public KycTypeEnum? KycType { get; set; }
+
+        public string KycNumber { get; set; }
+
+        public DateTime? KycIssueDate { get; set; }
+
+        public DateTime? KycExpiryDate { get; set; }
+
+        public PersonRequest NextOfKin { get; set; }
+    }
+
+    public class AgentResult : CreateNewAgentRequest
+    {
+        public AgentResult(Models.Party party)
+        {
+            AgentID = party.PartyID;
+            AgentName = party.PartyName;
+
+            //split into 3
+            LastName = party.PartyName;
+            FirstName = party.PartyName;
+            OtherName = party.PartyName;
+
+            //Gender = party.Gender;
+            Email = party.Email;
+            Address = party.Address;
+            //PhoneLine1 = party.PhoneNumber1;
+            //PhoneLine2 = party.PhoneNumber2;
+
+            //CityLGA = party.CityLGA;
+            StateID = party.StateID;
+            //Nationality = party.Nationality;
+            //DateOfBirth = party.DateOfBirth;
+
+            //KycType = party.KycIdType;
+            //KycNumber = party.KycIdNumber;
+            //KycIssueDate = party.KycIdIssueDate;
+            //KycExpiryDate = party.KycIdExpiryDate;
+
+            //NextOfKin = party.NextOfKin;
+        }
+
+        public string AgentID { get; set; }
     }
 }

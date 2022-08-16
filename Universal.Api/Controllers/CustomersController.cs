@@ -31,7 +31,7 @@ namespace Universal.Api.Controllers
 
             try
             {
-                var insured = await _repository.CustomerSelectThisAsync(login.AppId, login.CustomerId, login.Password);
+                var insured = await _repository.CustomerSelectThisAsync(login.AppID, login.CustomerID, login.Password);
 
                 if (insured is null)
                     return NotFound("ID or Password is incorrect");
@@ -41,8 +41,8 @@ namespace Universal.Api.Controllers
 
                 string token = CreateToken(_settings.JwtSecret,
                                            _settings.JwtExpiresIn,
-                                           login.AppId, 
-                                           login.CustomerId, 
+                                           login.AppID, 
+                                           login.CustomerID, 
                                            insured.InsuredID, "CUST");
                 var response = new LoginResult
                 {
@@ -63,7 +63,7 @@ namespace Universal.Api.Controllers
         /// Fetch a collection of Customers.
         /// </summary>
         /// <returns>A collection of Customers.</returns>
-        [HttpGet]
+        [HttpGet("search")]
         public async Task<ActionResult<IEnumerable<CustomerResult>>> ListCustomers([FromQuery] FilterPaging filter)
         {
             try
@@ -78,10 +78,10 @@ namespace Universal.Api.Controllers
         }
 
         /// <summary>
-        /// Fetch a single Customer.
+        /// Fetch a single Customer using either Email, Phone, or Universal CustomerId.
         /// </summary>
-        /// <param name="customerId">Id of the Customer to get.</param>
-        /// <returns>The Customer with the Id entered.</returns>
+        /// <param name="customerId">Email, Phone or Id of the Customer to get.</param>
+        /// <returns>The Customer with the Email, Phone or Id supplied.</returns>
         [HttpGet("{customerId}")]
         public async Task<ActionResult<CustomerResult>> GetCustomer(string customerId)
         {
@@ -99,6 +99,27 @@ namespace Universal.Api.Controllers
                 return ExceptionResult(ex);
             }
         }
+
+        ///// <summary>
+        ///// Fetch Customers using a combination of last name(surname) and first name.
+        ///// </summary>
+        ///// <param name="email">Email of the Customers to get.</param>
+        ///// <param name="phone">Phone number of the Customers to get.</param>
+        ///// <returns>The Customer with the details supplied.</returns>
+        //[HttpGet]
+        //public async Task<ActionResult<IEnumerable<CustomerResult>>> ListCustomers([FromQuery] string email, [FromQuery] string phone)
+        //{
+        //    try
+        //    {
+        //        var customers = await _repository.CustomerSelectThisAsync(email, phone);
+
+        //        return Ok(customers.Select(x => new CustomerResult(x)).ToList());
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return ExceptionResult(ex);
+        //    }
+        //}
 
         /// <summary>
         /// Create a Customer.

@@ -4,21 +4,20 @@ namespace Universal.Api.Contracts.V1
 {
     public class ProductResult
     {
-        public ProductResult()
-        {
-        }
-
         public ProductResult(Models.SubRisk product)
         {
-            ProductId = product.SubRiskID;
-            RiskId = product.RiskID;
+            RiskID = product.RiskID;
+            ProductID = product.SubRiskID;
             ProductName = product.SubRiskName;
             Description = product.Description;
+
+            //MidRiskID = product.MidClassID;
+            //MidRisk = product.MidClass.MidClassName;
         }
 
-        public string ProductId { get; set; }
+        public string RiskID { get; set; }
 
-        public string RiskId { get; set; }
+        public string ProductID { get; set; }
 
         public string ProductName { get; set; }
 

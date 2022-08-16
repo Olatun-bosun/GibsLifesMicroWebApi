@@ -2,12 +2,18 @@
 using System.IO;
 using System.Security.Claims;
 using System.Security.Principal;
+using System.Text.RegularExpressions;
 using Universal.Api.Data;
 
 namespace Universal.Api
 {
     public static class Extensions
     {
+        public static bool IsNullableEnum(this Type type)
+        {
+            Type uType = Nullable.GetUnderlyingType(type);
+            return (uType != null) && uType.IsEnum;
+        }
 
         public static byte[] ReadFully(this Stream input)
         {
@@ -17,5 +23,30 @@ namespace Universal.Api
                 return ms.ToArray();
             }
         }
+
+        public static bool IsNumeric(this string source)
+        {
+            try
+            {
+                return decimal.TryParse(source, out decimal result);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        public static bool IsValidEmail(this string source)
+        {
+            try
+            {
+                return Regex.IsMatch(source, @"^([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$");
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
     }
 }

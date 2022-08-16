@@ -26,11 +26,6 @@ namespace Universal.Api.Data.Repositories
                               && x.Password    == password).SingleOrDefaultAsync();
         }
 
-        public int SaveChanges()
-        {
-            return _db.SaveChanges();
-        }
-
         public Task<int> SaveChangesAsync()
         {
             return _db.SaveChangesAsync();

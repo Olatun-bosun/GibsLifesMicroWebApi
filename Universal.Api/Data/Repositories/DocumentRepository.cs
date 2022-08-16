@@ -11,9 +11,9 @@ namespace Universal.Api.Data.Repositories
     public partial class Repository
     {
 
-        public Task<List<Document>> DocumentSelectAsync(string policyNo)
+        public Task<List<Document>> DocumentSelectAsync(string ownerRefId)
         {
-            var query = _db.Documents.Where(x => x.PolicyNo == policyNo);
+            var query = _db.Documents.Where(x => x.OwnerRefId == ownerRefId);
 
             return query.ToListAsync();
         }
@@ -23,18 +23,36 @@ namespace Universal.Api.Data.Repositories
             if (string.IsNullOrWhiteSpace(documentId))
                 throw new ArgumentNullException(nameof(documentId));
 
-            return _db.Documents.Where(x => x.DocumentId == documentId).SingleOrDefaultAsync();
+            return _db.Documents.Where(x => x.DocumentId == documentId)
+                                .SingleOrDefaultAsync();
         }
 
-        public async Task<List<string>> DocumentCreateAsync(string policyNo, List<IFormFile> formFiles)
+        public async Task<List<string>> DocumentCreateAsync(string ownerType, string ownerRefId, List<IFormFile> formFiles)
         {
+            ownerType = ownerType.ToUpper();
+            string[] types = { "POLICY", "CLAIM" };
+
+            if (!types.Contains(ownerType))
+                throw new ArgumentOutOfRangeException(nameof(ownerType));
+
             if (formFiles is null)
                 throw new ArgumentNullException(nameof(formFiles));
 
-            var policy = await PolicySelectThisAsync(policyNo);
+            if (ownerType == "POLICY")
+            {
+                var policy = await PolicySelectThisAsync(ownerRefId);
 
-            if (policy is null)
-                throw new KeyNotFoundException("Policy No you supplied is invalid");
+                if (policy is null)
+                    throw new KeyNotFoundException("Policy No you supplied is invalid");
+            }
+
+            if (ownerType == "CLAIM")
+            {
+                var claim = await ClaimSelectThisAsync(ownerRefId);
+
+                if (claim is null)
+                    throw new KeyNotFoundException("Claim No you supplied is invalid");
+            }
 
             var documentIds = new List<string>();
 
@@ -45,7 +63,8 @@ namespace Universal.Api.Data.Repositories
 
                 var document = new Document
                 {
-                    PolicyNo = policyNo,
+                    OwnerType = ownerType,
+                    OwnerRefId = ownerRefId, 
                     SubmitDate = DateTime.Now,
                     DocumentName = file.FileName,
                     DocumentId = Guid.NewGuid().ToString(),

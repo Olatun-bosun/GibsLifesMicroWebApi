@@ -18,10 +18,10 @@ namespace Universal.Api.Controllers
         }
 
         /// <summary>
-        /// Fetch a collection of Claims.
+        /// Fetch a collection of Claim notifications.
         /// </summary>
         /// <param name="filter"></param>
-        /// <returns>A collection of Claims.</returns>
+        /// <returns>A collection of Claim notifications.</returns>
         [HttpGet()]
         public async Task<ActionResult<IEnumerable<ClaimResult>>> ListClaims([FromQuery] FilterPaging filter)
         {
@@ -37,10 +37,10 @@ namespace Universal.Api.Controllers
         }
 
         /// <summary>
-        /// Fetch a single claim.
+        /// Fetch a single Claim notification.
         /// </summary>
         /// <param name="claimNo"></param>
-        /// <returns>The claim with the claimNo entered.</returns>
+        /// <returns>The Claim notification for the claimNo entered.</returns>
         [HttpGet("{claimNo}")]
         public async Task<ActionResult<ClaimResult>> GetClaim(string claimNo)
         {
@@ -60,19 +60,18 @@ namespace Universal.Api.Controllers
         }
 
         /// <summary>
-        /// Create a Claim.
+        /// Create a Claim notification.
         /// </summary>
-        /// <returns>A newly created claim</returns>
+        /// <returns>A newly created Claim notification</returns>
         [HttpPost]
-        public async Task<ActionResult<ClaimResult>> CreateClaim(ClaimResult request)
+        public async Task<ActionResult<ClaimResult>> CreateClaim(CreateNewClaimRequest request)
         {
             try
             {
-                //var claim = _repository.ClaimCreate(claimDetails);
-                //var uri = new Uri($"{Request.Path}/{claim.NotificatnNo}", UriKind.Relative);
+                var claim = await _repository.ClaimCreateAsync(request);
+                var uri = new Uri($"{Request.Path}/{claim.ClaimNo}", UriKind.Relative);
 
-                //return Created(uri, new ClaimDto(claim));
-                throw new NotImplementedException();
+                return Created(uri, new ClaimResult(claim));
             }
             catch (Exception ex)
             {

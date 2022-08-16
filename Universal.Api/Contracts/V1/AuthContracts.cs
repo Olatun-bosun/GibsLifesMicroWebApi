@@ -5,7 +5,7 @@ namespace Universal.Api.Contracts.V1
     public class AppLoginRequest
     {
         [Required]
-        public string AppId { get; set; }
+        public string AppID { get; set; }
         [Required]
         public string Password { get; set; }
     }
@@ -13,9 +13,9 @@ namespace Universal.Api.Contracts.V1
     public class AgentLoginRequest
     {
         [Required]
-        public string AppId { get; set; }
+        public string AppID { get; set; }
         [Required]
-        public string AgentId { get; set; }
+        public string AgentID { get; set; }
         [Required]
         public string Password { get; set; }
     }
@@ -23,9 +23,9 @@ namespace Universal.Api.Contracts.V1
     public class CustomerLoginRequest
     {
         [Required]
-        public string AppId { get; set; }
+        public string AppID { get; set; }
         [Required]
-        public string CustomerId { get; set; }
+        public string CustomerID { get; set; }
         [Required]
         public string Password { get; set; }
     }

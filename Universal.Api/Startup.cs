@@ -13,15 +13,64 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Newtonsoft.Json;
 using Universal.Api.Data;
 using Universal.Api.Data.Repositories;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Universal.Api
 {
+    public class EnumStringConverter : JsonConverter<object>
+    {
+        public override object Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            var stringValue = reader.GetString();
+
+            Type enumType = typeToConvert.IsEnum ?
+                typeToConvert : Nullable.GetUnderlyingType(typeToConvert);
+
+            if (string.IsNullOrEmpty(stringValue))
+            {
+                if (typeToConvert.IsEnum)
+                    throw NewEnumJsonException(enumType, "Missing value.");
+                else
+                    return null;
+            }
+
+            if (Enum.TryParse(enumType, stringValue, out var enumValue))
+                return enumValue;
+            else
+                throw NewEnumJsonException(enumType, "Invalid entry.");
+
+            static JsonException NewEnumJsonException(Type enumType, string message)
+            {
+                string[] values = Enum.GetNames(enumType);
+                return new JsonException($"{message} Use the following: {string.Join(", ", values)}");
+            }
+        }
+
+        public override void Write(Utf8JsonWriter writer, object value, JsonSerializerOptions options)
+        {
+            var enumString = value.ToString();
+            writer.WriteStringValue(enumString);
+        }
+
+        public override bool CanConvert(Type typeToConvert)
+        {
+            if (typeToConvert.IsEnum)
+                return true;
+
+            if (typeToConvert.IsNullableEnum())
+                return true;
+
+            return base.CanConvert(typeToConvert);
+        }
+    }
+
     public class Startup
     {
         public Startup(IConfiguration configuration)
@@ -44,11 +93,24 @@ namespace Universal.Api
             {
                 options
                     .UseLazyLoadingProxies()
-                    .UseSqlServer(settings.SqldbConnString)
-                    .ReplaceService<IQueryTranslationPostprocessorFactory, SqlServer2008QueryTranslationPostprocessorFactory>();
+                    .UseSqlServer(settings.SqldbConnString);
             });
 
-            services.AddControllers();
+            services.AddControllers(options =>
+            {
+                //options.ModelBinderProviders.Insert(0, new EnumBinderProvider());
+            })
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.Converters.Add(new EnumStringConverter());
+            });
+
+            //TODO add custom validationResult
+            //services.Configure<ApiBehaviorOptions>(options =>
+            //{
+            //    options.InvalidModelStateResponseFactory = actionContext =>
+            //        new ValidationFailedResult(actionContext.ModelState);
+            //});
 
             services.AddSwaggerGen(s =>
             {

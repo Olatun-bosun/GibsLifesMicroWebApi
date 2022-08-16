@@ -12,6 +12,8 @@ using Universal.Api.Data;
 namespace Universal.Api.Controllers
 {
     [ApiController]
+    [ValidateModel]
+    [Produces("application/json")]
     [Route("api/v1/[controller]")]
     [ApiConventionType(typeof(DefaultApiConventions))]
     public class SecureControllerBase : ControllerBase

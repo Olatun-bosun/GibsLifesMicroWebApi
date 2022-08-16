@@ -41,32 +41,32 @@ namespace Universal.Api.Data.Repositories
             }
 
             return query.OrderByDescending(x => x.TransDate)
-                        .Skip(filter.SkipCount)
+                        //.Skip(filter.SkipCount)
                         .Take(filter.PageSize)
                         .ToListAsync();
         }
 
         public async Task<Policy> PolicyCreateAsync<T>(CreateNew<T> newPolicyDto)
-            where T : PolicyRequest
+            where T : RiskDetail
         {
             if (newPolicyDto is null)
                 throw new ArgumentNullException(nameof(newPolicyDto));
 
-            if (newPolicyDto.PolicyDetails is null)
-                throw new ArgumentNullException(nameof(newPolicyDto.PolicyDetails));
+            if (newPolicyDto.PolicySections is null)
+                throw new ArgumentNullException(nameof(newPolicyDto.PolicySections));
 
             // check for insured, party, product
-            var insured = await CustomerSelectThisAsync(newPolicyDto.CustomerId);
+            var insured = await CustomerGetOrAddAsync(newPolicyDto);
             if (insured is null)
-                throw new ArgumentOutOfRangeException($"This CustomerId [{newPolicyDto.CustomerId}] does not exist");
+                throw new ArgumentOutOfRangeException($"This CustomerId or Insured does not exist");
 
-            var subRisk = await ProductSelectThisAsync(newPolicyDto.ProductId);
+            var subRisk = await ProductSelectThisAsync(newPolicyDto.ProductID);
             if (subRisk is null)
-                throw new ArgumentOutOfRangeException($"This ProductId [{newPolicyDto.ProductId}] does not exist");
+                throw new ArgumentOutOfRangeException($"This ProductId [{newPolicyDto.ProductID}] does not exist");
 
-            var party = await PartySelectThisAsync(newPolicyDto.AgentId);
+            var party = await PartySelectThisAsync(newPolicyDto.AgentID);
             if (party is null)
-                throw new ArgumentOutOfRangeException($"This AgentId [{newPolicyDto.AgentId}] does not exist");
+                throw new ArgumentOutOfRangeException($"This AgentId [{newPolicyDto.AgentID}] does not exist");
 
 
             // create the policy
@@ -74,66 +74,62 @@ namespace Universal.Api.Data.Repositories
             _db.Policies.Add(policy);
 
             // create the policy details
-            foreach (var detail in newPolicyDto.PolicyDetails)
+            foreach (var detailDto in newPolicyDto.PolicySections)
             {
-                var pd = detail.MapToPolicyDetail();
-                pd.PolicyNo = policy.PolicyNo;
-
-                _db.PolicyDetails.Add(pd);
+                var policyDetail = CreateNewPolicyDetail(detailDto, policy);
+                _db.PolicyDetails.Add(policyDetail);
             }
 
             // create a debit note
             var debitNote = CreateNewDebitNote(policy);
             _db.DNCNNotes.Add(debitNote);
 
-            // and also a reciept
-            var receipt = CreateNewReceipt(policy, debitNote.refDNCNNo);
-            _db.DNCNNotes.Add(receipt);
+            var hasPaid = await PaymentValidate(newPolicyDto.PaymentReferenceID, newPolicyDto.PaymentProviderID);
+
+            if (hasPaid)
+            {
+                // and also a reciept
+                var receipt = CreateNewReceipt(policy, debitNote.refDNCNNo);
+                _db.DNCNNotes.Add(receipt);
+            }
 
             //return the policy number
             return policy;
         }
 
         private Policy CreateNewPolicy<T>(CreateNew<T> newPolicyDto, InsuredClient insured, Party party, SubRisk subRisk)
-             where T : PolicyRequest
+             where T : RiskDetail
         {
-            var policyNo = GetNextAutoNumber("[AUTO]", "POLICY", BRANCH_ID, newPolicyDto.ProductId);
+            if (newPolicyDto.StartDate >= newPolicyDto.EndDate)
+                throw new ArgumentOutOfRangeException(nameof(newPolicyDto.StartDate),
+                    $"{nameof(newPolicyDto.StartDate)} cannot be later than {nameof(newPolicyDto.EndDate)}");
+
+            var policyNo = GetNextAutoNumber("POLICY", BRANCH_ID, newPolicyDto.ProductID);
+
+            var TotalSumInsured = newPolicyDto.PolicySections.Sum(x => x.SectionSumInsured);
+            var TotalPremium = newPolicyDto.PolicySections.Sum(x => x.SectionPremium);
+
+            if (TotalSumInsured <= 0)
+                throw new InvalidOperationException($"Total [SectionSumInsured] cannot be zero");
+
+            if (TotalPremium <= 0)
+                throw new InvalidOperationException($"Total [SectionPremium] cannot be zero");
 
             return new Policy()
             {
-                TransDate = newPolicyDto.TransactionDate,
+                PolicyNo = policyNo,
+                CoPolicyNo = null,
+                TransDate = DateTime.Now,
                 StartDate = newPolicyDto.StartDate,
                 EndDate = newPolicyDto.EndDate,
-                SubRiskID = newPolicyDto.ProductId,
+                SubRiskID = subRisk.SubRiskID,
                 SubRisk = subRisk.SubRiskName,
                 PartyID = party.PartyID,
                 Party = party.PartyName,
                 BranchID = BRANCH_ID,
                 Branch = BRANCH_NAME,
-                //TrackID = 100L,
-                //SourceType = policyDto.BizChannel,
-                //ExRate = 1.0,
-                //ExRateID = 1L,
-                ExCurrency = "NAIRA",
-                PremiumRate = 0.0,
-                ProportionRate = 0.0,
-                SumInsured = newPolicyDto.TotalSumInsured,
-                GrossPremium = newPolicyDto.TotalGrossPremium,
-                SumInsuredFrgn = 0,
-                GrossPremiumFrgn = 0,
-                ProRataDays = 0,
-                ProRataPremium = 0,
-                //BizSource = policyDto.SourceId,
-                Active = 1,
-                Deleted = 0,
-                SubmittedBy = $"{SUBMITTED_BY}/{_authContext.User.AppId}",
-                SubmittedOn = DateTime.Now,
-                PolicyNo = policyNo,
-                CoPolicyNo = policyNo,
-                TransSTATUS = "PENDING",
-                Remarks = "RETAIL",
 
-                //InsStateID = insured.StateOfOrigin,
+                InsStateID = null,
                 InsuredID = insured.InsuredID,
                 InsSurname = insured.Surname,
                 InsFirstname = insured.FirstName,
@@ -144,86 +140,141 @@ namespace Universal.Api.Data.Repositories
                 InsEmail = insured.Email,
                 InsOccupation = insured.Occupation,
                 InsFaxNo = insured.ApiId,
-                //InsFullName = insured.Surname + " " + insured.FirstName + " " + insured.OtherNames,
+
+                ExRate = 1,
+                ExCurrency = "NAIRA",  
+                PremiumRate = 0,
+                ProportionRate = 100,
+                SumInsured = TotalSumInsured,
+                GrossPremium = TotalPremium, 
+                SumInsuredFrgn = 0,
+                GrossPremiumFrgn = 0,
+                ProRataDays = (int)(newPolicyDto.EndDate - newPolicyDto.StartDate).TotalDays + 1,
+                ProRataPremium = 0, 
+                isProposal = 0, 
+                BizSource = "DIRECT",  
+                TransSTATUS = "PENDING",
+                Remarks = "RETAIL", 
+
+                SubmittedBy = $"{SUBMITTED_BY}/{_authContext.User.AppId}",
+                SubmittedOn = DateTime.Now,
+                Active = 1,
+                Deleted = 0, 
             };
+        }
+
+        private PolicyDetail CreateNewPolicyDetail<T>(T detailDto, Policy policy)
+            where T : RiskDetail
+        {
+            string endorseNo = GetNextAutoNumber("INVOICE", BRANCH_ID); //, policy.SubRiskID);
+
+            var pd = detailDto.MapToPolicyDetail();
+
+            pd.PolicyNo = policy.PolicyNo;
+            pd.ExRate = policy.ExRate;
+
+            pd.EndorsementNo = endorseNo;
+            //pd.CertOrDocNo = CertificateNo;
+            pd.EntryDate = policy.TransDate;
+            pd.BizOption = "NEW";
+            pd.InsuredName = policy.InsFullname;
+            pd.StartDate = policy.StartDate;
+            pd.EndDate = policy.EndDate;
+            pd.ExRate = policy.ExRate;
+            pd.ExCurrency = policy.ExCurrency;
+            pd.PremiumRate = policy.PremiumRate;
+            pd.ProportionRate = policy.ProportionRate;
+            pd.ProRataDays = policy.ProRataDays;
+
+            pd.SumInsured = detailDto.SectionSumInsured;
+            pd.TotalRiskValue = detailDto.SectionSumInsured;
+            pd.GrossPremium = detailDto.SectionPremium;
+            pd.SumInsuredFrgn = 0;
+            pd.GrossPremiumFrgn = 0;
+            //pd.ProRataPremium = CDbl(PolicyAmount);
+            //pd.NetAmount = CDbl(PolicyAmount);
+            //pd.Field49 = CDbl(PolicyAmount);
+            pd.Field50 = "PENDING";
+
+            pd.SubmittedBy = policy.SubmittedBy;
+            pd.SubmittedOn = policy.SubmittedOn;
+            pd.Deleted = policy.Deleted;
+            pd.Active = policy.Active;
+
+            return pd;
         }
 
         private DNCNNote CreateNewDebitNote(Policy policy)
         {
-            //string dncnNo = Guid.NewGuid().ToString().Split('-')[0];
-            string dncnNo = GetNextAutoNumber("[AUTO]", "DNOTE", BRANCH_ID, policy.SubRiskID);
+            string dncnNo = GetNextAutoNumber("DNOTE", BRANCH_ID, policy.SubRiskID);
+            decimal partyRate = 0;
+            decimal? commission = (policy.GrossPremium * partyRate) / 100;
 
             return new DNCNNote()
             {
+                NoteType = "DN",
+
                 DNCNNo = dncnNo,
                 refDNCNNo = dncnNo,
                 PolicyNo = policy.PolicyNo,
                 CoPolicyNo = policy.CoPolicyNo,
-                BranchID = BRANCH_ID,
-                BizSource = "DIRECT",
-                //BizOption = P.BizOption,
-                NoteType = "DN",
-                BillingDate = DateTime.Now,
+                BranchID = policy.BranchID,
+                BizSource = policy.BizSource,
+                BizOption = "NEW",
+                BillingDate = policy.TransDate,
                 SubRiskID = policy.SubRiskID,
                 SubRisk = policy.SubRisk,
                 PartyID = policy.PartyID,
                 Party = policy.Party,
-                PartyRate = 0,
                 InsuredID = policy.InsuredID,
-                //InsuredName = P.InsuredName,
+                InsuredName = policy.InsFullname,
                 StartDate = policy.StartDate,
                 EndDate = policy.EndDate,
+
+                Narration = $"Being policy premium  for Policy No. {policy.PolicyNo}",
+                ExRate = policy.ExRate,
+                ExCurrency = policy.ExCurrency,
+                Remarks = "NORMAL",
+                PaymentType = "NORMAL",
+
                 SumInsured = policy.SumInsured,
                 GrossPremium = policy.GrossPremium,
-                Commission = 0,
-                PropRate = 100.0,
-                ProRataDays = 12L,
-                ProRataPremium = 0,
-                VatRate = 0.0,
-                VatAmount = 0,
-                NetAmount = 0,
-                Narration = "Being policy premium  for Policy No. " + policy.PolicyNo,
-                ExRate = 1.0,
-                ExCurrency = "NAIRA",
-                SumInsuredFrgn = 0,
-                GrossPremiumFrgn = 0,
-                Approval = 1,
-                HasTreaty = 1,
-                Remarks = "NORMAL",
-                TopMostValue = 0,
-                PMLValue = 0,
-                PaymentType = "NORMAL",
-                Deleted = 0,
-                DeletedOn = DateTime.Now,
-                Active = 1,
-                SubmittedBy = $"{SUBMITTED_BY}/{_authContext.User.AppId}",
-                SubmittedOn = DateTime.Now,
-                TotalRiskValue = 0,
-                TotalPremium = 0,
-                RetProp = 0.0,
+
+                PartyRate = partyRate,
+                Commission = commission,
+                PropRate = policy.ProportionRate,
+                ProRataDays = policy.ProRataDays,
+                ProRataPremium = policy.ProRataPremium,
+                NetAmount = policy.GrossPremium - commission,
+                SumInsuredFrgn = policy.SumInsuredFrgn,
+                GrossPremiumFrgn = policy.GrossPremiumFrgn,
+                TotalRiskValue = policy.SumInsured,
+                TotalPremium = policy.GrossPremium,
+                Approval = 0,
+                HasTreaty = 0,
+                RetProp = 0,
                 RetValue = 0,
                 RetPremium = 0,
-                DBDate = DateTime.Now,
-                A1 = 0,
-                A2 = 0,
-                A3 = 0,
-                A4 = 0,
-                A5 = 0,
-                A6 = 0,
-                A7 = 0,
-                A8 = 0,
-                A9 = 0,
-                A10 = 0
+                DBDate = policy.TransDate, 
+
+                SubmittedBy = policy.SubmittedBy,
+                SubmittedOn = policy.SubmittedOn,
+                Active = policy.Active,
+                Deleted = policy.Deleted,
             };
         }
 
         private DNCNNote CreateNewReceipt(Policy policy, string refDnCnNo)
         {
             string dncnNo = Guid.NewGuid().ToString().Split('-')[0];
-            string receiptNo = GetNextAutoNumber("[AUTO]", "RECEIPT", BRANCH_ID, policy.SubRiskID);
+            string receiptNo = GetNextAutoNumber("RECEIPT", BRANCH_ID, policy.SubRiskID);
+            decimal partyRate = 0;
+            decimal? commission = (policy.GrossPremium * partyRate) / 100;
 
             return new DNCNNote()
             {
+                NoteType = "RCP",
+
                 DNCNNo = dncnNo,
                 refDNCNNo = refDnCnNo,
                 ReceiptNo = receiptNo,
@@ -231,60 +282,67 @@ namespace Universal.Api.Data.Repositories
                 CoPolicyNo = policy.CoPolicyNo,
                 BranchID = policy.BranchID,
                 BizSource = policy.BizSource,
-                //BizOption = P.BizOption,
-                NoteType = "RCP",
-                BillingDate = DateTime.Now,
+                BizOption = "NEW",
+                BillingDate = policy.TransDate,
                 SubRiskID = policy.SubRiskID,
                 SubRisk = policy.SubRisk,
                 PartyID = policy.PartyID,
                 Party = policy.Party,
-                PartyRate = 0,
                 InsuredID = policy.InsuredID,
-                //InsuredName = P.InsuredName,
+                InsuredName = policy.InsFullname,
                 StartDate = policy.StartDate,
                 EndDate = policy.EndDate,
+
+                Narration = $"Being reciept for Debit Note No. {refDnCnNo}",
+                ExRate = policy.ExRate,
+                ExCurrency = policy.ExCurrency,
+                Remarks = "NORMAL",
+                PaymentType = "NORMAL",
+
                 SumInsured = policy.SumInsured,
                 GrossPremium = policy.GrossPremium,
-                Commission = 0,
-                PropRate = 100.0,
-                ProRataDays = 12L,
-                ProRataPremium = 0,
-                VatRate = 0.0,
-                VatAmount = 0,
-                NetAmount = 0,
-                Narration = "Being policy premium  for Policy No. " + policy.PolicyNo,
-                ExRate = 1.0,
-                ExCurrency = "NAIRA",
-                SumInsuredFrgn = 0,
-                GrossPremiumFrgn = 0,
-                Approval = 1,
-                HasTreaty = 1,
-                Remarks = "NORMAL",
-                TopMostValue = 0,
-                PMLValue = 0,
-                PaymentType = "NORMAL",
-                Deleted = 0,
-                DeletedOn = DateTime.Now,
-                Active = 1,
-                SubmittedBy = $"{SUBMITTED_BY}/{_authContext.User.AppId}",
-                SubmittedOn = DateTime.Now,
-                TotalRiskValue = 0,
-                TotalPremium = 0,
-                RetProp = 0.0,
+
+                PartyRate = partyRate,
+                Commission = commission,
+                PropRate = policy.ProportionRate,
+                ProRataDays = policy.ProRataDays,
+                ProRataPremium = policy.ProRataPremium,
+                NetAmount = policy.GrossPremium - commission,
+                SumInsuredFrgn = policy.SumInsuredFrgn,
+                GrossPremiumFrgn = policy.GrossPremiumFrgn,
+                TotalRiskValue = policy.SumInsured,
+                TotalPremium = policy.GrossPremium,
+                Approval = 0,
+                HasTreaty = 0,
+                RetProp = 0,
                 RetValue = 0,
                 RetPremium = 0,
-                DBDate = DateTime.Now,
-                A1 = 0,
-                A2 = 0,
-                A3 = 0,
-                A4 = 0,
-                A5 = 0,
-                A6 = 0,
-                A7 = 0,
-                A8 = 0,
-                A9 = 0,
-                A10 = 0
+                DBDate = policy.TransDate,
+
+                SubmittedBy = policy.SubmittedBy,
+                SubmittedOn = policy.SubmittedOn,
+                Active = policy.Active,
+                Deleted = policy.Deleted,
             };
+        }
+
+        private async Task<bool> PaymentValidate( string merchantId ,string transactionId)
+        {
+            if (string.IsNullOrEmpty( merchantId))
+                return false;
+
+            if (string.IsNullOrEmpty(transactionId))
+                return false;
+
+            if (merchantId.ToUpper() == "PAYSTACK")
+            {
+                if (transactionId == "DEMO")
+                    return true;
+                else
+                    return false;
+            }
+
+            return false;
         }
     }
 }

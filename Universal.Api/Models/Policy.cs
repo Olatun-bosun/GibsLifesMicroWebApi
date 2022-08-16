@@ -10,7 +10,7 @@ namespace Universal.Api.Models
         public string PolicyNo { get; set; }
         [ForeignKey("InsuredID")]
         public virtual InsuredClient InsuredClient { get; set; }
-        public long PolicyID { get; set; }
+        //public long PolicyID { get; set; }
         public DateTime? TransDate { get; set; }
 
         public string CoPolicyNo { get; set; }
@@ -101,5 +101,12 @@ namespace Universal.Api.Models
 
         public string Leader { get; set; }
 
+        public string InsFullname
+        {
+            get
+            {
+                return $"{InsSurname} {InsFirstname} {InsOthernames}".Trim();
+            }
+        }
     }
 }

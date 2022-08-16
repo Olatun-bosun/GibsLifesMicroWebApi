@@ -33,7 +33,7 @@ namespace Universal.Api.Data.Repositories
             }
 
             return query.OrderByDescending(x => x.EntryDate)
-                        .Skip(filter.SkipCount)
+                        //.Skip(filter.SkipCount)
                         .Take(filter.PageSize)
                         .ToListAsync();
         }
@@ -46,7 +46,7 @@ namespace Universal.Api.Data.Repositories
             return _db.ClaimsReserved.Where(x => x.ClaimNo == claimNo).SingleOrDefaultAsync();
         }
 
-        public async Task<Claim> ClaimCreateAsync(ClaimResult claimDto)
+        public async Task<Claim> ClaimCreateAsync(CreateNewClaimRequest claimDto)
         {
             var policy = await PolicySelectThisAsync(claimDto.PolicyNo);
 
@@ -55,26 +55,48 @@ namespace Universal.Api.Data.Repositories
 
             var claim = new Claim
             {
-                //NotificatnNo = GenerateNotificationNo(policy.SubRiskID, policy.BranchID),
+                ClaimNo = GetNextAutoNumber("CLAIM", policy.SubRiskID, policy.BranchID),
+                BranchID = policy.BranchID,
                 PolicyNo = claimDto.PolicyNo,
-                NotifyDate = claimDto.LossNotifyDate,
+                SubRiskID = policy.SubRiskID,
+                SubRisk = policy.SubRisk,
+                PartyID = policy.PartyID,
+                Party = policy.Party,
+                //refDNCNNo = claimDto.debitNoteNo, //TODO
+                InsuredID = policy.InsuredID,
+                InsuredName = policy.InsFullname,
+                StartDate = policy.StartDate,
+                EndDate = policy.EndDate,
+
+                LossType = claimDto.LossType,
                 LossDate = claimDto.LossDate,
                 LossDetails = claimDto.LossDescription,
-                //InsuredName = policy.InsFullName,
-                BranchID = policy.BranchID,
-                //SumInsured = policy.SumInsured,
-                InsuredID = policy.InsuredID,
-                //RegStatus = "PENDING",
-                Approval = 0,
-                Active = 1,
+                NotifyDate = claimDto.LossNotifyDate,
+
+                PropRate = (decimal?)policy.ProportionRate,
+                UndYear = policy.StartDate.Value.Year,
+                AmtReserved = 1000, //TODO
+                AmtPaid = 0,
+
+                //vehicle/marine/other info
+                //Field1 = "",
+                //Field2 = "",
+                //Field3 = "",
+                //Field4 = "",
+                //Field5 = "",
+                //Field6 = "",
+                //Field7 = "",
+                //Field8 = "",
+                //Field9 = "",
+                //Field10 = "",
+                //Field11 = "",
+                //Field12 = "",
+
+                EntryDate = DateTime.Now,
                 SubmittedBy = $"{SUBMITTED_BY}/{_authContext.User.AppId}",
                 SubmittedOn = DateTime.Now,
-                StartDate = DateTime.Now,
-                EndDate = DateTime.Now.AddYears(1).AddDays(-1.0),
-                EntryDate = DateTime.Now,
-                Party = policy.Party,
-                SubRisk = policy.SubRisk,
-                //Premium = policy.GrossPremium
+                Approval = 0,
+                Active = 1,
             };
 
             _db.ClaimsReserved.Add(claim);

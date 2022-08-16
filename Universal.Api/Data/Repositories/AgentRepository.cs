@@ -23,7 +23,8 @@ namespace Universal.Api.Data.Repositories
             if (string.IsNullOrWhiteSpace(agentId))
                 throw new ArgumentNullException("Agent ID cannot be empty", "AgentID");
 
-            return _db.Parties.Where(x => x.PartyID == agentId).SingleOrDefaultAsync();
+            return _db.Parties.Where(x => x.PartyID == agentId || 
+                                          x.Email   == agentId).SingleOrDefaultAsync();
         }
 
         public Task<List<Party>> PartySelectAsync(FilterPaging filter)
@@ -45,29 +46,30 @@ namespace Universal.Api.Data.Repositories
         public async Task<Party> PartyCreateAsync(CreateNewAgentRequest newAgentDto)
         {
             //check for duplicate
-            var existing = await _db.Parties.Where(x => x.ApiId.Contains(newAgentDto.Email) || 
+            var existing = await _db.Parties.Where(x => x.ApiId.Contains(newAgentDto.Email) ||
+                                                        x.Email       == newAgentDto.Email  ||
                                                         x.mobilePhone == newAgentDto.PhoneLine1).FirstOrDefaultAsync();
             if (existing != null)
                 throw new ArgumentException("Duplicate agent found");
 
             Party party = new Party()
             {
-                PartyID = GetNextAutoNumber("[AUTO]", "AGENTS", BRANCH_ID),
+                PartyID = GetNextAutoNumber("AGENTS", BRANCH_ID),
 
                 PartyName = newAgentDto.AgentName,
                 Address = newAgentDto.Address,
                 LandPhone = newAgentDto.PhoneLine2,
                 mobilePhone = newAgentDto.PhoneLine1,
                 Email = newAgentDto.Email,
-                ComRate = null,
-                CreditLimit = null,
+                ComRate = 20,
+                CreditLimit = 0,
                 PartyType = "AG",
                 InsContact = null,
                 FinContact = null,
-                Remarks = newAgentDto.Remarks,
+                //Remarks = newAgentDto.Remarks,
                 SubmittedBy = $"{SUBMITTED_BY}/{_authContext.User.AppId}",
                 SubmittedOn = DateTime.Now,
-                Active = 1,
+                Active = 0,
                 Deleted = 0,
 
                 ApiId = newAgentDto.Email,

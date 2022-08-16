@@ -7,9 +7,6 @@ namespace Universal.Api.Models
     public class DNCNNote
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public long DNCNID { get; set; }
-
         public string DNCNNo { get; set; }
 
         public string refDNCNNo { get; set; }
@@ -22,7 +19,7 @@ namespace Universal.Api.Models
 
         public string BranchID { get; set; }
 
-        public string CompanyID { get; set; }
+        //public string CompanyID { get; set; }
 
         public string BizSource { get; set; }
 
@@ -66,9 +63,9 @@ namespace Universal.Api.Models
 
         public Decimal? ProRataPremium { get; set; }
 
-        public double? VatRate { get; set; }
+        //public double? VatRate { get; set; }
 
-        public Decimal? VatAmount { get; set; }
+        //public Decimal? VatAmount { get; set; }
 
         public Decimal? NetAmount { get; set; }
 
@@ -90,37 +87,37 @@ namespace Universal.Api.Models
 
         public string Transguid { get; set; }
 
-        public string SourceType { get; set; }
+        //public string SourceType { get; set; }
 
-        public string RIClass { get; set; }
+        //public string RIClass { get; set; }
 
-        public Decimal? TopMostValue { get; set; }
+        //public Decimal? TopMostValue { get; set; }
 
-        public Decimal? PMLValue { get; set; }
+        //public Decimal? PMLValue { get; set; }
 
         public string PaymentType { get; set; }
 
         public string ChequeNo { get; set; }
 
-        public string Field1 { get; set; }
+        //public string Field1 { get; set; }
 
-        public string Field2 { get; set; }
+        //public string Field2 { get; set; }
 
-        public string Field3 { get; set; }
+        //public string Field3 { get; set; }
 
-        public string Field4 { get; set; }
+        //public string Field4 { get; set; }
 
-        public string Field5 { get; set; }
+        //public string Field5 { get; set; }
 
-        public string Field6 { get; set; }
+        //public string Field6 { get; set; }
 
-        public string Field7 { get; set; }
+        //public string Field7 { get; set; }
 
-        public string Field8 { get; set; }
+        //public string Field8 { get; set; }
 
-        public string Field9 { get; set; }
+        //public string Field9 { get; set; }
 
-        public string Field10 { get; set; }
+        //public string Field10 { get; set; }
 
         public byte? Deleted { get; set; }
 
@@ -158,7 +155,7 @@ namespace Universal.Api.Models
 
         public DateTime? DBDate { get; set; }
 
-        public DateTime? CRRefDate { get; set; }
+        //public DateTime? CRRefDate { get; set; }
 
         public string MktUnitID { get; set; }
 
@@ -166,28 +163,28 @@ namespace Universal.Api.Models
 
         public string CoverType { get; set; }
 
-        public Decimal? A1 { get; set; }
+        //public Decimal? A1 { get; set; }
 
-        public Decimal? A2 { get; set; }
+        //public Decimal? A2 { get; set; }
 
-        public Decimal? A3 { get; set; }
+        //public Decimal? A3 { get; set; }
 
-        public Decimal? A4 { get; set; }
+        //public Decimal? A4 { get; set; }
 
-        public Decimal? A5 { get; set; }
+        //public Decimal? A5 { get; set; }
 
-        public Decimal? A6 { get; set; }
+        //public Decimal? A6 { get; set; }
 
-        public Decimal? A7 { get; set; }
+        //public Decimal? A7 { get; set; }
 
-        public Decimal? A8 { get; set; }
+        //public Decimal? A8 { get; set; }
 
-        public Decimal? A9 { get; set; }
+        //public Decimal? A9 { get; set; }
 
-        public Decimal? A10 { get; set; }
+        //public Decimal? A10 { get; set; }
 
-        public DateTime? ExtraDate1 { get; set; }
+        //public DateTime? ExtraDate1 { get; set; }
 
-        public DateTime? ExtraDate2 { get; set; }
+        //public DateTime? ExtraDate2 { get; set; }
     }
 }

@@ -31,7 +31,7 @@ namespace Universal.Api.Controllers
 
             try
             {
-                var party = await _repository.PartySelectThisAsync(login.AppId, login.AgentId, login.Password);
+                var party = await _repository.PartySelectThisAsync(login.AppID, login.AgentID, login.Password);
 
                 if (party is null)
                     return NotFound("AgentID or Password is incorrect");
@@ -41,8 +41,8 @@ namespace Universal.Api.Controllers
 
                 string token = CreateToken(_settings.JwtSecret,
                                            _settings.JwtExpiresIn,
-                                           login.AppId, 
-                                           login.AgentId, 
+                                           login.AppID, 
+                                           login.AgentID, 
                                            party.PartyID, "AGENT");
                 var response = new LoginResult
                 {

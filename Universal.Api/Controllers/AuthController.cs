@@ -29,7 +29,7 @@ namespace Universal.Api.Controllers
 
             try
             {
-                var apiUser = await _repository.AppLogin(login.AppId, login.Password);
+                var apiUser = await _repository.AppLogin(login.AppID, login.Password);
 
                 if (apiUser is null)
                     return NotFound("AppID or Password is incorrect");
@@ -39,7 +39,7 @@ namespace Universal.Api.Controllers
 
                 string token = CreateToken(_settings.JwtSecret,
                                            _settings.JwtExpiresIn,
-                                           login.AppId, "", "", "APP");
+                                           login.AppID, "", "", "APP");
 
                 var response = new LoginResult
                 {

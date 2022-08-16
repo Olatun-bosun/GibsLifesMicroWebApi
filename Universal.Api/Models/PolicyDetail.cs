@@ -30,12 +30,6 @@ namespace Universal.Api.Models
 
         public DateTime? EndDate { get; set; }
 
-        public DateTime? LTAStartDate { get; set; }
-
-        public DateTime? LTAEndDate { get; set; }
-
-        public long? ExRateID { get; set; }
-
         public double? ExRate { get; set; }
 
         public string ExCurrency { get; set; }
@@ -69,46 +63,6 @@ namespace Universal.Api.Models
         public string ModifiedBy { get; set; }
 
         public DateTime? ModifiedOn { get; set; }
-
-        public Decimal? A1 { get; set; }
-
-        public Decimal? A2 { get; set; }
-
-        public Decimal? A3 { get; set; }
-
-        public Decimal? A4 { get; set; }
-
-        public Decimal? A5 { get; set; }
-
-        public Decimal? A6 { get; set; }
-
-        public Decimal? A7 { get; set; }
-
-        public Decimal? A8 { get; set; }
-
-        public Decimal? A9 { get; set; }
-
-        public Decimal? A10 { get; set; }
-
-        public Decimal? A11 { get; set; }
-
-        public Decimal? A12 { get; set; }
-
-        public Decimal? A13 { get; set; }
-
-        public Decimal? A14 { get; set; }
-
-        public long? A15 { get; set; }
-
-        public Decimal? A16 { get; set; }
-
-        public Decimal? A17 { get; set; }
-
-        public Decimal? A18 { get; set; }
-
-        public Decimal? A19 { get; set; }
-
-        public Decimal? A20 { get; set; }
 
         public string Field1 { get; set; }
 

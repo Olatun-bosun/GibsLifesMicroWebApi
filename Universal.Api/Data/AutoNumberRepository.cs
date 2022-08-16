@@ -7,7 +7,7 @@ namespace Universal.Api.Data.Repositories
 {
     public partial class Repository
     {
-        public string GetNextAutoNumber(string customNo, string numType, string branchID, string subRiskNo = "", string endorseType = "")
+        public string GetNextAutoNumber(string numType, string branchID, string subRiskNo = "", string endorseType = "", DateTime optionalDate = default)
         {
             //'$SR$ - Sub Risk Code
             //'$RC$ - Risk Code
@@ -18,6 +18,9 @@ namespace Universal.Api.Data.Repositories
             //'$BR2$ - Branch Code 2
 
             //'$P$ - Endorsement something
+
+            if (optionalDate == default)
+                optionalDate = DateTime.Today;
 
             static string GetEndorsementCode(string endorseType)
             {
@@ -47,8 +50,8 @@ namespace Universal.Api.Data.Repositories
 
             try
             {
-                if (customNo.ToUpper().Contains("AUTO"))
-                {
+                //if (customNo.ToUpper().Contains("AUTO"))
+                //{
                     string strAutoNum = GetSerialNoFormat(numType, branchID);
 
                     if (strAutoNum.IndexOf("$0") >= 0)
@@ -73,8 +76,8 @@ namespace Universal.Api.Data.Repositories
                         throw new Exception("Missing format $0000$");
                     }
                     strAutoNum = strAutoNum.Replace("$SR$", subRiskNo);
-                    strAutoNum = strAutoNum.Replace("$YR$", DateTime.Now.ToString("yy"));
-                    strAutoNum = strAutoNum.Replace("$MO$", DateTime.Now.ToString("MM"));
+                    strAutoNum = strAutoNum.Replace("$YR$", optionalDate.ToString("yy"));
+                    strAutoNum = strAutoNum.Replace("$MO$", optionalDate.ToString("MM"));
                     strAutoNum = strAutoNum.Replace("$BR$", branchID);
 
 
@@ -95,15 +98,15 @@ namespace Universal.Api.Data.Repositories
                     }
 
                     return strAutoNum.ToUpper();
-                }
-                else
-                {
-                    return customNo.ToUpper();
-                }
+                //}
+                //else
+                //{
+                //    return customNo.ToUpper();
+                //}
             }
-            catch 
+            catch (Exception ex)
             {
-                throw new InvalidOperationException("Error in GetNextAutoNumber()");
+                throw new InvalidOperationException("Error in GetNextAutoNumber()\n\r" + ex.ToString());
             }
         }
 
@@ -196,206 +199,3 @@ namespace Universal.Api.Data.Repositories
         }
     }
 }
-
-//Public Function getNextAutoNumber(ByVal CustomNo As String, ByVal NumType As AutoNumEnum, ByVal BranchID As String, Optional ByVal SubRiskNo As String = "", Optional ByVal EndorseType As String = "") As String
-//        '$SR$ - Sub Risk Code
-//        '$RC$ - Risk Code
-//        '$YR$ - Current Year (2 digits)
-//        '$MO$ - Current Month (2 Digits)
-//        '$00000$ - Serial Number
-//        '$BR$ - Branch Code
-//        '$BR2$ - Branch Code 2
-
-//        Try
-
-//            'If SubRiskID = "" Then
-//            If CustomNo.ToUpper.Contains("AUTO") Then
-//                Dim strAutoNum As String = getSerialNoFormat(NumType.ToString, BranchID).ToString
-
-//                If strAutoNum.IndexOf("$0") >= 0 Then
-//                    Dim nextNum As Long = getNextSerialNo(NumType.ToString, BranchID)
-//                    If nextNum > 0 Then
-//                        Dim len As Integer = strAutoNum.IndexOf("0$") -strAutoNum.IndexOf("$0")
-//                        If len< 3 Then len = 3
-
-//                        Dim zeros As String = New String("0", len)
-//                        strAutoNum = Replace(strAutoNum, "$" & zeros & "$", Format(nextNum, zeros)) 'formation of number
-//                    Else
-//                        Throw New Exception("Invalid format in $0000$")
-//                    End If
-//                Else
-//                    Throw New Exception("Missing format $0000$")
-//                End If
-//                strAutoNum = Replace(strAutoNum, "$SR$", SubRiskNo)
-//                strAutoNum = Replace(strAutoNum, "$YR$", Right(Now.Year.ToString, 2))
-//                strAutoNum = Replace(strAutoNum, "$MO$", Right("0" & Now.Month.ToString, 2))
-//                strAutoNum = Replace(strAutoNum, "$BR$", BranchID)
-
-
-//                If strAutoNum.Contains("$RC$") Then
-//                    strAutoNum = Replace(strAutoNum, "$RC$", (New cls_SubRisks).SelectThis(SubRiskNo).RiskID)
-//                End If
-//                If strAutoNum.Contains("$BR2$") Then
-//                    strAutoNum = Replace(strAutoNum, "$BR2$", (New cls_Branches).SelectThis(BranchID).BranchID2)
-//                End If
-//                If strAutoNum.Contains("$P$") Then
-//                    Dim TypeF As String = ""
-
-//                    Select Case EndorseType
-//                        Case "DELETED", "DELETE", "REVERSAL"
-//                            TypeF = "C"
-//                        Case "RETURN"
-//                            TypeF = "C"
-//                        Case "RENEWAL", "RENEW"
-//                            TypeF = "R"
-//                        Case "ADDITIONAL"
-//                            TypeF = "E"
-//                        Case "NIL", "REDO"
-//                            TypeF = "N"
-//                        Case Else
-//                            TypeF = "A"
-//                    End Select
-
-
-//                    strAutoNum = Replace(strAutoNum, "$P$", TypeF)
-
-//                End If
-
-//                Return strAutoNum
-//            Else
-//                Return CustomNo.ToUpper
-//            End If
-
-
-//        Catch ex As Exception
-//            Return String.Empty
-//        End Try
-//    End Function
-
-//    Private Function getNextSerialNo(ByVal NumType As String, ByVal BranchID As String, Optional ByVal RiskID As String = "") As Long
-//        If NumType = "CLAIM" Then
-//            If settings.COMPANY_ABREV = "staco" Then
-//                RiskID = BranchID
-//            End If
-
-//        End If
-//        Try
-//            Dim T As List(Of Gibs5.AutoNumber) = (From A In db.AutoNumbers _
-//            Where A.NumType = NumType And A.BranchID = "ALL").ToList()
-
-//            If T.Count > 0 Then
-//                Try
-//                    getNextSerialNo = T(0).NextValue
-//                Catch ex As Exception
-//                    T(0).NextValue = 1
-//                    getNextSerialNo = 1
-//                End Try
-//                'then increment and update
-//                T(0).NextValue += 1
-//                db.SubmitChanges()
-//            Else 'try specific
-
-//                If RiskID = "" Then
-//                    T = (From A In db.AutoNumbers _
-//                        Where A.NumType = NumType And A.BranchID = BranchID).ToList()
-
-//                    If T.Count > 0 Then
-//                        getNextSerialNo = T(0).NextValue
-//                        'then increment and update
-//                        T(0).NextValue += 1
-//                        db.SubmitChanges()
-//                    Else 'no number setup
-//                        Return - 1
-//                    End If
-//                Else
-//                    Select Case NumType
-//                        Case "CLAIM"
-//                            T = (From A In db.AutoNumbers _
-//                            Where A.NumType = NumType And A.BranchID = BranchID).ToList()
-
-//                            If T.Count > 0 Then
-//                                getNextSerialNo = T(0).NextValue
-//                                'then increment and update
-//                                T(0).NextValue += 1
-//                                db.SubmitChanges()
-//                            Else 'no number setup
-//                                Return - 1
-//                            End If
-//                        Case Else
-//                            T = (From A In db.AutoNumbers _
-//                                Where A.NumType = NumType And A.BranchID = BranchID And A.RiskID = RiskID).ToList()
-
-//                            If T.Count > 0 Then
-//                                getNextSerialNo = T(0).NextValue
-//                                'then increment and update
-//                                T(0).NextValue += 1
-//                                db.SubmitChanges()
-//                            Else 'no number setup
-//                                Return - 1
-//                            End If
-
-//                    End Select
-
-
-//                End If
-
-//            End If
-
-//        Catch ex As Exception
-//            Return -2
-//        End Try
-//    End Function
-
-//    Private Function getSerialNoFormat(ByVal NumType As String, ByVal BranchID As String, Optional ByVal RiskID As String = "") As String
-//        If NumType = "CLAIM" Then
-//            If settings.COMPANY_ABREV = "staco" Then
-//                RiskID = BranchID
-//            End If
-//        End If
-//        Try
-//            Dim T As List(Of Gibs5.AutoNumber) = (From A In db.AutoNumbers _
-//            Where A.NumType = NumType And A.BranchID = "ALL").ToList()
-
-//            If T.Count > 0 Then
-//                Return T(0).Format
-//            Else 'try specific
-
-//                If RiskID = "" Then
-//                    T = (From A In db.AutoNumbers _
-//                        Where A.NumType = NumType And A.BranchID = BranchID).ToList()
-
-//                    If T.Count > 0 Then
-//                        Return T(0).Format
-//                    Else 'no number setup
-//                        Return String.Empty
-//                    End If
-//                Else
-
-//                    Select Case NumType
-//                        Case "CLAIM"
-//                            T = (From A In db.AutoNumbers _
-//                                Where A.NumType = NumType And A.BranchID = BranchID).ToList()
-
-//                            If T.Count > 0 Then
-//                                Return T(0).Format
-//                            Else 'no number setup
-//                                Return String.Empty
-//                            End If
-
-//                        Case Else
-//                            T = (From A In db.AutoNumbers _
-//                            Where A.NumType = NumType And A.BranchID = BranchID And A.RiskID = RiskID).ToList()
-
-//                            If T.Count > 0 Then
-//                                Return T(0).Format
-//                            Else 'no number setup
-//                                Return String.Empty
-//                            End If
-//                    End Select
-//                End If
-//            End If
-//        Catch ex As Exception
-//            Return String.Empty
-//        End Try
-//    End Function
-
