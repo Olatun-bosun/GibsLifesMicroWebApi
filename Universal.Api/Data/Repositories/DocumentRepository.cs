@@ -18,16 +18,16 @@ namespace Universal.Api.Data.Repositories
             return query.ToListAsync();
         }
 
-        public Task<Document> DocumentSelectThisAsync(string documentId)
+        public Task<Document> DocumentSelectThisAsync(long documentId)
         {
-            if (string.IsNullOrWhiteSpace(documentId))
-                throw new ArgumentNullException(nameof(documentId));
+            //if (string.IsNullOrWhiteSpace(documentId))
+            //    throw new ArgumentNullException(nameof(documentId));
 
             return _db.Documents.Where(x => x.DocumentId == documentId)
                                 .SingleOrDefaultAsync();
         }
 
-        public async Task<List<string>> DocumentCreateAsync(string ownerType, string ownerRefId, List<IFormFile> formFiles)
+        public async Task<List<long>> DocumentCreateAsync(string ownerType, string ownerRefId, List<IFormFile> formFiles)
         {
             ownerType = ownerType.ToUpper();
             string[] types = { "POLICY", "CLAIM" };
@@ -54,7 +54,7 @@ namespace Universal.Api.Data.Repositories
                     throw new KeyNotFoundException("Claim No you supplied is invalid");
             }
 
-            var documentIds = new List<string>();
+            var documentIds = new List<long>();
 
             foreach (var file in formFiles)
             {
@@ -67,7 +67,7 @@ namespace Universal.Api.Data.Repositories
                     OwnerRefId = ownerRefId, 
                     SubmitDate = DateTime.Now,
                     DocumentName = file.FileName,
-                    DocumentId = Guid.NewGuid().ToString(),
+                    //DocumentId = Guid.NewGuid().ToString(),
                     Content = file.OpenReadStream().ReadFully(),
                     //ContentType = "application/json",
                 };

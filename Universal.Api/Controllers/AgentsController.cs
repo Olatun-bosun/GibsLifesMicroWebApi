@@ -24,7 +24,7 @@ namespace Universal.Api.Controllers
         /// </summary>
         /// <returns>A JWT Token and it's expiry time.</returns>
         [HttpPost("Login"), AllowAnonymous]
-        public async Task<ActionResult<LoginResult>> AgentLogin(AgentLoginRequest login)
+        public async Task<ActionResult<LoginResult>> LoginAgent(AgentLoginRequest login)
         {
             if (login is null)
                 return BadRequest("Request body is null");

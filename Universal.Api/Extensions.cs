@@ -1,9 +1,6 @@
 ﻿using System;
 using System.IO;
-using System.Security.Claims;
-using System.Security.Principal;
 using System.Text.RegularExpressions;
-using Universal.Api.Data;
 
 namespace Universal.Api
 {

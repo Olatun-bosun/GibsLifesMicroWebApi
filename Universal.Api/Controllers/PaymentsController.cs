@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
-using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authorization;
-using Universal.Api.Contracts.V1;
 using Universal.Api.Data.Repositories;
 using Universal.Api.Data;
 

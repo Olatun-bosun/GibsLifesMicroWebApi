@@ -29,7 +29,7 @@ namespace Universal.Api.Data.Repositories
                 query = query.Where(x => x.SubRiskName.Contains(item)).AsQueryable();
 
             return query.OrderBy(x => x.SubRiskName)
-                        .Skip(filter.SkipCount)
+                        //.Skip(filter.SkipCount)
                         .Take(filter.PageSize)
                         .ToListAsync();
         }

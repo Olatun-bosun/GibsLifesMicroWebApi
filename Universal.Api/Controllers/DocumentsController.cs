@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authorization;
-using Universal.Api.Contracts.V1;
 using Universal.Api.Data.Repositories;
 using Universal.Api.Data;
 
@@ -47,7 +46,7 @@ namespace Universal.Api.Controllers
         /// <param name="documentId"></param>
         /// <returns>The Document with the DocumentId supplied</returns>
         [HttpGet("Search")]
-        public async Task<ActionResult> GetDocument([FromQuery] string documentId)
+        public async Task<ActionResult> GetDocument([FromQuery] long documentId)
         {
             try
             {
@@ -72,7 +71,7 @@ namespace Universal.Api.Controllers
         /// <returns>The newly created Documents IDs</returns>
         [HttpPost("Upload/Policy")]
         public async Task<ActionResult<IEnumerable<string>>> 
-            UploadDocsPolicy([FromForm] string policyNo, [FromForm] List<IFormFile> file)
+            UploadDocumentsForPolicy([FromForm] string policyNo, [FromForm] List<IFormFile> file)
         {
             try
             {
@@ -94,7 +93,7 @@ namespace Universal.Api.Controllers
         /// <returns>The newly created Documents IDs</returns>
         [HttpPost("Upload/Claim")]
         public async Task<ActionResult<IEnumerable<string>>>
-            UploadDocsClaims([FromForm] string claimNo, [FromForm] List<IFormFile> file)
+            UploadDocumentsForClaims([FromForm] string claimNo, [FromForm] List<IFormFile> file)
         {
             try
             {

@@ -38,7 +38,7 @@ namespace Universal.Api.Data.Repositories
                 query = query.Where(x => x.PartyName.Contains(item)).AsQueryable();
 
             return query.OrderBy(x => x.PartyName)
-                        .Skip(filter.SkipCount)
+                        //.Skip(filter.SkipCount)
                         .Take(filter.PageSize)
                         .ToListAsync();
         }

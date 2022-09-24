@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Universal.Api.Contracts.V1
+﻿namespace Universal.Api.Contracts.V1
 {
     public class ProductResult
     {
