@@ -55,13 +55,13 @@ namespace Universal.Api.Data.Repositories
                 return insured;
 
             if (newPolicyDto.Insured != null)
-                return await CustomerCreateAsync(newPolicyDto.Insured);
+                return CustomerCreate(newPolicyDto.Insured);
 
             throw new InvalidOperationException("Either you specify CustomerID for existing customer, " +
                 "or you create a new customer by populating the Insured object");
         }
 
-        public async Task<InsuredClient> CustomerCreateAsync(CreateNewCustomerRequest newCustomerDto)
+        public InsuredClient CustomerCreate(CreateNewCustomerRequest newCustomerDto)
         {
             ////check for duplicate
             //var duplicate = await CustomerSelectThisAsync(newCustomerDto.Email, newCustomerDto.PhoneLine1);

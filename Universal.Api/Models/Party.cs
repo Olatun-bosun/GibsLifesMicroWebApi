@@ -32,9 +32,9 @@ namespace Universal.Api.Models
 
         public string FinContact { get; set; }
 
-        public Decimal? CreditLimit { get; set; }
+        public decimal? CreditLimit { get; set; }
 
-        public Decimal? ComRate { get; set; }
+        public decimal? ComRate { get; set; }
 
         public string Remarks { get; set; }
         public string ApiStatus { get; set; }

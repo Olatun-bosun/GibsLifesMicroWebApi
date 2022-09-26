@@ -80,115 +80,115 @@ namespace Universal.Api.Models
 
         public string Field30 { get; set; }
 
-        public Decimal? RiskSum { get; set; }
+        public decimal? RiskSum { get; set; }
 
-        public Decimal? OtherSum { get; set; }
+        public decimal? OtherSum { get; set; }
 
-        public Decimal? SectionPremium { get; set; }
+        public decimal? SectionPremium { get; set; }
 
         public DateTime? TStartDate { get; set; }
 
         public DateTime? TEndDate { get; set; }
 
-        public Decimal? A1 { get; set; }
+        public decimal? A1 { get; set; }
 
-        public Decimal? A2 { get; set; }
+        public decimal? A2 { get; set; }
 
-        public Decimal? A3 { get; set; }
+        public decimal? A3 { get; set; }
 
-        public Decimal? A4 { get; set; }
+        public decimal? A4 { get; set; }
 
         public long? A5 { get; set; }
 
-        public Decimal? A6 { get; set; }
+        public decimal? A6 { get; set; }
 
-        public Decimal? A7 { get; set; }
+        public decimal? A7 { get; set; }
 
-        public Decimal? A8 { get; set; }
+        public decimal? A8 { get; set; }
 
-        public Decimal? A9 { get; set; }
+        public decimal? A9 { get; set; }
 
-        public Decimal? A10 { get; set; }
+        public decimal? A10 { get; set; }
 
-        public Decimal? A11 { get; set; }
+        public decimal? A11 { get; set; }
 
-        public Decimal? A12 { get; set; }
+        public decimal? A12 { get; set; }
 
-        public Decimal? A13 { get; set; }
+        public decimal? A13 { get; set; }
 
-        public Decimal? A14 { get; set; }
+        public decimal? A14 { get; set; }
 
-        public Decimal? A15 { get; set; }
+        public decimal? A15 { get; set; }
 
-        public Decimal? A16 { get; set; }
+        public decimal? A16 { get; set; }
 
         public double? A17 { get; set; }
 
-        public Decimal? A18 { get; set; }
+        public decimal? A18 { get; set; }
 
-        public Decimal? A19 { get; set; }
+        public decimal? A19 { get; set; }
 
-        public Decimal? A20 { get; set; }
+        public decimal? A20 { get; set; }
 
-        public Decimal? A21 { get; set; }
+        public decimal? A21 { get; set; }
 
-        public Decimal? A22 { get; set; }
+        public decimal? A22 { get; set; }
 
-        public Decimal? A23 { get; set; }
+        public decimal? A23 { get; set; }
 
-        public Decimal? A24 { get; set; }
+        public decimal? A24 { get; set; }
 
-        public Decimal? A25 { get; set; }
+        public decimal? A25 { get; set; }
 
-        public Decimal? A26 { get; set; }
+        public decimal? A26 { get; set; }
 
-        public Decimal? A27 { get; set; }
+        public decimal? A27 { get; set; }
 
-        public Decimal? A28 { get; set; }
+        public decimal? A28 { get; set; }
 
-        public Decimal? A29 { get; set; }
+        public decimal? A29 { get; set; }
 
-        public Decimal? A30 { get; set; }
+        public decimal? A30 { get; set; }
 
-        public Decimal? A31 { get; set; }
+        public decimal? A31 { get; set; }
 
-        public Decimal? A32 { get; set; }
+        public decimal? A32 { get; set; }
 
-        public Decimal? A33 { get; set; }
+        public decimal? A33 { get; set; }
 
-        public Decimal? A34 { get; set; }
+        public decimal? A34 { get; set; }
 
-        public Decimal? A35 { get; set; }
+        public decimal? A35 { get; set; }
 
-        public Decimal? A36 { get; set; }
+        public decimal? A36 { get; set; }
 
-        public Decimal? A37 { get; set; }
+        public decimal? A37 { get; set; }
 
-        public Decimal? A38 { get; set; }
+        public decimal? A38 { get; set; }
 
-        public Decimal? A39 { get; set; }
+        public decimal? A39 { get; set; }
 
-        public Decimal? A40 { get; set; }
+        public decimal? A40 { get; set; }
 
-        public Decimal? A41 { get; set; }
+        public decimal? A41 { get; set; }
 
-        public Decimal? A42 { get; set; }
+        public decimal? A42 { get; set; }
 
-        public Decimal? A43 { get; set; }
+        public decimal? A43 { get; set; }
 
-        public Decimal? A44 { get; set; }
+        public decimal? A44 { get; set; }
 
-        public Decimal? A45 { get; set; }
+        public decimal? A45 { get; set; }
 
-        public Decimal? A46 { get; set; }
+        public decimal? A46 { get; set; }
 
-        public Decimal? A47 { get; set; }
+        public decimal? A47 { get; set; }
 
-        public Decimal? A48 { get; set; }
+        public decimal? A48 { get; set; }
 
-        public Decimal? A49 { get; set; }
+        public decimal? A49 { get; set; }
 
-        public Decimal? A50 { get; set; }
+        public decimal? A50 { get; set; }
 
         public string Tag { get; set; }
 

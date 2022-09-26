@@ -12,6 +12,11 @@ namespace Universal.Api.Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.Entity<PolicyAutoNumber>().HasKey(p => new { p.NumType, p.RiskID, p.BranchID, p.CompanyID });
+
+            builder.Entity<PolicyDetail>()
+                    .HasOne(pd => pd.Policy)
+                    .WithMany(p => p.PolicyDetails)
+                    .IsRequired(false);
         }
 
         public DbSet<Document> Documents { get; set; }

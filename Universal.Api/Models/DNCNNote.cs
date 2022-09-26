@@ -36,7 +36,7 @@ namespace Universal.Api.Models
 
         public string Party { get; set; }
 
-        public Decimal? PartyRate { get; set; }
+        public decimal? PartyRate { get; set; }
 
         public string InsuredID { get; set; }
 
@@ -50,23 +50,23 @@ namespace Universal.Api.Models
 
         public string MktStaff { get; set; }
 
-        public Decimal? SumInsured { get; set; }
+        public decimal? SumInsured { get; set; }
 
-        public Decimal? GrossPremium { get; set; }
+        public decimal? GrossPremium { get; set; }
 
-        public Decimal? Commission { get; set; }
+        public decimal? Commission { get; set; }
 
         public double? PropRate { get; set; }
 
         public long? ProRataDays { get; set; }
 
-        public Decimal? ProRataPremium { get; set; }
+        public decimal? ProRataPremium { get; set; }
 
         //public double? VatRate { get; set; }
 
         //public Decimal? VatAmount { get; set; }
 
-        public Decimal? NetAmount { get; set; }
+        public decimal? NetAmount { get; set; }
 
         public string Narration { get; set; }
 
@@ -74,9 +74,9 @@ namespace Universal.Api.Models
 
         public string ExCurrency { get; set; }
 
-        public Decimal? SumInsuredFrgn { get; set; }
+        public decimal? SumInsuredFrgn { get; set; }
 
-        public Decimal? GrossPremiumFrgn { get; set; }
+        public decimal? GrossPremiumFrgn { get; set; }
 
         public byte? Approval { get; set; }
 
@@ -138,9 +138,9 @@ namespace Universal.Api.Models
 
         public DateTime? ApprovedOn { get; set; }
 
-        public Decimal? TotalRiskValue { get; set; }
+        public decimal? TotalRiskValue { get; set; }
 
-        public Decimal? TotalPremium { get; set; }
+        public decimal? TotalPremium { get; set; }
 
         public string LeaderID { get; set; }
 
@@ -148,9 +148,9 @@ namespace Universal.Api.Models
 
         public double? RetProp { get; set; }
 
-        public Decimal? RetValue { get; set; }
+        public decimal? RetValue { get; set; }
 
-        public Decimal? RetPremium { get; set; }
+        public decimal? RetPremium { get; set; }
 
         public DateTime? DBDate { get; set; }
 

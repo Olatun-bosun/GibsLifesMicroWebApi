@@ -130,7 +130,7 @@ namespace Universal.Api.Controllers
         {
             try
             {
-                var customer = await _repository.CustomerCreateAsync(request);
+                var customer = _repository.CustomerCreate(request);
                 await _repository.SaveChangesAsync();
 
                 var uri = new Uri($"{Request.Path}/{customer.ApiId}", UriKind.Relative);

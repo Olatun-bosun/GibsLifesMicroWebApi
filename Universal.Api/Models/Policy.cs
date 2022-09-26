@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -55,7 +56,7 @@ namespace Universal.Api.Models
 
         public string InsOccupation { get; set; }
 
-        public byte? isProposal { get; set; }
+        public byte? IsProposal { get; set; }
 
         public DateTime? StartDate { get; set; }
 
@@ -69,17 +70,17 @@ namespace Universal.Api.Models
 
         public double? ProportionRate { get; set; }
 
-        public Decimal? SumInsured { get; set; }
+        public decimal? SumInsured { get; set; }
 
-        public Decimal? GrossPremium { get; set; }
+        public decimal? GrossPremium { get; set; }
 
-        public Decimal? SumInsuredFrgn { get; set; }
+        public decimal? SumInsuredFrgn { get; set; }
 
-        public Decimal? GrossPremiumFrgn { get; set; }
+        public decimal? GrossPremiumFrgn { get; set; }
 
         public int? ProRataDays { get; set; }
 
-        public Decimal? ProRataPremium { get; set; }
+        public decimal? ProRataPremium { get; set; }
 
         public string Remarks { get; set; }
 
@@ -100,6 +101,9 @@ namespace Universal.Api.Models
         public string LeadID { get; set; }
 
         public string Leader { get; set; }
+
+
+        public virtual List<PolicyDetail> PolicyDetails { get; set; }
 
         public string InsFullname
         {

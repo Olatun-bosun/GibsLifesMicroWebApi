@@ -61,11 +61,11 @@ namespace Universal.Api.Models
         public DateTime? ModifiedOn { get; set; }
         public string ApprovedBy { get; set; }
         public DateTime? ApprovedOn { get; set; }
-        public Decimal? A1 { get; set; }
-        public Decimal? A2 { get; set; }
-        public Decimal? A3 { get; set; }
-        public Decimal? A4 { get; set; }
-        public Decimal? A5 { get; set; }
+        public decimal? A1 { get; set; }
+        public decimal? A2 { get; set; }
+        public decimal? A3 { get; set; }
+        public decimal? A4 { get; set; }
+        public decimal? A5 { get; set; }
         public double? A6 { get; set; }
         public double? A7 { get; set; }
         public double? A8 { get; set; }
@@ -73,6 +73,6 @@ namespace Universal.Api.Models
         public string LeadID { get; set; }
         public string Leader { get; set; }
         public string PropType { get; set; }
-        public Decimal? LeadProp { get; set; }
+        public decimal? LeadProp { get; set; }
     }
 }

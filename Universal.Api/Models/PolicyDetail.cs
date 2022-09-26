@@ -9,8 +9,8 @@ namespace Universal.Api.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long DetailID { get; set; }
-
-        public string PolicyNo { get; set; }
+        //[ForeignKey("PolicyNo")]
+        //public string PolicyNo { get; set; }
 
         public string CoPolicyNo { get; set; }
 
@@ -38,19 +38,19 @@ namespace Universal.Api.Models
 
         public double? ProportionRate { get; set; }
 
-        public Decimal? SumInsured { get; set; }
+        public decimal? SumInsured { get; set; }
 
-        public Decimal? GrossPremium { get; set; }
+        public decimal? GrossPremium { get; set; }
 
-        public Decimal? SumInsuredFrgn { get; set; }
+        public decimal? SumInsuredFrgn { get; set; }
 
-        public Decimal? GrossPremiumFrgn { get; set; }
+        public decimal? GrossPremiumFrgn { get; set; }
 
         public int? ProRataDays { get; set; }
 
-        public Decimal? ProRataPremium { get; set; }
+        public decimal? ProRataPremium { get; set; }
 
-        public Decimal? NetAmount { get; set; }
+        public decimal? NetAmount { get; set; }
 
         public byte? Deleted { get; set; }
 
@@ -164,6 +164,9 @@ namespace Universal.Api.Models
 
         public string Field50 { get; set; }
 
-        public Decimal? TotalRiskValue { get; set; }
+        public decimal? TotalRiskValue { get; set; }
+
+        public virtual Policy Policy { get; set; }
+
     }
 }

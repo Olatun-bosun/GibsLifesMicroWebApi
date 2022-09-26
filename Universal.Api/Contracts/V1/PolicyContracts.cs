@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Universal.Api.Models;
 
 namespace Universal.Api.Contracts.V1
 {
@@ -36,23 +38,34 @@ namespace Universal.Api.Contracts.V1
         [Required]
         public decimal SectionPremium { get; set; }
 
-        public abstract Models.PolicyDetail MapToPolicyDetail();
+        //public RiskDetail()
+        //{
+
+        //}
+
+        public RiskDetail(PolicyDetail pd)
+        {
+            FromPolicyDetail(pd);
+        }
+
+        public abstract void FromPolicyDetail(PolicyDetail pd);
+
+        public abstract PolicyDetail ToPolicyDetail();
     }
 
     public class PolicyResult
     {
-        public PolicyResult(Models.Policy policy)
+        public PolicyResult(Policy policy)
         {
             PolicyNo = policy.PolicyNo;
             AgentID = policy.PartyID;
-            CustomerID = policy.InsuredClient.InsuredID; //TODO:
+            CustomerID = policy.InsuredClient.InsuredID;
             ProductID = policy.SubRiskID;
             //ProductClass = policy.
-            StartDate = policy.StartDate.Value;
             EntryDate = policy.TransDate.Value;
+            StartDate = policy.StartDate.Value;
             EndDate = policy.EndDate.Value;
 
-            //if (policy.Insured != null)
             Insured = new CustomerResult(policy);
         }
 
@@ -67,4 +80,19 @@ namespace Universal.Api.Contracts.V1
         public CustomerResult Insured { get; set; }
     }
 
+    public class PolicyResult<T> : PolicyResult where T : RiskDetail
+    {
+        public PolicyResult(Policy policy) : base(policy)
+        {
+            PolicySections = new List<T>();
+
+            foreach (var pd in policy.PolicyDetails)
+            {
+                var t = Activator.CreateInstance(typeof(T), new object[] { pd }) as T;
+                PolicySections.Add(t);
+            }
+        }
+
+        public List<T> PolicySections { get; set; }
+    }
 }

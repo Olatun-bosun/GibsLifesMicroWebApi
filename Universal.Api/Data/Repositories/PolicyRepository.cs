@@ -46,6 +46,18 @@ namespace Universal.Api.Data.Repositories
                         .ToListAsync();
         }
 
+        //public Task<List<PolicyDetail>> PolicyDetailSelectAsync(string policyNo)
+        //{
+        //    if (string.IsNullOrWhiteSpace(policyNo))
+        //        throw new ArgumentNullException(nameof(policyNo));
+
+        //    var query = _db.PolicyDetails.Where(x => x.PolicyNo == policyNo);
+
+        //    return query.OrderByDescending(x => x.StartDate)
+        //                //.Skip(filter.SkipCount)
+        //                .ToListAsync();
+        //}
+
         public async Task<Policy> PolicyCreateAsync<T>(CreateNew<T> newPolicyDto)
             where T : RiskDetail
         {
@@ -73,11 +85,14 @@ namespace Universal.Api.Data.Repositories
             var policy = CreateNewPolicy(newPolicyDto, insured, party, subRisk);
             _db.Policies.Add(policy);
 
+            policy.PolicyDetails = new List<PolicyDetail>();
+
             // create the policy details
             foreach (var detailDto in newPolicyDto.PolicySections)
             {
                 var policyDetail = CreateNewPolicyDetail(detailDto, policy);
-                _db.PolicyDetails.Add(policyDetail);
+                policy.PolicyDetails.Add(policyDetail);
+                //_db.PolicyDetails.Add(policyDetail);
             }
 
             // create a debit note
@@ -151,7 +166,7 @@ namespace Universal.Api.Data.Repositories
                 GrossPremiumFrgn = 0,
                 ProRataDays = (int)(newPolicyDto.EndDate - newPolicyDto.StartDate).TotalDays + 1,
                 ProRataPremium = 0, 
-                isProposal = 0, 
+                IsProposal = 0, 
                 BizSource = "DIRECT",  
                 TransSTATUS = "PENDING",
                 Remarks = "RETAIL", 
@@ -166,11 +181,12 @@ namespace Universal.Api.Data.Repositories
         private PolicyDetail CreateNewPolicyDetail<T>(T detailDto, Policy policy)
             where T : RiskDetail
         {
-            string endorseNo = GetNextAutoNumber("INVOICE", BRANCH_ID); //, policy.SubRiskID);
+            string endorseNo = GetNextAutoNumber("INVOICE", BRANCH_ID); 
 
-            var pd = detailDto.MapToPolicyDetail();
+            var pd = detailDto.ToPolicyDetail();
 
-            pd.PolicyNo = policy.PolicyNo;
+            //pd.PolicyNo = policy.PolicyNo;
+            pd.Policy = policy;
             pd.ExRate = policy.ExRate;
 
             pd.EndorsementNo = endorseNo;
@@ -328,6 +344,8 @@ namespace Universal.Api.Data.Repositories
 
         private async Task<bool> PaymentValidate( string merchantId ,string transactionId)
         {
+            await Task.Delay(50);
+
             if (string.IsNullOrEmpty( merchantId))
                 return false;
 
