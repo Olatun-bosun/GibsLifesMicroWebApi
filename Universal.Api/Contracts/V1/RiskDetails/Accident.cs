@@ -1,5 +1,4 @@
-﻿using System.Text.Json;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Universal.Api.Models;
 
 namespace Universal.Api.Contracts.V1.RiskDetails
@@ -25,20 +24,11 @@ namespace Universal.Api.Contracts.V1.RiskDetails
             Members = JsonSerializer.Deserialize<List<PersonRequest>>(pd.Field17);
         }
 
-        public override PolicyDetail ToPolicyDetail()
+        public override Models.PolicyDetail ToPolicyDetail()
         {
-            //Field1  -  8  32   chars
-            //Field9  - 16  64   chars
-            //Field17 - 50  1024 chars
-
-            return new PolicyDetail
+            return new Models.PolicyDetail
             {
-                Field11 = CoverType,
-                Field12 = Location,
-                Field13 = Description,
-                Field14 = ScopeofCover,
-                Field15 = LienClauses,
-                Field17 = JsonSerializer.Serialize(Members),
+
             };
         }
     }

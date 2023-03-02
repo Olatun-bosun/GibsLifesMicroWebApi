@@ -1,5 +1,4 @@
-﻿using System.Text.Json;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Universal.Api.Models;
 
 namespace Universal.Api.Contracts.V1.RiskDetails
@@ -27,35 +26,27 @@ namespace Universal.Api.Contracts.V1.RiskDetails
 
         public override void FromPolicyDetail(PolicyDetail pd)
         {
-            CoverType = pd.Field11;
-            PropertyType = pd.Field12;
-            PropertyAddress = pd.Field13;
-            PropertyDescription = pd.Field14;
-            PropertyLengthOfStay = pd.Field15;
-            PropertyOccupants = pd.Field16;
-            TypeOfGoods = pd.Field18;
-
-            Values = JsonSerializer.Deserialize<List<NameValue>>(pd.Field17);
         }
+
+        //public string MaterialWall { get; set; }
+        //public string MaterialRoof { get; set; }
+        //public string WindowsBuglary { get; set; }
+
 
         public override PolicyDetail ToPolicyDetail()
         {
-            //Field1  -  8  32   chars
-            //Field9  - 16  64   chars
-            //Field17 - 50  1024 chars
-
             return new PolicyDetail
             {
-                Field11 = CoverType,
-                Field12 = PropertyType,
-                Field13 = PropertyAddress,
-                Field14 = PropertyDescription,
-                Field15 = PropertyLengthOfStay,
-                Field16 = PropertyOccupants,
-                Field18 = TypeOfGoods,
 
-                Field17 = JsonSerializer.Serialize(Values),
             };
         }
+    }
+
+
+
+    public class NameValue
+    {
+        public string Name { get; set; }
+        public string Value { get; set; }
     }
 }
