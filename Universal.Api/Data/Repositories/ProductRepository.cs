@@ -10,6 +10,14 @@ namespace Universal.Api.Data.Repositories
 {
     public partial class Repository
     {
+        public Task<Branch> BranchSelectThisAsync(string appId)
+        {
+            if (string.IsNullOrWhiteSpace(appId))
+                throw new ArgumentNullException(nameof(appId));
+
+            return _db.Branches.Where(x => x.StateID == appId).SingleOrDefaultAsync();
+        }
+
         public Task<SubRisk> ProductSelectThisAsync(string productId)
         {
             if (string.IsNullOrWhiteSpace(productId))

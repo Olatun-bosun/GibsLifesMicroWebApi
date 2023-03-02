@@ -45,16 +45,20 @@ namespace Universal.Api.Data.Repositories
 
         public async Task<Party> PartyCreateAsync(CreateNewAgentRequest newAgentDto)
         {
+            var branch = await BranchSelectThisAsync(_authContext.User.AppId);
+            if (branch is null)
+                throw new ArgumentOutOfRangeException($"No BranchId for [{_authContext.User.AppId}]");
+
             //check for duplicate
             var existing = await _db.Parties.Where(x => x.ApiId.Contains(newAgentDto.Email) ||
                                                         x.Email       == newAgentDto.Email  ||
                                                         x.mobilePhone == newAgentDto.PhoneLine1).FirstOrDefaultAsync();
             if (existing != null)
-                throw new ArgumentException("Duplicate agent found");
+                throw new ArgumentException($"Duplicate agent found. ID={existing.PartyID} {existing.Email}, {existing.mobilePhone}");
 
-            Party party = new Party()
+            var party = new Party()
             {
-                PartyID = GetNextAutoNumber("AGENTS", BRANCH_ID),
+                PartyID = GetNextAutoNumber("AGENTS", branch.BranchID),
 
                 PartyName = newAgentDto.AgentName,
                 Address = newAgentDto.Address,

@@ -55,13 +55,13 @@ namespace Universal.Api.Data.Repositories
                 return insured;
 
             if (newPolicyDto.Insured != null)
-                return CustomerCreate(newPolicyDto.Insured);
+                return await CustomerCreate(newPolicyDto.Insured);
 
             throw new InvalidOperationException("Either you specify CustomerID for existing customer, " +
                 "or you create a new customer by populating the Insured object");
         }
 
-        public InsuredClient CustomerCreate(CreateNewCustomerRequest newCustomerDto)
+        public async Task<InsuredClient> CustomerCreate(CreateNewCustomerRequest newCustomerDto)
         {
             ////check for duplicate
             //var duplicate = await CustomerSelectThisAsync(newCustomerDto.Email, newCustomerDto.PhoneLine1);
@@ -69,9 +69,13 @@ namespace Universal.Api.Data.Repositories
             //if (duplicate != null)
             //    throw new ArgumentException("Customer already exists with this email or phone number");
 
+            var branch = await BranchSelectThisAsync(_authContext.User.AppId);
+            if (branch is null)
+                throw new ArgumentOutOfRangeException($"No BranchId for [{_authContext.User.AppId}]");
+
             var newInsured = new InsuredClient
             {
-                InsuredID = GetNextAutoNumber("INSURED", BRANCH_ID),
+                InsuredID = GetNextAutoNumber("INSURED", branch.BranchID),
 
                 Address = newCustomerDto.Address,
                 Email = newCustomerDto.Email,

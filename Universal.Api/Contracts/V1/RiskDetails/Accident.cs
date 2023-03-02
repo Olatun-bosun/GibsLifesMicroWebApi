@@ -1,18 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System.Text.Json;
+using System.Collections.Generic;
 using Universal.Api.Models;
 
 namespace Universal.Api.Contracts.V1.RiskDetails
 {
     public class PolicyAsAccident : RiskDetail
     {
-        //public PolicyAsAccident()
-        //{
-
-        //}
-        public PolicyAsAccident(PolicyDetail pd) : base(pd)
-        {
-        }
-
         public string CoverType { get; set; }
         public string Location { get; set; }
         public string Description { get; set; }
@@ -24,14 +17,28 @@ namespace Universal.Api.Contracts.V1.RiskDetails
 
         public override void FromPolicyDetail(PolicyDetail pd)
         {
-            throw new System.NotImplementedException();
+            CoverType = pd.Field11;
+            Location = pd.Field12;
+            Description = pd.Field13;
+            ScopeofCover = pd.Field14;
+            LienClauses = pd.Field15;
+            Members = JsonSerializer.Deserialize<List<PersonRequest>>(pd.Field17);
         }
 
-        public override Models.PolicyDetail ToPolicyDetail()
+        public override PolicyDetail ToPolicyDetail()
         {
-            return new Models.PolicyDetail
-            {
+            //Field1  -  8  32   chars
+            //Field9  - 16  64   chars
+            //Field17 - 50  1024 chars
 
+            return new PolicyDetail
+            {
+                Field11 = CoverType,
+                Field12 = Location,
+                Field13 = Description,
+                Field14 = ScopeofCover,
+                Field15 = LienClauses,
+                Field17 = JsonSerializer.Serialize(Members),
             };
         }
     }

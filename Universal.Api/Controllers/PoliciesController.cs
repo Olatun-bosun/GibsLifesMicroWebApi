@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
 using Universal.Api.Controllers;
 using Universal.Api.Data.Repositories;
 using Universal.Api.Data;
@@ -11,7 +10,10 @@ using Universal.Api.Contracts.V1.RiskDetails;
 
 namespace Universal.Api.Contracts.V1
 {
-    [Authorize(Roles = "APP,AGENT,CUST")]
+#if !DEBUG
+    [Microsoft.AspNetCore.Authorization.Authorize(Roles = "APP,AGENT,CUST")]
+#endif
+
     public class PoliciesController : SecureControllerBase
     {
         public PoliciesController(Repository repository, AuthContext authContext) : base(repository, authContext)
@@ -226,6 +228,9 @@ namespace Universal.Api.Contracts.V1
             {
                 var policy = await _repository.PolicyCreateAsync(newPolicyDto);
                 await _repository.SaveChangesAsync();
+
+                // where T is Motor/Marine send to NIID & NAICOM
+                // 
 
                 var uri = new Uri($"{Request.Path}/{policy.PolicyNo}", UriKind.Relative);
                 return Created(uri, new PolicyResult<T>(policy));

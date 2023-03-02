@@ -24,28 +24,14 @@ namespace Universal.Api.Data.Repositories
 
             static string GetEndorsementCode(string endorseType)
             {
-                switch (endorseType)
+                return endorseType switch
                 {
-                    case "DELETE":
-                    case "DELETED":
-                    case "REVERSAL":
-                    case "RETURN":
-                        return "C";
-
-                    case "RENEW":
-                    case "RENEWAL":
-                        return "R";
-
-                    case "ADDITIONAL":
-                        return "E";
-
-                    case "NIL":
-                    case "REDO":
-                        return "N";
-
-                    default:
-                        return "A";
-                }
+                    "DELETE" or "DELETED" or "REVERSAL" or "RETURN" => "C",
+                    "RENEW" or "RENEWAL" => "R",
+                    "ADDITIONAL" => "E",
+                    "NIL" or "REDO" => "N",
+                    _ => "A",
+                };
             }
 
             try
@@ -54,7 +40,7 @@ namespace Universal.Api.Data.Repositories
                 //{
                     string strAutoNum = GetSerialNoFormat(numType, branchID);
 
-                    if (strAutoNum.IndexOf("$0") >= 0)
+                    if (strAutoNum.Contains("$0", StringComparison.CurrentCulture))
                     {
                         long nextNum = GetNextSerialNo(numType, branchID);
 
@@ -63,7 +49,7 @@ namespace Universal.Api.Data.Repositories
                             int len = strAutoNum.IndexOf("0$") - strAutoNum.IndexOf("$0");
                             if (len < 3) len = 3;
 
-                            string zeros = new string('0', len);
+                            var zeros = new string('0', len);
                             strAutoNum = strAutoNum.Replace($"${zeros}$", nextNum.ToString(zeros)); //formation of number
                         }
                         else
@@ -114,7 +100,7 @@ namespace Universal.Api.Data.Repositories
         {
             static long ResultOf(List<AutoNumber> list, long errorValue)
             {
-                if (list.Count() > 0)
+                if (list.Count > 0)
                 {
                     long result = 0;
                     if (list[0].NextValue.HasValue)
@@ -136,7 +122,7 @@ namespace Universal.Api.Data.Repositories
                 var query = _db.AutoNumbers.Where(x => x.NumType == numType);
                 var T = query.Where(x => x.BranchID == "ALL").ToList();
 
-                if (T.Count() > 0)
+                if (T.Count > 0)
                     return ResultOf(T, 1);
                 else
                 {
@@ -163,7 +149,7 @@ namespace Universal.Api.Data.Repositories
         {
             static string ResultOf(List<AutoNumber> list)
             {
-                if (list.Count() > 0)
+                if (list.Count > 0)
                     return list[0].Format;
                 else
                     //'no number setup
@@ -175,7 +161,7 @@ namespace Universal.Api.Data.Repositories
                 var query = _db.AutoNumbers.Where(x => x.NumType == numType);
                 var T = query.Where(x => x.BranchID == "ALL").ToList();
 
-                if (T.Count() > 0)
+                if (T.Count > 0)
                     return T[0].Format;
                 else
                 {

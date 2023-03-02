@@ -41,7 +41,7 @@ namespace Universal.Api.Data.Repositories
         public Task<Claim> ClaimSelectThisAsync(string claimNo)
         {
             if (string.IsNullOrWhiteSpace(claimNo))
-                throw new ArgumentNullException("Claim No cannot be empty ", nameof(claimNo));
+                throw new ArgumentNullException(nameof(claimNo), "Claim No cannot be empty");
 
             return _db.ClaimsReserved.Where(x => x.ClaimNo == claimNo).SingleOrDefaultAsync();
         }

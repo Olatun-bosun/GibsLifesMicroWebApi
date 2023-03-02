@@ -80,9 +80,12 @@ namespace Universal.Api.Data.Repositories
             if (party is null)
                 throw new ArgumentOutOfRangeException($"This AgentId [{newPolicyDto.AgentID}] does not exist");
 
+            var branch = await BranchSelectThisAsync(_authContext.User.AppId);
+            if (branch is null)
+                throw new ArgumentOutOfRangeException($"No BranchId for [{_authContext.User.AppId}]");
 
             // create the policy
-            var policy = CreateNewPolicy(newPolicyDto, insured, party, subRisk);
+            var policy = CreateNewPolicy(newPolicyDto, insured, branch, party, subRisk);
             _db.Policies.Add(policy);
 
             policy.PolicyDetails = new List<PolicyDetail>();
@@ -95,7 +98,7 @@ namespace Universal.Api.Data.Repositories
                 //_db.PolicyDetails.Add(policyDetail);
             }
 
-            // create a debit note
+            // create a debit note 
             var debitNote = CreateNewDebitNote(policy);
             _db.DNCNNotes.Add(debitNote);
 
@@ -112,14 +115,14 @@ namespace Universal.Api.Data.Repositories
             return policy;
         }
 
-        private Policy CreateNewPolicy<T>(CreateNew<T> newPolicyDto, InsuredClient insured, Party party, SubRisk subRisk)
+        private Policy CreateNewPolicy<T>(CreateNew<T> newPolicyDto, InsuredClient insured, Branch branch, Party party, SubRisk subRisk)
              where T : RiskDetail
         {
             if (newPolicyDto.StartDate >= newPolicyDto.EndDate)
                 throw new ArgumentOutOfRangeException(nameof(newPolicyDto.StartDate),
                     $"{nameof(newPolicyDto.StartDate)} cannot be later than {nameof(newPolicyDto.EndDate)}");
 
-            var policyNo = GetNextAutoNumber("POLICY", BRANCH_ID, newPolicyDto.ProductID);
+            var policyNo = GetNextAutoNumber("POLICY", branch.BranchID, newPolicyDto.ProductID);
 
             var TotalSumInsured = newPolicyDto.PolicySections.Sum(x => x.SectionSumInsured);
             var TotalPremium = newPolicyDto.PolicySections.Sum(x => x.SectionPremium);
@@ -132,6 +135,9 @@ namespace Universal.Api.Data.Repositories
 
             return new Policy()
             {
+                //save the PolicyNo from caller to MktStaffID //14-feb-23
+                MktStaffID = newPolicyDto.PolicyNo,
+
                 PolicyNo = policyNo,
                 CoPolicyNo = null,
                 TransDate = DateTime.Now,
@@ -141,8 +147,8 @@ namespace Universal.Api.Data.Repositories
                 SubRisk = subRisk.SubRiskName,
                 PartyID = party.PartyID,
                 Party = party.PartyName,
-                BranchID = BRANCH_ID,
-                Branch = BRANCH_NAME,
+                BranchID = branch.BranchID,
+                Branch = branch.Description,
 
                 InsStateID = null,
                 InsuredID = insured.InsuredID,
@@ -181,8 +187,7 @@ namespace Universal.Api.Data.Repositories
         private PolicyDetail CreateNewPolicyDetail<T>(T detailDto, Policy policy)
             where T : RiskDetail
         {
-            string endorseNo = GetNextAutoNumber("INVOICE", BRANCH_ID); 
-
+            string endorseNo = GetNextAutoNumber("INVOICE", policy.BranchID); 
             var pd = detailDto.ToPolicyDetail();
 
             //pd.PolicyNo = policy.PolicyNo;
@@ -222,7 +227,7 @@ namespace Universal.Api.Data.Repositories
 
         private DNCNNote CreateNewDebitNote(Policy policy)
         {
-            string dncnNo = GetNextAutoNumber("DNOTE", BRANCH_ID, policy.SubRiskID);
+            string dncnNo = GetNextAutoNumber("DNOTE", policy.BranchID, policy.SubRiskID);
             decimal partyRate = 0;
             decimal? commission = (policy.GrossPremium * partyRate) / 100;
 
@@ -283,7 +288,7 @@ namespace Universal.Api.Data.Repositories
         private DNCNNote CreateNewReceipt(Policy policy, string refDnCnNo)
         {
             string dncnNo = Guid.NewGuid().ToString().Split('-')[0];
-            string receiptNo = GetNextAutoNumber("RECEIPT", BRANCH_ID, policy.SubRiskID);
+            string receiptNo = GetNextAutoNumber("RECEIPT", policy.BranchID, policy.SubRiskID);
             decimal partyRate = 0;
             decimal? commission = (policy.GrossPremium * partyRate) / 100;
 

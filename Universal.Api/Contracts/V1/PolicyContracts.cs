@@ -8,6 +8,7 @@ namespace Universal.Api.Contracts.V1
 {
     public class CreateNew<T> where T : RiskDetail
     {
+        public string PolicyNo { get; set; }
         [Required]
         public string AgentID { get; set; }
         //[Required]
@@ -38,15 +39,6 @@ namespace Universal.Api.Contracts.V1
         [Required]
         public decimal SectionPremium { get; set; }
 
-        //public RiskDetail()
-        //{
-
-        //}
-
-        public RiskDetail(PolicyDetail pd)
-        {
-            FromPolicyDetail(pd);
-        }
 
         public abstract void FromPolicyDetail(PolicyDetail pd);
 
@@ -88,7 +80,8 @@ namespace Universal.Api.Contracts.V1
 
             foreach (var pd in policy.PolicyDetails)
             {
-                var t = Activator.CreateInstance(typeof(T), new object[] { pd }) as T;
+                var t = Activator.CreateInstance(typeof(T)) as T;
+                t.FromPolicyDetail(pd);
                 PolicySections.Add(t);
             }
         }

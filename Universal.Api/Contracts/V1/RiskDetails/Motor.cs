@@ -63,12 +63,22 @@ namespace Universal.Api.Contracts.V1.RiskDetails
         [Required]
         public VehicleCoverEnum? CoverType { get; set; }
 
-
-        //public PolicyAsMotor()
-        //{
-        //}
-        public PolicyAsMotor(PolicyDetail detail) : base(detail)
+        public override void FromPolicyDetail(PolicyDetail pd)
         {
+            CoverType = Enum.Parse<VehicleCoverEnum>(pd.Field17);
+            VehicleRegNo = pd.Field19;
+            EngineNumber = pd.Field20;
+            ChasisNumber = pd.Field21;
+            VehicleTypeID = Enum.Parse<VehicleTypeEnum>(pd.Field22);
+            VehicleMake = pd.Field23;
+            VehicleModel = pd.Field24;
+            ManufactureYear = int.Parse(pd.Field25);
+            VehicleColour = pd.Field26;
+
+            StateOfIssue = pd.Field28;
+            EngineCapacityHP = pd.Field29;
+            NumberOfSeats = int.Parse(pd.Field30);
+            VehicleUsage = Enum.Parse<VehicleUsageEnum>(pd.Field31);
         }
 
         public override PolicyDetail ToPolicyDetail()
@@ -115,24 +125,6 @@ namespace Universal.Api.Contracts.V1.RiskDetails
                  //Field49 = CDbl(txtProRataPrem.Text),
                  Field50 = "PENDING",
             };
-        }
-
-        public override void FromPolicyDetail(PolicyDetail pd)
-        {
-            CoverType = Enum.Parse<VehicleCoverEnum>(pd.Field17);
-            VehicleRegNo = pd.Field19;
-            EngineNumber = pd.Field20;
-            ChasisNumber = pd.Field21;
-            VehicleTypeID = Enum.Parse<VehicleTypeEnum>(pd.Field22);
-            VehicleMake = pd.Field23;
-            VehicleModel = pd.Field24;
-            ManufactureYear = int.Parse(pd.Field25);
-            VehicleColour = pd.Field26;
-
-            StateOfIssue = pd.Field28;
-            EngineCapacityHP = pd.Field29;
-            NumberOfSeats = int.Parse(pd.Field30);
-            VehicleUsage = Enum.Parse<VehicleUsageEnum>(pd.Field31);
         }
     }
 }

@@ -37,7 +37,7 @@ namespace Universal.Api
                     return null;
             }
 
-            if (Enum.TryParse(enumType, stringValue, out var enumValue))
+            if (Enum.TryParse(enumType, stringValue, true, out var enumValue))
                 return enumValue;
             else
                 throw NewEnumJsonException(enumType, "Invalid entry.");
