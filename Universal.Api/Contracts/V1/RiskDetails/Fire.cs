@@ -42,11 +42,4 @@ namespace Universal.Api.Contracts.V1.RiskDetails
         }
     }
 
-
-
-    public class NameValue
-    {
-        public string Name { get; set; }
-        public string Value { get; set; }
-    }
 }

@@ -146,7 +146,7 @@ namespace Universal.Api.Models
 
         public string Leader { get; set; }
 
-        public double? RetProp { get; set; }
+        public decimal? RetProp { get; set; }
 
         public decimal? RetValue { get; set; }
 
@@ -185,5 +185,12 @@ namespace Universal.Api.Models
         //public DateTime? ExtraDate1 { get; set; }
 
         //public DateTime? ExtraDate2 { get; set; }
+
+
+        public string Z_NAICOM_UID { get; set; }
+        public string Z_NAICOM_STATUS { get; set; }
+        public DateTime? Z_NAICOM_SENT_ON { get; set; }
+        public string Z_NAICOM_ERROR { get; set; }
+        public string Z_NAICOM_JSON { get; set; }
     }
 }

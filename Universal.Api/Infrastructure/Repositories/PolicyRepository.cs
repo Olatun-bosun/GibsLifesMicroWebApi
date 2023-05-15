@@ -10,12 +10,17 @@ namespace Universal.Api.Data.Repositories
 {
     public partial class Repository
     {
-        public Task<Policy> PolicySelectThisAsync(string policyNo)
+        public async Task<Policy> PolicySelectThisAsync(string policyNo)
         {
             if (string.IsNullOrWhiteSpace(policyNo))
                 throw new ArgumentNullException(nameof(policyNo));
 
-            return _db.Policies.Where(x => x.PolicyNo == policyNo).SingleOrDefaultAsync();
+            var p = await _db.Policies.FirstOrDefaultAsync(x => x.PolicyNo == policyNo);
+
+            if (p != null)
+                p.DebitNote = await _db.DNCNNotes.FirstOrDefaultAsync(z => z.PolicyNo == policyNo &&
+                                                                           z.NoteType == "DN");
+            return p;
         }
 
         public Task<List<Policy>> PolicySelectAsync(FilterPaging filter)
@@ -35,10 +40,8 @@ namespace Universal.Api.Data.Repositories
                 query = query.Where(x => x.InsuredID == c.InsuredId);
 
             if (filter.CanSearchDate)
-            {
                 query = query.Where(x => (x.TransDate >= filter.DateFrom) &&
                                          (x.TransDate <= filter.DateTo));
-            }
 
             return query.OrderByDescending(x => x.TransDate)
                         //.Skip(filter.SkipCount)
@@ -102,6 +105,9 @@ namespace Universal.Api.Data.Repositories
             var debitNote = CreateNewDebitNote(policy);
             _db.DNCNNotes.Add(debitNote);
 
+            policy.DebitNote = debitNote; //add the DN to the policy object
+            policy.SubRisk = subRisk;     //add the subRisk to the policy object
+
             var hasPaid = await PaymentValidate(newPolicyDto.PaymentReferenceID, newPolicyDto.PaymentProviderID);
 
             if (hasPaid)
@@ -113,6 +119,17 @@ namespace Universal.Api.Data.Repositories
 
             //return the policy number
             return policy;
+        }
+
+        public void SaveNaicomStatus(Policy policy, NaicomDetail naicom)
+        {
+            policy.Z_NAICOM_UID = naicom.UniqueID;
+
+            policy.DebitNote.Z_NAICOM_UID = naicom.UniqueID;
+            policy.DebitNote.Z_NAICOM_STATUS = naicom.Status.ToString();
+            policy.DebitNote.Z_NAICOM_SENT_ON = naicom.SubmitDate;
+            policy.DebitNote.Z_NAICOM_ERROR = naicom.ErrorMessage;
+            policy.DebitNote.Z_NAICOM_JSON = naicom.JsonPayload;
         }
 
         private Policy CreateNewPolicy<T>(CreateNew<T> newPolicyDto, InsuredClient insured, Branch branch, Party party, SubRisk subRisk)
@@ -144,7 +161,7 @@ namespace Universal.Api.Data.Repositories
                 StartDate = newPolicyDto.StartDate,
                 EndDate = newPolicyDto.EndDate,
                 SubRiskID = subRisk.SubRiskID,
-                SubRisk = subRisk.SubRiskName,
+                SubRiskName = subRisk.SubRiskName,
                 PartyID = party.PartyID,
                 Party = party.PartyName,
                 BranchID = branch.BranchID,
@@ -161,6 +178,8 @@ namespace Universal.Api.Data.Repositories
                 InsEmail = insured.Email,
                 InsOccupation = insured.Occupation,
                 InsFaxNo = insured.ApiId,
+
+                InsuredClient = insured, //hmmm
 
                 ExRate = 1,
                 ExCurrency = "NAIRA",  
@@ -187,7 +206,7 @@ namespace Universal.Api.Data.Repositories
         private PolicyDetail CreateNewPolicyDetail<T>(T detailDto, Policy policy)
             where T : RiskDetail
         {
-            string endorseNo = GetNextAutoNumber("INVOICE", policy.BranchID); 
+            string endorseNo = GetNextAutoNumber("INVOICE", BRANCH_ID); 
             var pd = detailDto.ToPolicyDetail();
 
             //pd.PolicyNo = policy.PolicyNo;
@@ -227,8 +246,8 @@ namespace Universal.Api.Data.Repositories
 
         private DNCNNote CreateNewDebitNote(Policy policy)
         {
-            string dncnNo = GetNextAutoNumber("DNOTE", policy.BranchID, policy.SubRiskID);
             decimal partyRate = 0;
+            string dncnNo = GetNextAutoNumber("DNOTE", BRANCH_ID, policy.SubRiskID);
             decimal? commission = (policy.GrossPremium * partyRate) / 100;
 
             return new DNCNNote()
@@ -244,7 +263,7 @@ namespace Universal.Api.Data.Repositories
                 BizOption = "NEW",
                 BillingDate = policy.TransDate,
                 SubRiskID = policy.SubRiskID,
-                SubRisk = policy.SubRisk,
+                SubRisk = policy.SubRiskName,
                 PartyID = policy.PartyID,
                 Party = policy.Party,
                 InsuredID = policy.InsuredID,
@@ -271,8 +290,8 @@ namespace Universal.Api.Data.Repositories
                 GrossPremiumFrgn = policy.GrossPremiumFrgn,
                 TotalRiskValue = policy.SumInsured,
                 TotalPremium = policy.GrossPremium,
-                Approval = 0,
                 HasTreaty = 0,
+                Approval = 0,
                 RetProp = 0,
                 RetValue = 0,
                 RetPremium = 0,
@@ -280,16 +299,22 @@ namespace Universal.Api.Data.Repositories
 
                 SubmittedBy = policy.SubmittedBy,
                 SubmittedOn = policy.SubmittedOn,
-                Active = policy.Active,
                 Deleted = policy.Deleted,
+                Active = policy.Active,
+
+                Z_NAICOM_UID = null,
+                Z_NAICOM_STATUS = "QUEUED",  // CIP -> PENDING, SENT, IGNORED, ARCHIVED
+                // Z_NAICOM_SENT_ON
+                // Z_NAICOM_ERROR
+                // Z_NAICOM_JSON
             };
         }
 
         private DNCNNote CreateNewReceipt(Policy policy, string refDnCnNo)
         {
-            string dncnNo = Guid.NewGuid().ToString().Split('-')[0];
-            string receiptNo = GetNextAutoNumber("RECEIPT", policy.BranchID, policy.SubRiskID);
             decimal partyRate = 0;
+            string dncnNo = Guid.NewGuid().ToString().Split('-')[0];
+            string receiptNo = GetNextAutoNumber("RECEIPT", BRANCH_ID, policy.SubRiskID);
             decimal? commission = (policy.GrossPremium * partyRate) / 100;
 
             return new DNCNNote()
@@ -306,7 +331,7 @@ namespace Universal.Api.Data.Repositories
                 BizOption = "NEW",
                 BillingDate = policy.TransDate,
                 SubRiskID = policy.SubRiskID,
-                SubRisk = policy.SubRisk,
+                SubRisk = policy.SubRiskName,
                 PartyID = policy.PartyID,
                 Party = policy.Party,
                 InsuredID = policy.InsuredID,
@@ -347,7 +372,7 @@ namespace Universal.Api.Data.Repositories
             };
         }
 
-        private async Task<bool> PaymentValidate( string merchantId ,string transactionId)
+        private async static Task<bool> PaymentValidate( string merchantId ,string transactionId)
         {
             await Task.Delay(50);
 

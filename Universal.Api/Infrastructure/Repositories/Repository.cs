@@ -9,7 +9,7 @@ namespace Universal.Api.Data.Repositories
         private readonly DataContext _db;
         private AuthContext _authContext;
 
-        //private const string BRANCH_ID = "19";
+        private const string BRANCH_ID = "19";
         //private const string BRANCH_NAME = "RETAIL OFFICE";
         private const string SUBMITTED_BY = "WEB-API";
 
@@ -21,9 +21,7 @@ namespace Universal.Api.Data.Repositories
 
         public Task<ApiUser> AppLogin(string username, string password)
         {
-           return _db.OpenApiUsers
-                     .Where(x => x.CompanyName == username
-                              && x.Password    == password).SingleOrDefaultAsync();
+           return _db.OpenApiUsers.FirstOrDefaultAsync(x => x.CompanyName == username && x.Password == password);
         }
 
         public Task<int> SaveChangesAsync()

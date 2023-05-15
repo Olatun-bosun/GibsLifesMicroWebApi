@@ -4,14 +4,6 @@ namespace Universal.Api.Contracts.V1.RiskDetails
 {
     public class PolicyAsMarineCargo : RiskDetail
     {
-        //public PolicyAsMarineCargo()
-        //{
-
-        //}
-        public PolicyAsMarineCargo(PolicyDetail pd) : base(pd)
-        {
-        }
-
         public string CertificateType { get; set; } //Enum (Single transit Or Open Transit)
         public string ConveyanceId { get; set; } //Enum (Sea,Air Or Sea/Air)
         public string VesselDescription { get; set; }

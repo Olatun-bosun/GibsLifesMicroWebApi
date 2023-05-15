@@ -4,14 +4,6 @@ namespace Universal.Api.Contracts.V1.RiskDetails
 {
     public class PolicyAsEngineering : RiskDetail
     {
-        //public PolicyAsEngineering()
-        //{
-
-        //}
-        public PolicyAsEngineering(PolicyDetail pd) : base(pd)
-        {
-        }
-
         public string ContractorName { get; set; }
         public string ScopeOfContract { get; set; }
         public string ProjectConsultant { get; set; }

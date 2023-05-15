@@ -4,14 +4,6 @@ namespace Universal.Api.Contracts.V1.RiskDetails
 {
     public class PolicyAsAviation : RiskDetail
     {
-        //public PolicyAsAviation()
-        //{
-
-        //}
-        public PolicyAsAviation(PolicyDetail pd) : base(pd)
-        {
-        }
-
         public string AircraftID { get; set; }
         public string AircraftMake { get; set; }
         public string AircraftModel { get; set; }

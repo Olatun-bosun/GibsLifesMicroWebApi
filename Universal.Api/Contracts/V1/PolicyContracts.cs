@@ -47,18 +47,36 @@ namespace Universal.Api.Contracts.V1
 
     public class PolicyResult
     {
-        public PolicyResult(Policy policy)
+        public PolicyResult(Policy p)
         {
-            PolicyNo = policy.PolicyNo;
-            AgentID = policy.PartyID;
-            CustomerID = policy.InsuredClient.InsuredID;
-            ProductID = policy.SubRiskID;
-            //ProductClass = policy.
-            EntryDate = policy.TransDate.Value;
-            StartDate = policy.StartDate.Value;
-            EndDate = policy.EndDate.Value;
+            var dn = p.DebitNote;
 
-            Insured = new CustomerResult(policy);
+            if (dn  == null)
+            {
+                PolicyNo = p.PolicyNo;
+                AgentID = p.PartyID;
+                CustomerID = p.InsuredID;
+                ProductID = p.SubRiskID;
+                //ProductClass = policy.
+                NaicomID = p.Z_NAICOM_UID;
+                EntryDate = p.TransDate.Value;
+                StartDate = p.StartDate.Value;
+                EndDate = p.EndDate.Value;
+            }
+            else
+            {
+                PolicyNo = dn.PolicyNo;
+                AgentID = dn.PartyID;
+                CustomerID = dn.InsuredID;
+                ProductID = dn.SubRiskID;
+                //ProductClass = policy.
+                NaicomID = dn.Z_NAICOM_UID;
+                EntryDate = dn.BillingDate.Value;
+                StartDate = dn.StartDate.Value;
+                EndDate = dn.EndDate.Value;
+            }
+
+            Insured = new CustomerResult(p);
         }
 
         public string PolicyNo { get; set; }
@@ -66,6 +84,7 @@ namespace Universal.Api.Contracts.V1
         public string CustomerID { get; set; }
         public string ProductID { get; set; }
         public string ProductClass { get; set; }
+        public string NaicomID { get; set; }
         public DateTime EntryDate { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }

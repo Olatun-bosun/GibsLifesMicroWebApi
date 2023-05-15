@@ -4,14 +4,6 @@ namespace Universal.Api.Contracts.V1.RiskDetails
 {
     public class PolicyAsBond : RiskDetail
     {
-        //public PolicyAsBond()
-        //{
-
-        //}
-        public PolicyAsBond(PolicyDetail pd) : base(pd)
-        {
-        }
-
         //public int OurShare { get; set; }
         public string PrincipalName { get; set; }
         public string ContractorName { get; set; }

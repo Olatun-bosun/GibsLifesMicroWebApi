@@ -16,9 +16,8 @@ namespace Universal.Api.Contracts.V1
 
     public class PoliciesController : SecureControllerBase
     {
-        public PoliciesController(Repository repository, AuthContext authContext) : base(repository, authContext)
-        {
-        }
+        public PoliciesController(Repository repository, AuthContext authContext) 
+            : base(repository, authContext) {  }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<PolicyResult>>> ListPolicies([FromQuery] FilterPaging filter)
@@ -117,7 +116,6 @@ namespace Universal.Api.Contracts.V1
         }
 
         #endregion
-
 
         [HttpPost("renew/{policyNo}")]
         public async Task<ActionResult<PolicyResult>> RenewPolicy(string policyNo, DateTime effectiveDate)
@@ -232,6 +230,14 @@ namespace Universal.Api.Contracts.V1
                 // where T is Motor/Marine send to NIID & NAICOM
                 // 
 
+                var naicomClient = new NaicomService(_repository);
+                var result = await naicomClient.PublishAndSaveNaicomID(policy);
+
+                //save naicom status
+                _repository.SaveNaicomStatus(policy, result);
+                await _repository.SaveChangesAsync();
+
+
                 var uri = new Uri($"{Request.Path}/{policy.PolicyNo}", UriKind.Relative);
                 return Created(uri, new PolicyResult<T>(policy));
             }
@@ -260,6 +266,5 @@ namespace Universal.Api.Contracts.V1
                 return ExceptionResult(ex);
             }
         }
-
     }
 }

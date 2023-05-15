@@ -12,10 +12,10 @@ namespace Universal.Api.Data.Repositories
     {
         public Task<Party> PartySelectThisAsync(string appId, string agentId, string password)
         {
-            return _db.Parties
-                      .Where(x => (x.PartyID == agentId || x.Email == agentId)
+            return _db.Parties.FirstOrDefaultAsync(x => 
+                                  (x.PartyID == agentId || x.Email == agentId)
                                 && x.ApiPassword == password
-                                && x.SubmittedBy == $"{SUBMITTED_BY}/{appId}").SingleOrDefaultAsync();
+                                && x.SubmittedBy == $"{SUBMITTED_BY}/{appId}");
         }
 
         public Task<Party> PartySelectThisAsync(string agentId)
@@ -23,8 +23,8 @@ namespace Universal.Api.Data.Repositories
             if (string.IsNullOrWhiteSpace(agentId))
                 throw new ArgumentNullException("Agent ID cannot be empty", "AgentID");
 
-            return _db.Parties.Where(x => x.PartyID == agentId || 
-                                          x.Email   == agentId).SingleOrDefaultAsync();
+            return _db.Parties.FirstOrDefaultAsync(x => x.PartyID == agentId || 
+                                                        x.Email   == agentId);
         }
 
         public Task<List<Party>> PartySelectAsync(FilterPaging filter)
@@ -43,28 +43,26 @@ namespace Universal.Api.Data.Repositories
                         .ToListAsync();
         }
 
-        public async Task<Party> PartyCreateAsync(CreateNewAgentRequest newAgentDto)
+        public async Task<Party> PartyCreateAsync(CreateNewAgentRequest dto)
         {
-            var branch = await BranchSelectThisAsync(_authContext.User.AppId);
-            if (branch is null)
-                throw new ArgumentOutOfRangeException($"No BranchId for [{_authContext.User.AppId}]");
-
             //check for duplicate
-            var existing = await _db.Parties.Where(x => x.ApiId.Contains(newAgentDto.Email) ||
-                                                        x.Email       == newAgentDto.Email  ||
-                                                        x.mobilePhone == newAgentDto.PhoneLine1).FirstOrDefaultAsync();
+            var existing = await _db.Parties.FirstOrDefaultAsync(x => x.ApiId.Contains(dto.Email) ||
+                                                                      x.Email       == dto.Email  ||
+                                                                      x.mobilePhone == dto.PhoneLine1);
             if (existing != null)
                 throw new ArgumentException($"Duplicate agent found. ID={existing.PartyID} {existing.Email}, {existing.mobilePhone}");
 
             var party = new Party()
             {
-                PartyID = GetNextAutoNumber("AGENTS", branch.BranchID),
+                PartyID = GetNextAutoNumber("AGENTS", BRANCH_ID),
 
-                PartyName = newAgentDto.AgentName,
-                Address = newAgentDto.Address,
-                LandPhone = newAgentDto.PhoneLine2,
-                mobilePhone = newAgentDto.PhoneLine1,
-                Email = newAgentDto.Email,
+                PartyName = dto.AgentName,
+                FirstName = dto.FirstName,
+                OtherName = dto.OtherName,
+                Address = dto.Address,
+                LandPhone = dto.PhoneLine2,
+                mobilePhone = dto.PhoneLine1,
+                Email = dto.Email,
                 ComRate = 20,
                 CreditLimit = 0,
                 PartyType = "AG",
@@ -76,8 +74,8 @@ namespace Universal.Api.Data.Repositories
                 Active = 0,
                 Deleted = 0,
 
-                ApiId = newAgentDto.Email,
-                ApiPassword = newAgentDto.Password,
+                ApiId = dto.Email,
+                ApiPassword = dto.Password,
                 ApiStatus = "PENDING",
             };
 

@@ -37,5 +37,11 @@
     <Folder Include="Properties\PublishProfiles\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="Naicom.Library.NetFx">
+      <HintPath>..\..\..\Gibs\Naicom.Library.NetFx\bin\Debug\Naicom.Library.NetFx.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 
 </Project>

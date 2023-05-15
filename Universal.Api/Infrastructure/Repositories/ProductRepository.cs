@@ -15,7 +15,7 @@ namespace Universal.Api.Data.Repositories
             if (string.IsNullOrWhiteSpace(appId))
                 throw new ArgumentNullException(nameof(appId));
 
-            return _db.Branches.Where(x => x.StateID == appId).SingleOrDefaultAsync();
+            return _db.Branches.FirstOrDefaultAsync(x => x.StateID == appId);
         }
 
         public Task<SubRisk> ProductSelectThisAsync(string productId)
@@ -23,7 +23,7 @@ namespace Universal.Api.Data.Repositories
             if (string.IsNullOrWhiteSpace(productId))
                 throw new ArgumentNullException(nameof(productId));
 
-            return _db.SubRisks.Where(x => x.SubRiskID == productId).SingleOrDefaultAsync();
+            return _db.SubRisks.FirstOrDefaultAsync(x => x.SubRiskID == productId);
         }
 
         public Task<List<SubRisk>> ProductSelectAsync(FilterPaging filter)

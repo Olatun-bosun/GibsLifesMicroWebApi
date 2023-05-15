@@ -23,8 +23,7 @@ namespace Universal.Api.Data.Repositories
             //if (string.IsNullOrWhiteSpace(documentId))
             //    throw new ArgumentNullException(nameof(documentId));
 
-            return _db.Documents.Where(x => x.DocumentId == documentId)
-                                .SingleOrDefaultAsync();
+            return _db.Documents.FirstOrDefaultAsync(x => x.DocumentId == documentId);
         }
 
         public async Task<List<long>> DocumentCreateAsync(string ownerType, string ownerRefId, List<IFormFile> formFiles)

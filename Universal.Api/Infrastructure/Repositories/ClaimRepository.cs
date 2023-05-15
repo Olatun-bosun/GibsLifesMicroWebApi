@@ -43,7 +43,7 @@ namespace Universal.Api.Data.Repositories
             if (string.IsNullOrWhiteSpace(claimNo))
                 throw new ArgumentNullException(nameof(claimNo), "Claim No cannot be empty");
 
-            return _db.ClaimsReserved.Where(x => x.ClaimNo == claimNo).SingleOrDefaultAsync();
+            return _db.ClaimsReserved.FirstOrDefaultAsync(x => x.ClaimNo == claimNo);
         }
 
         public async Task<Claim> ClaimCreateAsync(CreateNewClaimRequest claimDto)
@@ -55,11 +55,11 @@ namespace Universal.Api.Data.Repositories
 
             var claim = new Claim
             {
-                ClaimNo = GetNextAutoNumber("CLAIM", policy.SubRiskID, policy.BranchID),
+                ClaimNo = GetNextAutoNumber("CLAIM", BRANCH_ID, policy.SubRiskID),
                 BranchID = policy.BranchID,
                 PolicyNo = claimDto.PolicyNo,
                 SubRiskID = policy.SubRiskID,
-                SubRisk = policy.SubRisk,
+                SubRisk = policy.SubRiskName,
                 PartyID = policy.PartyID,
                 Party = policy.Party,
                 //refDNCNNo = claimDto.debitNoteNo, //TODO

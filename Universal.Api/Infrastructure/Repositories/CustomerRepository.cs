@@ -12,10 +12,10 @@ namespace Universal.Api.Data.Repositories
     {
         public Task<InsuredClient> CustomerSelectThisAsync(string appId, string customerId, string password)
         {
-            return _db.InsuredClients
-                      .Where(x => (x.InsuredID == customerId || x.Email == customerId)
+            return _db.InsuredClients.FirstOrDefaultAsync(x => 
+                                  (x.InsuredID == customerId || x.Email == customerId)
                                 && x.ApiPassword == password
-                                && x.SubmittedBy == $"{SUBMITTED_BY}/{appId}").SingleOrDefaultAsync();
+                                && x.SubmittedBy == $"{SUBMITTED_BY}/{appId}");
         }
 
         public Task<InsuredClient> CustomerSelectThisAsync(string email, string mobile)
@@ -23,11 +23,11 @@ namespace Universal.Api.Data.Repositories
             var query = _db.InsuredClients.AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(email))
-                return query.Where(x => x.Email == email).FirstOrDefaultAsync();
+                return query.FirstOrDefaultAsync(x => x.Email == email);
 
             if (!string.IsNullOrWhiteSpace(mobile))
-                return query.Where(x => x.MobilePhone == mobile || 
-                                        x.LandPhone   == mobile).FirstOrDefaultAsync();
+                return query.FirstOrDefaultAsync(x => x.MobilePhone == mobile || 
+                                                      x.LandPhone   == mobile);
 
             throw new ArgumentException("Please enter a valid email or phone number");
         }
@@ -37,13 +37,14 @@ namespace Universal.Api.Data.Repositories
             if (string.IsNullOrWhiteSpace(customerId))
                 throw new ArgumentNullException(nameof(customerId));
 
-            if (customerId.IsNumeric())
-                return _db.InsuredClients.Where(x => x.MobilePhone == customerId).SingleOrDefaultAsync();
-
             if (customerId.IsValidEmail())
-                return _db.InsuredClients.Where(x => x.Email == customerId).SingleOrDefaultAsync();
+                return _db.InsuredClients.FirstOrDefaultAsync(x => x.Email == customerId);
 
-            return _db.InsuredClients.Where(x => x.InsuredID == customerId).SingleOrDefaultAsync();
+            if (customerId.IsNumeric())
+                return _db.InsuredClients.FirstOrDefaultAsync(x => x.MobilePhone == customerId 
+                                                                || x.InsuredID   == customerId);
+
+            return _db.InsuredClients.FirstOrDefaultAsync(x => x.InsuredID == customerId);
         }
 
         public async Task<InsuredClient> CustomerGetOrAddAsync<T>(CreateNew<T> newPolicyDto) 
@@ -69,13 +70,9 @@ namespace Universal.Api.Data.Repositories
             //if (duplicate != null)
             //    throw new ArgumentException("Customer already exists with this email or phone number");
 
-            var branch = await BranchSelectThisAsync(_authContext.User.AppId);
-            if (branch is null)
-                throw new ArgumentOutOfRangeException($"No BranchId for [{_authContext.User.AppId}]");
-
             var newInsured = new InsuredClient
             {
-                InsuredID = GetNextAutoNumber("INSURED", branch.BranchID),
+                InsuredID = GetNextAutoNumber("INSURED", BRANCH_ID),
 
                 Address = newCustomerDto.Address,
                 Email = newCustomerDto.Email,

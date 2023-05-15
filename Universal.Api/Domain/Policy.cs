@@ -24,7 +24,8 @@ namespace Universal.Api.Models
 
         public string SubRiskID { get; set; }
 
-        public string SubRisk { get; set; }
+        [Column("SubRisk")]
+        public string SubRiskName { get; set; }
 
         public string PartyID { get; set; }
 
@@ -103,6 +104,14 @@ namespace Universal.Api.Models
         public string Leader { get; set; }
 
 
+
+        public string Z_NAICOM_UID { get; set; }
+        //public string Z_NAICOM_STATUS { get; set; }
+        //public DateTime? Z_NAICOM_SENT_ON { get; set; }
+        //public string Z_NAICOM_ERROR { get; set; }
+        //public string Z_NAICOM_JSON { get; set; }
+
+
         public virtual List<PolicyDetail> PolicyDetails { get; set; }
 
         public string InsFullname
@@ -112,5 +121,12 @@ namespace Universal.Api.Models
                 return $"{InsSurname} {InsFirstname} {InsOthernames}".Trim();
             }
         }
+
+
+       
+        [NotMapped]
+        public DNCNNote DebitNote { get; set; }
+        [NotMapped]
+        public SubRisk SubRisk { get; set; }
     }
 }

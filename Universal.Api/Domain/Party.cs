@@ -14,6 +14,9 @@ namespace Universal.Api.Models
         [Column("Party")]
         public string PartyName { get; set; }
 
+        public string FirstName { get; set; }
+        public string OtherName { get; set; }
+
         public string Description { get; set; }
 
         public string PartyType { get; set; }

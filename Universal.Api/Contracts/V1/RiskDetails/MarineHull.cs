@@ -4,14 +4,6 @@ namespace Universal.Api.Contracts.V1.RiskDetails
 {
     public class PolicyAsMarineHull : RiskDetail
     {
-        //public PolicyAsMarineHull()
-        //{
-
-        //}
-        public PolicyAsMarineHull(PolicyDetail pd) : base(pd)
-        {
-        }
-
         public string VesselStateId { get; set; }
         public string VesselName { get; set; }
         public string VesselTonne { get; set; }

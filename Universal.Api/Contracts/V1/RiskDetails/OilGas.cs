@@ -4,14 +4,6 @@ namespace Universal.Api.Contracts.V1.RiskDetails
 {
     public class PolicyAsOilGas : RiskDetail
     {
-        //public PolicyAsOilGas()
-        //{
-
-        //}
-        public PolicyAsOilGas(PolicyDetail pd) : base(pd)
-        {
-        }
-
         public string ProjectPeriodFrom { get; set; }
         public string ProjectPeriodTo { get; set; }
         public decimal InterestCover { get; set; }

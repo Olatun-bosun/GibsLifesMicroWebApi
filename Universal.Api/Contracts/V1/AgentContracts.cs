@@ -39,8 +39,8 @@ namespace Universal.Api.Contracts.V1
 
             //split into 3
             LastName = party.PartyName;
-            FirstName = party.PartyName;
-            OtherName = party.PartyName;
+            FirstName = party.FirstName;
+            OtherName = party.OtherName;
 
             //Gender = party.Gender;
             Email = party.Email;
