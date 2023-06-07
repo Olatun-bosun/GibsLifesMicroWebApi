@@ -10,7 +10,7 @@ namespace Universal.Api.Data.Repositories
 {
     public partial class Repository
     {
-        public Task<Party> PartySelectThisAsync(string appId, string agentId, string password)
+        public Task<Party> PartyLoginAsync(string appId, string agentId, string password)
         {
             return _db.Parties.FirstOrDefaultAsync(x => 
                                   (x.PartyID == agentId || x.Email == agentId)
@@ -20,11 +20,15 @@ namespace Universal.Api.Data.Repositories
 
         public Task<Party> PartySelectThisAsync(string agentId)
         {
+            string appId = _authContext.User.AppId;
+
             if (string.IsNullOrWhiteSpace(agentId))
                 throw new ArgumentNullException("Agent ID cannot be empty", "AgentID");
 
-            return _db.Parties.FirstOrDefaultAsync(x => x.PartyID == agentId || 
-                                                        x.Email   == agentId);
+            return _db.Parties.Where(x => x.PartyID == agentId || 
+                                          x.Email   == agentId)
+                              .Where(x => x.SubmittedBy == $"{SUBMITTED_BY}/{appId}")
+                              .FirstOrDefaultAsync();
         }
 
         public Task<List<Party>> PartySelectAsync(FilterPaging filter)
@@ -45,10 +49,14 @@ namespace Universal.Api.Data.Repositories
 
         public async Task<Party> PartyCreateAsync(CreateNewAgentRequest dto)
         {
+            string appId = _authContext.User.AppId;
+
             //check for duplicate
-            var existing = await _db.Parties.FirstOrDefaultAsync(x => x.ApiId.Contains(dto.Email) ||
-                                                                      x.Email       == dto.Email  ||
-                                                                      x.mobilePhone == dto.PhoneLine1);
+            var existing = await _db.Parties.Where(x => x.ApiId.Contains(dto.Email) ||
+                                                        x.Email       == dto.Email  ||
+                                                        x.mobilePhone == dto.PhoneLine1)
+                                            .Where(x => x.SubmittedBy == $"{SUBMITTED_BY}/{appId}")
+                                            .FirstOrDefaultAsync();
             if (existing != null)
                 throw new ArgumentException($"Duplicate agent found. ID={existing.PartyID} {existing.Email}, {existing.mobilePhone}");
 
@@ -69,7 +77,7 @@ namespace Universal.Api.Data.Repositories
                 InsContact = null,
                 FinContact = null,
                 //Remarks = newAgentDto.Remarks,
-                SubmittedBy = $"{SUBMITTED_BY}/{_authContext.User.AppId}",
+                SubmittedBy = $"{SUBMITTED_BY}/{appId}",
                 SubmittedOn = DateTime.Now,
                 Active = 0,
                 Deleted = 0,

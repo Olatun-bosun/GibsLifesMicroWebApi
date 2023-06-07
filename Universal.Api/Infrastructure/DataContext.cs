@@ -19,6 +19,7 @@ namespace Universal.Api.Data
                     .IsRequired(false);
         }
 
+        public DbSet<AuditLog> AuditLogs { get; set; }
         public DbSet<Document> Documents { get; set; }
         public DbSet<ApiUser> OpenApiUsers { get; set; }
         public DbSet<AutoNumber> AutoNumbers { get; set; }

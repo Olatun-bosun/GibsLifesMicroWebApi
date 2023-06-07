@@ -214,7 +214,7 @@ namespace Universal.Api.Data.Repositories
             pd.ExRate = policy.ExRate;
 
             pd.EndorsementNo = endorseNo;
-            //pd.CertOrDocNo = CertificateNo;
+            pd.CertOrDocNo = detailDto.CertificateNo; 
             pd.EntryDate = policy.TransDate;
             pd.BizOption = "NEW";
             pd.InsuredName = policy.InsFullname;

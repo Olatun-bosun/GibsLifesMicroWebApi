@@ -1,6 +1,9 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Universal.Api.Contracts.V1;
+using Universal.Api.Models;
 
 namespace Universal.Api.Data.Repositories
 {
@@ -27,6 +30,22 @@ namespace Universal.Api.Data.Repositories
         public Task<int> SaveChangesAsync()
         {
             return _db.SaveChangesAsync();
+        }
+
+        public AuditLog AuditLogCreateAsync(string logType, string source, string categories, string logDetails)
+        {        
+            var log = new AuditLog()
+            {
+                LogType = logType,
+                Source = source,
+                Category = categories,
+                Description = logDetails,
+                SubmittedBy = $"{SUBMITTED_BY}/{_authContext.User.AppId}",
+                SubmittedOn = DateTime.Now,
+            };
+
+            _db.AuditLogs.Add(log);
+            return log;
         }
     }
 }

@@ -31,7 +31,7 @@ namespace Universal.Api.Controllers
 
             try
             {
-                var party = await _repository.PartySelectThisAsync(login.AppID, login.AgentID, login.Password);
+                var party = await _repository.PartyLoginAsync(login.AppID, login.AgentID, login.Password);
 
                 if (party is null)
                     return NotFound("AgentID or Password is incorrect");

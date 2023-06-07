@@ -7,6 +7,9 @@ using Universal.Api.Controllers;
 using Universal.Api.Data.Repositories;
 using Universal.Api.Data;
 using Universal.Api.Contracts.V1.RiskDetails;
+using Naicom.ApiV1;
+using System.Net.Mail;
+using System.Text.RegularExpressions;
 
 namespace Universal.Api.Contracts.V1
 {
@@ -228,7 +231,6 @@ namespace Universal.Api.Contracts.V1
                 await _repository.SaveChangesAsync();
 
                 // where T is Motor/Marine send to NIID & NAICOM
-                // 
 
                 var naicomClient = new NaicomService(_repository);
                 var result = await naicomClient.PublishAndSaveNaicomID(policy);
@@ -236,6 +238,9 @@ namespace Universal.Api.Contracts.V1
                 //save naicom status
                 _repository.SaveNaicomStatus(policy, result);
                 await _repository.SaveChangesAsync();
+
+                var niidClient = new NiidService(_repository);
+                await niidClient.PublishAndSaveNIID(policy);
 
 
                 var uri = new Uri($"{Request.Path}/{policy.PolicyNo}", UriKind.Relative);

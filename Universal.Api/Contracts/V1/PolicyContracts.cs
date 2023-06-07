@@ -35,6 +35,8 @@ namespace Universal.Api.Contracts.V1
     public abstract class RiskDetail
     {
         [Required]
+        public string CertificateNo { get; set; }
+        [Required]
         public decimal SectionSumInsured { get; set; }
         [Required]
         public decimal SectionPremium { get; set; }
