@@ -27,7 +27,7 @@ namespace Universal.Api.Data.Repositories
 
             return _db.Parties.Where(x => x.PartyID == agentId || 
                                           x.Email   == agentId)
-                              .Where(x => x.SubmittedBy == $"{SUBMITTED_BY}/{appId}")
+                              //.Where(x => x.SubmittedBy == $"{SUBMITTED_BY}/{appId}")
                               .FirstOrDefaultAsync();
         }
 

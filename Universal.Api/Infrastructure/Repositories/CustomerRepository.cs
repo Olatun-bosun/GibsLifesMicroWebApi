@@ -50,10 +50,13 @@ namespace Universal.Api.Data.Repositories
         public async Task<InsuredClient> CustomerGetOrAddAsync<T>(CreateNew<T> newPolicyDto) 
             where T : RiskDetail
         {
-            var insured = await CustomerSelectThisAsync(newPolicyDto.CustomerID);
+            if (!string.IsNullOrWhiteSpace(newPolicyDto.CustomerID))
+            {
+                var insured = await CustomerSelectThisAsync(newPolicyDto.CustomerID);
 
-            if (insured != null)
-                return insured;
+                if (insured != null)
+                    return insured;
+            }
 
             if (newPolicyDto.Insured != null)
                 return await CustomerCreate(newPolicyDto.Insured);

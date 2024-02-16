@@ -39,7 +39,7 @@
 
   <ItemGroup>
     <Reference Include="Naicom.Library.NetFx">
-      <HintPath>..\..\..\Gibs\Naicom.Library.NetFx\bin\Debug\Naicom.Library.NetFx.dll</HintPath>
+      <HintPath>..\..\..\Gibs\Gibs.Naicom.Library.NetFx\bin\Debug\Naicom.Library.NetFx.dll</HintPath>
     </Reference>
   </ItemGroup>
 

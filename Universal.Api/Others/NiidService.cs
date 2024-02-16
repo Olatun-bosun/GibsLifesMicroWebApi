@@ -189,7 +189,7 @@ namespace Universal.Api
                 default:
                     break;
             }
-
+            sec.Field27 = result;
             _repository.AuditLogCreateAsync("NIID_ALERT", sec.Policy.PolicyNo, sec.Field19, result);
         }
 
