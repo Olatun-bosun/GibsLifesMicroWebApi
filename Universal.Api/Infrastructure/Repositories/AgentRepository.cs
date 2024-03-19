@@ -10,7 +10,7 @@ namespace Universal.Api.Data.Repositories
 {
     public partial class Repository
     {
-        public Task<Party> PartyLoginAsync(string appId, string agentId, string password)
+        public Task<Party?> PartyLoginAsync(string appId, string agentId, string password)
         {
             return _db.Parties.FirstOrDefaultAsync(x => 
                                   (x.PartyID == agentId || x.Email == agentId)
@@ -18,12 +18,12 @@ namespace Universal.Api.Data.Repositories
                                 && x.SubmittedBy == $"{SUBMITTED_BY}/{appId}");
         }
 
-        public Task<Party> PartySelectThisAsync(string agentId)
+        public Task<Party?> PartySelectThisAsync(string agentId)
         {
             string appId = _authContext.User.AppId;
 
             if (string.IsNullOrWhiteSpace(agentId))
-                throw new ArgumentNullException("Agent ID cannot be empty", "AgentID");
+                throw new ArgumentNullException(nameof(agentId), "Agent ID cannot be empty");
 
             return _db.Parties.Where(x => x.PartyID == agentId || 
                                           x.Email   == agentId)
@@ -90,5 +90,24 @@ namespace Universal.Api.Data.Repositories
             _db.Parties.Add(party);
             return party;
         }
+
+        public async Task<Party?> PartyDeleteAsync(string agentId)
+        {
+            string appId = _authContext.User.AppId;
+
+            if (string.IsNullOrWhiteSpace(agentId))
+                throw new ArgumentNullException(nameof(agentId), "Agent ID cannot be empty");
+
+            var party = await _db.Parties.Where(x => x.PartyID == agentId ||
+                                                     x.Email   == agentId)
+                              //.Where(x => x.SubmittedBy == $"{SUBMITTED_BY}/{appId}")
+                              .FirstOrDefaultAsync();
+            if (party == null)
+                return null;
+
+            _db.Parties.Remove(party);
+            return party;
+        }
+
     }
 }

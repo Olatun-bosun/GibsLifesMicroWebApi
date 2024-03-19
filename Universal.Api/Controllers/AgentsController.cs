@@ -119,5 +119,24 @@ namespace Universal.Api.Controllers
                 return ExceptionResult(ex);
             }
         }
+
+
+        [HttpDelete("{agentId}")]
+        public async Task<ActionResult> DeleteAgent(string agentId)
+        {
+            try
+            {
+                var agent = await _repository.PartyDeleteAsync(agentId);
+
+                if (agent is null)
+                    return NotFound();
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return ExceptionResult(ex);
+            }
+        }
     }
 }
