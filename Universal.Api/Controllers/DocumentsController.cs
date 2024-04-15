@@ -5,10 +5,10 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authorization;
-using Universal.Api.Data.Repositories;
-using Universal.Api.Data;
+using GibsLifesMicroWebApi.Data.Repositories;
+using GibsLifesMicroWebApi.Data;
 
-namespace Universal.Api.Controllers
+namespace GibsLifesMicroWebApi.Controllers
 {
     [Authorize(Roles = "APP,AGENT,CUST")]
     public class DocumentsController : SecureControllerBase

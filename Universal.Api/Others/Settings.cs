@@ -1,4 +1,4 @@
-﻿namespace Universal.Api
+﻿namespace GibsLifesMicroWebApi
 {
     public class Settings
     {

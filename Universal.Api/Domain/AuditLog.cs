@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace Universal.Api.Models
+namespace GibsLifesMicroWebApi.Models
 {
     public class AuditLog
     {

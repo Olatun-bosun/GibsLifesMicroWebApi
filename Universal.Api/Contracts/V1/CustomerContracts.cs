@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace Universal.Api.Contracts.V1
+namespace GibsLifesMicroWebApi.Contracts.V1
 {
     public class CreateNewCustomerRequest : PersonRequest
     {

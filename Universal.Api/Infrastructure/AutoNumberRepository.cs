@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
-using Universal.Api.Models;
+using GibsLifesMicroWebApi.Models;
 
-namespace Universal.Api.Data.Repositories
+namespace GibsLifesMicroWebApi.Data.Repositories
 {
     public partial class Repository
     {

@@ -3,10 +3,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
-using Universal.Api.Models;
-using Universal.Api.Contracts.V1;
+using GibsLifesMicroWebApi.Models;
+using GibsLifesMicroWebApi.Contracts.V1;
 
-namespace Universal.Api.Data.Repositories
+namespace GibsLifesMicroWebApi.Data.Repositories
 {
     public partial class Repository
     {
@@ -20,6 +20,8 @@ namespace Universal.Api.Data.Repositories
 
         public Task<SubRisk> ProductSelectThisAsync(string productId)
         {
+          
+
             if (string.IsNullOrWhiteSpace(productId))
                 throw new ArgumentNullException(nameof(productId));
 

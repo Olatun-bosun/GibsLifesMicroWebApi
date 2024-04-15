@@ -1,21 +1,21 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Universal.Api.Models
+namespace GibsLifesMicroWebApi.Models
 {
     public class Party
     {
         public string PartyID { get; set; }
-        public string ApiId { get; set; }
-        public string ApiPassword { get; set; }
+        //public string ApiId { get; set; }
+        //public string ApiPassword { get; set; }
 
         public string StateID { get; set; }
 
         [Column("Party")]
         public string PartyName { get; set; }
 
-        public string FirstName { get; set; }
-        public string OtherName { get; set; }
+        //public string FirstName { get; set; }
+        //public string OtherName { get; set; }
 
         public string Description { get; set; }
 
@@ -40,7 +40,7 @@ namespace Universal.Api.Models
         public decimal? ComRate { get; set; }
 
         public string Remarks { get; set; }
-        public string ApiStatus { get; set; }
+        //public string ApiStatus { get; set; }
 
         public byte? Deleted { get; set; }
 

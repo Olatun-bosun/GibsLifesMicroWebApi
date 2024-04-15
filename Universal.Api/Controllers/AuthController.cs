@@ -2,11 +2,11 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using Universal.Api.Data.Repositories;
-using Universal.Api.Contracts.V1;
-using Universal.Api.Data;
+using GibsLifesMicroWebApi.Data.Repositories;
+using GibsLifesMicroWebApi.Contracts.V1;
+using GibsLifesMicroWebApi.Data;
 
-namespace Universal.Api.Controllers
+namespace GibsLifesMicroWebApi.Controllers
 {
     public class AuthController : SecureControllerBase
     {

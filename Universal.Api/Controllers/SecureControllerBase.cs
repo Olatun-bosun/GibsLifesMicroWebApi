@@ -5,10 +5,10 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Mvc;
-using Universal.Api.Data.Repositories;
-using Universal.Api.Data;
+using GibsLifesMicroWebApi.Data.Repositories;
+using GibsLifesMicroWebApi.Data;
 
-namespace Universal.Api.Controllers
+namespace GibsLifesMicroWebApi.Controllers
 {
     [ApiController]
     [ValidateModel]

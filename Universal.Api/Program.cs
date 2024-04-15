@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 
-namespace Universal.Api
+namespace GibsLifesMicroWebApi
 {
     public class Program
     {

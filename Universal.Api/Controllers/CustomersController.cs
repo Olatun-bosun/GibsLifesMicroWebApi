@@ -4,11 +4,11 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using Universal.Api.Contracts.V1;
-using Universal.Api.Data.Repositories;
-using Universal.Api.Data;
+using GibsLifesMicroWebApi.Contracts.V1;
+using GibsLifesMicroWebApi.Data.Repositories;
+using GibsLifesMicroWebApi.Data;
 
-namespace Universal.Api.Controllers
+namespace GibsLifesMicroWebApi.Controllers
 {
     [Authorize(Roles = "APP,AGENT")]
     public class CustomersController : SecureControllerBase
@@ -23,41 +23,41 @@ namespace Universal.Api.Controllers
         /// Customers should Login using this endpoint. It creates a JWT Token that can be used to access secured endpoints of the API.
         /// </summary>
         /// <returns>A JWT Token and it's expiry time.</returns>
-        [HttpPost("Login"), AllowAnonymous]
-        public async Task<ActionResult<LoginResult>> CustomerLogin(CustomerLoginRequest login)
-        {
-            if (login is null)
-                return BadRequest("Request body is null");
+        //[HttpPost("Login"), AllowAnonymous]
+        //public async Task<ActionResult<LoginResult>> CustomerLogin(CustomerLoginRequest login)
+        //{
+        //    if (login is null)
+        //        return BadRequest("Request body is null");
 
-            try
-            {
-                var insured = await _repository.CustomerSelectThisAsync(login.AppID, login.CustomerID, login.Password);
+        //    try
+        //    {
+        //        var insured = await _repository.CustomerSelectThisAsync(login.AppID, login.CustomerID, login.Password);
 
-                if (insured is null)
-                    return NotFound("ID or Password is incorrect");
+        //        if (insured is null)
+        //            return NotFound("ID or Password is incorrect");
 
-                else if (insured.ApiStatus != "ENABLED")
-                    return Unauthorized("This Customer has not been activated");
+        //        else if (insured.ApiStatus != "ENABLED")
+        //            return Unauthorized("This Customer has not been activated");
 
-                string token = CreateToken(_settings.JwtSecret,
-                                           _settings.JwtExpiresIn,
-                                           login.AppID, 
-                                           login.CustomerID, 
-                                           insured.InsuredID, "CUST");
-                var response = new LoginResult
-                {
-                    TokenType = "Bearer",
-                    ExpiresIn = _settings.JwtExpiresIn,
-                    AccessToken = token
-                };
+        //        string token = CreateToken(_settings.JwtSecret,
+        //                                   _settings.JwtExpiresIn,
+        //                                   login.AppID, 
+        //                                   login.CustomerID, 
+        //                                   insured.InsuredID, "CUST");
+        //        var response = new LoginResult
+        //        {
+        //            TokenType = "Bearer",
+        //            ExpiresIn = _settings.JwtExpiresIn,
+        //            AccessToken = token
+        //        };
 
-                return Ok(response);
-            }
-            catch (Exception ex)
-            {
-                return ExceptionResult(ex);
-            }
-        }
+        //        return Ok(response);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return ExceptionResult(ex);
+        //    }
+        //}
 
         /// <summary>
         /// Fetch a collection of Customers.
@@ -83,16 +83,16 @@ namespace Universal.Api.Controllers
         /// <param name="customerId">Email, Phone or Id of the Customer to get.</param>
         /// <returns>The Customer with the Email, Phone or Id supplied.</returns>
         [HttpGet("{customerId}")]
-        public async Task<ActionResult<CustomerResult>> GetCustomer(string customerId)
+        public async Task<ActionResult> GetCustomer(string customerId)
         {
             try
             {
                 var customer = await _repository.CustomerSelectThisAsync(customerId);
 
-                if (customer is null)
+                if (customerId is null)
                     return NotFound();
 
-                return Ok(new CustomerResult(customer));
+                return Ok( customer);
             }
             catch (Exception ex)
             {
@@ -133,7 +133,7 @@ namespace Universal.Api.Controllers
                 var customer = await _repository.CustomerCreate(request);
                 await _repository.SaveChangesAsync();
 
-                var uri = new Uri($"{Request.Path}/{customer.ApiId}", UriKind.Relative);
+                var uri = new Uri($"{Request.Path}/{customer.InsuredID}", UriKind.Relative);
                 return Created(uri, new CustomerResult(customer));
             }
             catch (Exception ex)

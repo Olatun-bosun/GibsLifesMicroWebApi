@@ -11,14 +11,14 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Universal.Api.Data;
-using Universal.Api.Data.Repositories;
+using GibsLifesMicroWebApi.Data;
+using GibsLifesMicroWebApi.Data.Repositories;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Universal.Api
+namespace GibsLifesMicroWebApi
 {
     public class EnumStringConverter : JsonConverter<object>
     {
@@ -192,7 +192,7 @@ namespace Universal.Api
 
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Universal.Api V1");
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "GibsLifesMicroWebApi V1");
                 c.RoutePrefix = string.Empty;
             });
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Universal.Api.Models
+namespace GibsLifesMicroWebApi.Models
 {
     public class Policy
     {
@@ -105,7 +105,7 @@ namespace Universal.Api.Models
 
 
 
-        public string Z_NAICOM_UID { get; set; }
+        //public string Z_NAICOM_UID { get; set; }
         //public string Z_NAICOM_STATUS { get; set; }
         //public DateTime? Z_NAICOM_SENT_ON { get; set; }
         //public string Z_NAICOM_ERROR { get; set; }

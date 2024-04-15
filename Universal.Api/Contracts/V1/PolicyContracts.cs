@@ -2,9 +2,9 @@
 using System.Linq;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using Universal.Api.Models;
+using GibsLifesMicroWebApi.Models;
 
-namespace Universal.Api.Contracts.V1
+namespace GibsLifesMicroWebApi.Contracts.V1
 {
     public class CreateNew<T> where T : RiskDetail
     {
@@ -13,7 +13,7 @@ namespace Universal.Api.Contracts.V1
         public string AgentID { get; set; }
         //[Required]
         public string CustomerID { get; set; }
-        [Required]
+        //[Required]
         public string ProductID { get; set; }
         [Required]
         public DateTime EntryDate { get; set; }
@@ -60,7 +60,7 @@ namespace Universal.Api.Contracts.V1
                 CustomerID = p.InsuredID;
                 ProductID = p.SubRiskID;
                 //ProductClass = policy.
-                NaicomID = p.Z_NAICOM_UID;
+                //NaicomID = p.Z_NAICOM_UID;
                 EntryDate = p.TransDate.Value;
                 StartDate = p.StartDate.Value;
                 EndDate = p.EndDate.Value;
@@ -72,7 +72,7 @@ namespace Universal.Api.Contracts.V1
                 CustomerID = dn.InsuredID;
                 ProductID = dn.SubRiskID;
                 //ProductClass = policy.
-                NaicomID = dn.Z_NAICOM_UID;
+                //NaicomID = dn.Z_NAICOM_UID;
                 EntryDate = dn.BillingDate.Value;
                 StartDate = dn.StartDate.Value;
                 EndDate = dn.EndDate.Value;

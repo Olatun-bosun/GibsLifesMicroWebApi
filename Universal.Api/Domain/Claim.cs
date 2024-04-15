@@ -1,12 +1,14 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Universal.Api.Models
+namespace GibsLifesMicroWebApi.Models
 {
     public class Claim
     {
         [Key]
         public string ClaimNo { get; set; }
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long ClaimReservedID { get; set; }
         public string BranchID { get; set; }
         public DateTime? EntryDate { get; set; }
@@ -46,11 +48,11 @@ namespace Universal.Api.Models
         public decimal? AmtReserved { get; set; }
         public decimal? AmtPaid { get; set; }
 
-        public double? ExRate { get; set; }
+        //public double? ExRate { get; set; }
 
-        public string ExCurrency { get; set; }
+        //public string ExCurrency { get; set; }
 
-        public decimal? ClaimReservedFrgn { get; set; }
+        //public decimal? ClaimReservedFrgn { get; set; }
         public long? DetailID { get; set; }
         public byte? Approval { get; set; }
         public byte? Deleted { get; set; }

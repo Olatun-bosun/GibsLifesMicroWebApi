@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Universal.Api.Models
+namespace GibsLifesMicroWebApi.Models
 {
     public class PolicyAutoNumber
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace Universal.Api.Models
+namespace GibsLifesMicroWebApi.Models
 {
     public class DNCNNote
     {
@@ -120,9 +120,9 @@ namespace Universal.Api.Models
 
         public byte? Deleted { get; set; }
 
-        public string DeletedBy { get; set; }
+        //public string DeletedBy { get; set; }
 
-        public DateTime? DeletedOn { get; set; }
+        //public DateTime? DeletedOn { get; set; }
 
         public byte? Active { get; set; }
 
@@ -156,11 +156,11 @@ namespace Universal.Api.Models
 
         //public DateTime? CRRefDate { get; set; }
 
-        public string MktUnitID { get; set; }
+        //public string MktUnitID { get; set; }
 
-        public string mktUnit { get; set; }
+        //public string mktUnit { get; set; }
 
-        public string CoverType { get; set; }
+        //public string CoverType { get; set; }
 
         //public Decimal? A1 { get; set; }
 
@@ -187,10 +187,10 @@ namespace Universal.Api.Models
         //public DateTime? ExtraDate2 { get; set; }
 
 
-        public string Z_NAICOM_UID { get; set; }
-        public string Z_NAICOM_STATUS { get; set; }
-        public DateTime? Z_NAICOM_SENT_ON { get; set; }
-        public string Z_NAICOM_ERROR { get; set; }
-        public string Z_NAICOM_JSON { get; set; }
+        //public string Z_NAICOM_UID { get; set; }
+        //public string Z_NAICOM_STATUS { get; set; }
+        //public DateTime? Z_NAICOM_SENT_ON { get; set; }
+        //public string Z_NAICOM_ERROR { get; set; }
+        //public string Z_NAICOM_JSON { get; set; }
     }
 }

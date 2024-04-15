@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace Universal.Api.Controllers
+namespace GibsLifesMicroWebApi.Controllers
 {
     public class ValidateModelAttribute : ActionFilterAttribute
     {

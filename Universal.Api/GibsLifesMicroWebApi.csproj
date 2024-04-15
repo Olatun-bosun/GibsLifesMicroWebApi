@@ -48,7 +48,10 @@
 
   <ItemGroup>
     <Reference Include="Naicom.Library.NetFx">
-      <HintPath>..\..\..\Gibs\Gibs.Naicom.Library.NetFx\bin\Debug\Naicom.Library.NetFx.dll</HintPath>
+      <HintPath>..\..\..\Documents\Naicom.Library.NetFx.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\..\Documents\Newtonsoft.Json.dll</HintPath>
     </Reference>
   </ItemGroup>
 

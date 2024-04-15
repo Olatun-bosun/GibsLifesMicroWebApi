@@ -17,7 +17,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "Universal.Api": {
+    "GibsLifesMicroWebApi": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "index.html",

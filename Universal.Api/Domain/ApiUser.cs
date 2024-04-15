@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Universal.Api.Data
+namespace GibsLifesMicroWebApi.Data
 {
     [Table("Webservice_ID")]
     public class ApiUser

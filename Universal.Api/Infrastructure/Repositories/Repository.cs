@@ -2,10 +2,10 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Universal.Api.Contracts.V1;
-using Universal.Api.Models;
+using GibsLifesMicroWebApi.Contracts.V1;
+using GibsLifesMicroWebApi.Models;
 
-namespace Universal.Api.Data.Repositories
+namespace GibsLifesMicroWebApi.Data.Repositories
 {
     public partial class Repository 
     {

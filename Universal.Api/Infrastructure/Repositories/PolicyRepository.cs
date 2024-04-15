@@ -3,10 +3,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
-using Universal.Api.Contracts.V1;
-using Universal.Api.Models;
+using GibsLifesMicroWebApi.Contracts.V1;
+using GibsLifesMicroWebApi.Models;
+using GibsLifesMicroWebApi.Domain;
 
-namespace Universal.Api.Data.Repositories
+namespace GibsLifesMicroWebApi.Data.Repositories
 {
     public partial class Repository
     {
@@ -79,8 +80,8 @@ namespace Universal.Api.Data.Repositories
             if (subRisk is null)
                 throw new ArgumentOutOfRangeException($"This ProductId [{newPolicyDto.ProductID}] does not exist");
 
-            var party = await PartySelectThisAsync(newPolicyDto.AgentID);
-            if (party is null)
+            var agents = await AgentSelectThisAsync(newPolicyDto.AgentID);
+            if (agents is null)
                 throw new ArgumentOutOfRangeException($"This AgentId [{newPolicyDto.AgentID}] does not exist");
 
             var branch = await BranchSelectThisAsync(_authContext.User.AppId);
@@ -88,7 +89,7 @@ namespace Universal.Api.Data.Repositories
                 throw new ArgumentOutOfRangeException($"No BranchId for [{_authContext.User.AppId}]");
 
             // create the policy
-            var policy = CreateNewPolicy(newPolicyDto, insured, branch, party, subRisk);
+            var policy = CreateNewPolicy(newPolicyDto, insured, branch, agents, subRisk);
             _db.Policies.Add(policy);
 
             policy.PolicyDetails = new List<PolicyDetail>();
@@ -121,18 +122,18 @@ namespace Universal.Api.Data.Repositories
             return policy;
         }
 
-        public void SaveNaicomStatus(Policy policy, NaicomDetail naicom)
-        {
-            policy.Z_NAICOM_UID = naicom.UniqueID;
+        //public void SaveNaicomStatus(Policy policy, NaicomDetail naicom)
+        //{
+        //    policy.Z_NAICOM_UID = naicom.UniqueID;
 
-            policy.DebitNote.Z_NAICOM_UID = naicom.UniqueID;
-            policy.DebitNote.Z_NAICOM_STATUS = naicom.Status.ToString();
-            policy.DebitNote.Z_NAICOM_SENT_ON = naicom.SubmitDate;
-            policy.DebitNote.Z_NAICOM_ERROR = naicom.ErrorMessage;
-            policy.DebitNote.Z_NAICOM_JSON = naicom.JsonPayload;
-        }
+        //    policy.DebitNote.Z_NAICOM_UID = naicom.UniqueID;
+        //    policy.DebitNote.Z_NAICOM_STATUS = naicom.Status.ToString();
+        //    policy.DebitNote.Z_NAICOM_SENT_ON = naicom.SubmitDate;
+        //    policy.DebitNote.Z_NAICOM_ERROR = naicom.ErrorMessage;
+        //    policy.DebitNote.Z_NAICOM_JSON = naicom.JsonPayload;
+        //}
 
-        private Policy CreateNewPolicy<T>(CreateNew<T> newPolicyDto, InsuredClient insured, Branch branch, Party party, SubRisk subRisk)
+        private Policy CreateNewPolicy<T>(CreateNew<T> newPolicyDto, InsuredClient insured, Branch branch, Agents agents, SubRisk subRisk)
              where T : RiskDetail
         {
             if (newPolicyDto.StartDate >= newPolicyDto.EndDate)
@@ -162,8 +163,8 @@ namespace Universal.Api.Data.Repositories
                 EndDate = newPolicyDto.EndDate,
                 SubRiskID = subRisk.SubRiskID,
                 SubRiskName = subRisk.SubRiskName,
-                PartyID = party.PartyID,
-                Party = party.PartyName,
+                PartyID = agents.AgentID,
+                Party = agents.Agent,
                 BranchID = branch.BranchID,
                 Branch = branch.Description,
 
@@ -177,7 +178,7 @@ namespace Universal.Api.Data.Repositories
                 InsLandPhone = insured.LandPhone,
                 InsEmail = insured.Email,
                 InsOccupation = insured.Occupation,
-                InsFaxNo = insured.ApiId,
+                InsFaxNo = "0" /*insured.ApiId*/,
 
                 InsuredClient = insured, //hmmm
 
@@ -302,8 +303,8 @@ namespace Universal.Api.Data.Repositories
                 Deleted = policy.Deleted,
                 Active = policy.Active,
 
-                Z_NAICOM_UID = null,
-                Z_NAICOM_STATUS = "QUEUED",  // CIP -> PENDING, SENT, IGNORED, ARCHIVED
+                //Z_NAICOM_UID = null,
+                //Z_NAICOM_STATUS = "QUEUED",  // CIP -> PENDING, SENT, IGNORED, ARCHIVED
                 // Z_NAICOM_SENT_ON
                 // Z_NAICOM_ERROR
                 // Z_NAICOM_JSON

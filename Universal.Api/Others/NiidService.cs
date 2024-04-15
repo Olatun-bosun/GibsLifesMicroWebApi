@@ -1,10 +1,10 @@
 ﻿using NIID;
 using System;
 using System.Threading.Tasks;
-using Universal.Api.Data.Repositories;
-using Universal.Api.Models;
+using GibsLifesMicroWebApi.Data.Repositories;
+using GibsLifesMicroWebApi.Models;
 
-namespace Universal.Api
+namespace GibsLifesMicroWebApi
 {
     public class NiidService
     {

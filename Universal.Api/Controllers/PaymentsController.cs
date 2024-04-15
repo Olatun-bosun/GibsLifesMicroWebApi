@@ -2,10 +2,10 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using Universal.Api.Data.Repositories;
-using Universal.Api.Data;
+using GibsLifesMicroWebApi.Data.Repositories;
+using GibsLifesMicroWebApi.Data;
 
-namespace Universal.Api.Controllers
+namespace GibsLifesMicroWebApi.Controllers
 {
     [Authorize(Roles = "APP,AGENT")]
     public class PaymentsController : SecureControllerBase

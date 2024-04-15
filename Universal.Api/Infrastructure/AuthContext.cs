@@ -1,7 +1,7 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 
-namespace Universal.Api.Data
+namespace GibsLifesMicroWebApi.Data
 {
     public class AuthContext
     {

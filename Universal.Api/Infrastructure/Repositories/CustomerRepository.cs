@@ -3,10 +3,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
-using Universal.Api.Contracts.V1;
-using Universal.Api.Models;
+using GibsLifesMicroWebApi.Contracts.V1;
+using GibsLifesMicroWebApi.Models;
 
-namespace Universal.Api.Data.Repositories
+namespace GibsLifesMicroWebApi.Data.Repositories
 {
     public partial class Repository
     {
@@ -14,7 +14,7 @@ namespace Universal.Api.Data.Repositories
         {
             return _db.InsuredClients.FirstOrDefaultAsync(x => 
                                   (x.InsuredID == customerId || x.Email == customerId)
-                                && x.ApiPassword == password
+                                //&& x.ApiPassword == password
                                 && x.SubmittedBy == $"{SUBMITTED_BY}/{appId}");
         }
 
@@ -67,6 +67,11 @@ namespace Universal.Api.Data.Repositories
 
         public async Task<InsuredClient> CustomerCreate(CreateNewCustomerRequest newCustomerDto)
         {
+            //int incNumber = 500;
+            //++incNumber;
+
+            //string nyNumber = "S" + incNumber.ToString("00");
+
             ////check for duplicate
             //var duplicate = await CustomerSelectThisAsync(newCustomerDto.Email, newCustomerDto.PhoneLine1);
 
@@ -75,7 +80,7 @@ namespace Universal.Api.Data.Repositories
 
             var newInsured = new InsuredClient
             {
-                InsuredID = GetNextAutoNumber("INSURED", BRANCH_ID),
+                InsuredID = GetNextSerialNo("INSURED", BRANCH_ID).ToString(),
 
                 Address = newCustomerDto.Address,
                 Email = newCustomerDto.Email,
@@ -92,10 +97,10 @@ namespace Universal.Api.Data.Repositories
                 SubmittedOn = DateTime.Now,
                 Active = 1,
                 Deleted = 0,
-
-                ApiId = newCustomerDto.Email,
-                ApiPassword = newCustomerDto.Password,
-                ApiStatus = "ENABLED", 
+                TransID = true,
+                //ApiId = newCustomerDto.Email,
+                //ApiPassword = newCustomerDto.Password,
+                //ApiStatus = "ENABLED", 
             };
 
             _db.InsuredClients.Add(newInsured);

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using Universal.Api.Models;
+using GibsLifesMicroWebApi.Models;
 
-namespace Universal.Api.Contracts.V1.RiskDetails
+namespace GibsLifesMicroWebApi.Contracts.V1.RiskDetails
 {
     public class PolicyAsMotor : RiskDetail
     {

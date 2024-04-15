@@ -1,7 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Universal.Api.Models;
+using GibsLifesMicroWebApi.Models;
+using GibsLifesMicroWebApi.Domain;
 
-namespace Universal.Api.Data
+namespace GibsLifesMicroWebApi.Data
 {
     public class DataContext : DbContext
     {
@@ -31,5 +32,9 @@ namespace Universal.Api.Data
         public DbSet<DNCNNote> DNCNNotes { get; set; }
         public DbSet<PolicyDetail> PolicyDetails { get; set; }
         public DbSet<InsuredClient> InsuredClients { get; set; }
+        public DbSet<PolicyMaster> PolicyMaster { get; set; }
+        public DbSet<Agents> Agents { get; set; }
+
+
     }
 }

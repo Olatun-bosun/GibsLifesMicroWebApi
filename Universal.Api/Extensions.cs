@@ -2,7 +2,7 @@
 using System.IO;
 using System.Text.RegularExpressions;
 
-namespace Universal.Api
+namespace GibsLifesMicroWebApi
 {
     public static class Extensions
     {

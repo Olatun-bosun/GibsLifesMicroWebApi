@@ -3,10 +3,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
-using Universal.Api.Contracts.V1;
-using Universal.Api.Models;
+using GibsLifesMicroWebApi.Contracts.V1;
+using GibsLifesMicroWebApi.Models;
 
-namespace Universal.Api.Data.Repositories
+namespace GibsLifesMicroWebApi.Data.Repositories
 {
     public partial class Repository
     {
@@ -100,6 +100,7 @@ namespace Universal.Api.Data.Repositories
             };
 
             _db.ClaimsReserved.Add(claim);
+            _db.SaveChanges();
             return claim;
         }
     }

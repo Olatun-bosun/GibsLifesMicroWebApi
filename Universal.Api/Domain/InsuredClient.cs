@@ -1,14 +1,14 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace Universal.Api.Models
+namespace GibsLifesMicroWebApi.Models
 {
     public class InsuredClient
     {
         [Key]
         public string InsuredID { get; set; }
-        public string ApiId { get; set; }
-        public string ApiPassword { get; set; }
+        //public string ApiId { get; set; }
+        //public string ApiPassword { get; set; }
 
         public string Surname { get; set; }
 
@@ -25,7 +25,7 @@ namespace Universal.Api.Models
         public string LandPhone { get; set; }
 
         public string Email { get; set; }
-        public string ApiStatus { get; set; }
+        //public string ApiStatus { get; set; }
 
         public string Fax { get; set; }
 
@@ -41,5 +41,7 @@ namespace Universal.Api.Models
         public string ModifiedBy { get; set; }
 
         public DateTime? ModifiedOn { get; set; }
+
+        public bool TransID { get; set; }
     }
 }
