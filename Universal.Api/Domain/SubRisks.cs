@@ -4,22 +4,20 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GibsLifesMicroWebApi.Models
 {
-    public class SubRisk
+    public class SubRisks
     {
         [Key]
         public string SubRiskID { get; set; }
 
         public string RiskID { get; set; }
         [Column("SubRisk")]
-        public string SubRiskName { get; set; }
-
+        public string SubRisk { get; set; }
         public string Description { get; set; }
 
         public byte? Deleted { get; set; }
 
         public byte? Active { get; set; }
 
-        public string InsuranceTypeID { get; set; }
 
         public string SubmittedBy { get; set; }
 

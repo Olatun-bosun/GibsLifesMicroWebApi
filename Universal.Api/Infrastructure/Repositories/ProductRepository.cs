@@ -18,7 +18,7 @@ namespace GibsLifesMicroWebApi.Data.Repositories
             return _db.Branches.FirstOrDefaultAsync(x => x.StateID == appId);
         }
 
-        public Task<SubRisk> ProductSelectThisAsync(string productId)
+        public Task<SubRisks> ProductSelectThisAsync(string productId)
         {
           
 
@@ -28,7 +28,7 @@ namespace GibsLifesMicroWebApi.Data.Repositories
             return _db.SubRisks.FirstOrDefaultAsync(x => x.SubRiskID == productId);
         }
 
-        public Task<List<SubRisk>> ProductSelectAsync(FilterPaging filter)
+        public Task<List<SubRisks>> ProductSelectAsync(FilterPaging filter)
         {
             if (filter == null)
                 filter = new FilterPaging();
@@ -36,9 +36,9 @@ namespace GibsLifesMicroWebApi.Data.Repositories
             var query = _db.SubRisks.AsQueryable();
 
             foreach (string item in filter.SearchTextItems)
-                query = query.Where(x => x.SubRiskName.Contains(item)).AsQueryable();
+                query = query.Where(x => x.SubRisk.Contains(item)).AsQueryable();
 
-            return query.OrderBy(x => x.SubRiskName)
+            return query.OrderBy(x => x.SubRisk)
                         //.Skip(filter.SkipCount)
                         .Take(filter.PageSize)
                         .ToListAsync();

@@ -2,11 +2,11 @@
 {
     public class ProductResult
     {
-        public ProductResult(Models.SubRisk product)
+        public ProductResult(Models.SubRisks product)
         {
             RiskID = product.RiskID;
             ProductID = product.SubRiskID;
-            ProductName = product.SubRiskName;
+            ProductName = product.SubRisk;
             Description = product.Description;
 
             //MidRiskID = product.MidClassID;

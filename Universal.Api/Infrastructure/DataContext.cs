@@ -25,7 +25,7 @@ namespace GibsLifesMicroWebApi.Data
         public DbSet<ApiUser> OpenApiUsers { get; set; }
         public DbSet<AutoNumber> AutoNumbers { get; set; }
         public DbSet<Branch> Branches { get; set; }
-        public DbSet<SubRisk> SubRisks { get; set; }
+        public DbSet<SubRisks> SubRisks { get; set; }
         public DbSet<Policy> Policies { get; set; }
         public DbSet<Party> Parties { get; set; }
         public DbSet<Claim> ClaimsReserved { get; set; }

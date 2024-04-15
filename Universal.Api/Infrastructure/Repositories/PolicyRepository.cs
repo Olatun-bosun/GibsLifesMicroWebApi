@@ -133,7 +133,7 @@ namespace GibsLifesMicroWebApi.Data.Repositories
         //    policy.DebitNote.Z_NAICOM_JSON = naicom.JsonPayload;
         //}
 
-        private Policy CreateNewPolicy<T>(CreateNew<T> newPolicyDto, InsuredClient insured, Branch branch, Agents agents, SubRisk subRisk)
+        private Policy CreateNewPolicy<T>(CreateNew<T> newPolicyDto, InsuredClient insured, Branch branch, Agents agents, SubRisks subRisk)
              where T : RiskDetail
         {
             if (newPolicyDto.StartDate >= newPolicyDto.EndDate)
@@ -162,7 +162,7 @@ namespace GibsLifesMicroWebApi.Data.Repositories
                 StartDate = newPolicyDto.StartDate,
                 EndDate = newPolicyDto.EndDate,
                 SubRiskID = subRisk.SubRiskID,
-                SubRiskName = subRisk.SubRiskName,
+                SubRiskName = subRisk.SubRisk,
                 PartyID = agents.AgentID,
                 Party = agents.Agent,
                 BranchID = branch.BranchID,

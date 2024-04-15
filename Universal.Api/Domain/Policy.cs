@@ -127,6 +127,6 @@ namespace GibsLifesMicroWebApi.Models
         [NotMapped]
         public DNCNNote DebitNote { get; set; }
         [NotMapped]
-        public SubRisk SubRisk { get; set; }
+        public SubRisks SubRisk { get; set; }
     }
 }
