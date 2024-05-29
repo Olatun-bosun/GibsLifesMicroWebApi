@@ -200,7 +200,7 @@ namespace GibsLifesMicroWebApi
 
             app.UseAuthentication();
             app.UseAuthorization();
-
+            app.UseCorsMiddleware();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
